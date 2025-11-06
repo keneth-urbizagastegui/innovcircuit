@@ -1,0 +1,30 @@
+meta {
+  name: Editar Diseño (Proveedor)
+  type: http
+  seq: 13
+}
+
+put {
+  url: http://localhost:8080/api/v1/disenos/ID_DISENO
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: REEMPLAZAR_CON_TOKEN_PROVEEDOR
+}
+
+body:json {
+  {
+    "nombre": "Diseño Editado",
+    "categoriaId": 1,
+    "precio": 19.99,
+    "gratuito": false,
+    "descripcion": "Descripción actualizada"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

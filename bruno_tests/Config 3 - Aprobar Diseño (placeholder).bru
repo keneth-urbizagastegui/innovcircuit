@@ -1,0 +1,19 @@
+meta {
+  name: Config 3 - Aprobar Diseño (Ejemplo)
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:8080/api/v1/disenos/ID_DISENO/aprobar
+  auth: bearer
+}
+
+auth:bearer {
+  token: REEMPLAZAR_CON_TOKEN_ADMIN
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

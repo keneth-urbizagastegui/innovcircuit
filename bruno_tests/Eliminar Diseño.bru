@@ -1,0 +1,19 @@
+meta {
+  name: Eliminar Diseño (Proveedor)
+  type: http
+  seq: 15
+}
+
+delete {
+  url: http://localhost:8080/api/v1/disenos/ID_DISENO
+  auth: bearer
+}
+
+auth:bearer {
+  token: REEMPLAZAR_CON_TOKEN_PROVEEDOR
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

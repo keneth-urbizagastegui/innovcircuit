@@ -1,0 +1,26 @@
+meta {
+  name: Bloquear Usuario (Admin)
+  type: http
+  seq: 12
+}
+
+put {
+  url: http://localhost:8080/api/v1/admin/usuarios/ID_USUARIO/estado
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: REEMPLAZAR_CON_TOKEN_ADMIN
+}
+
+body:json {
+  {
+    "estado": "BLOQUEADO"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

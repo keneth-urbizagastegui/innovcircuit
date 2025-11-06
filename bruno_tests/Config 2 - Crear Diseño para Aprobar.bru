@@ -1,7 +1,7 @@
 meta {
   name: Config 2 - Crear Diseño para Aprobar
   type: http
-  seq: 7
+  seq: 9
 }
 
 post {
@@ -11,16 +11,16 @@ post {
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcm92ZWVkb3JAaW5ub3ZjaXJjdWl0LmNvbSIsInJvbCI6IlBST1ZFRURPUiIsImlhdCI6MTc2MjM5NTE3NSwiZXhwIjoxNzYyNDMxMTc1fQ.Y0emvhVWLdT616w1Xvn0uUMRjHWysB_Ob9dz30qX9f4
+  token: REEMPLAZAR_CON_TOKEN_PROVEEDOR
 }
 
 body:json {
   {
-    "nombre": "Diseño Aprobado Test",
-    "categoriaId": 2,
-    "precio": 20.0,
+    "nombre": "Diseño para Aprobar",
+    "categoriaId": 1,
+    "precio": 15.0,
     "gratuito": false,
-    "descripcion": "Un diseño que SÍ debe poder comprarse."
+    "descripcion": "Diseño de prueba para aprobación"
   }
 }
 
