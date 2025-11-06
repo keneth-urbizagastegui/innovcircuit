@@ -1,0 +1,21 @@
+# === Java / Spring Boot ===
+# Ignora la carpeta de compilación de Maven
+/backend/target/
+
+# Ignora los archivos de log y compilados
+*.log
+*.jar
+*.war
+
+# === Node / React ===
+# Ignora la carpeta de dependencias
+/frontend/node_modules/
+
+# Ignora la carpeta de compilación de Vite
+/frontend/dist/
+
+# === IDE / OS ===
+.idea/
+.vscode/
+*.iml
+.DS_Store
