@@ -22,4 +22,11 @@ public interface IDisenoService {
     // Interacciones en detalle
     void darLike(Long disenoId);
     String registrarDescarga(Long disenoId);
+
+    // Administración de productos
+    List<DisenoResponseDTO> listarDisenosPorEstado(String estado);
+    DisenoResponseDTO rechazarDiseno(Long disenoId);
+
+    // Historial del proveedor: todos sus diseños (cualquier estado)
+    List<DisenoResponseDTO> getDisenosPorProveedor(String emailProveedor);
 }

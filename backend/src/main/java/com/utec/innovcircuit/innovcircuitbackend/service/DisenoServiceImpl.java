@@ -153,4 +153,36 @@ public class DisenoServiceImpl implements IDisenoService {
 
         return dto;
     }
+
+    // --- Nuevas funcionalidades de Administración ---
+    @Override
+    public List<DisenoResponseDTO> listarDisenosPorEstado(String estado) {
+        return disenoRepository.findByEstado(estado)
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public DisenoResponseDTO rechazarDiseno(Long disenoId) {
+        Diseno diseno = disenoRepository.findById(disenoId)
+                .orElseThrow(() -> new NoSuchElementException("Diseño no encontrado"));
+
+        diseno.setEstado("RECHAZADO");
+        Diseno saved = disenoRepository.save(diseno);
+        return mapToResponseDTO(saved);
+    }
+
+    // Historial del proveedor: todos sus diseños
+    @Override
+    public List<DisenoResponseDTO> getDisenosPorProveedor(String emailProveedor) {
+        Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
+                .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
+
+        return disenoRepository.findByProveedorId(proveedor.getId())
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
 }

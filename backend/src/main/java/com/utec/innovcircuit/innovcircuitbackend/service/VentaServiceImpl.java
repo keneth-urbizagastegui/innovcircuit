@@ -94,4 +94,16 @@ public class VentaServiceImpl implements IVentaService {
                 .collect(Collectors.toList()));
         return dto;
     }
+
+    // Historial del cliente: todas sus compras
+    @Override
+    public List<VentaResponseDTO> getComprasPorCliente(String emailCliente) {
+        Cliente cliente = usuarioRepository.findByEmail(emailCliente, Cliente.class)
+                .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado"));
+
+        return ventaRepository.findByClienteId(cliente.getId())
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
 }

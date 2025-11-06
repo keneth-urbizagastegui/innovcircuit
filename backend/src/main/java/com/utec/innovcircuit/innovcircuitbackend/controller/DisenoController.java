@@ -25,13 +25,11 @@ public class DisenoController {
 
     // RF-6, RF-9: Para todos los usuarios logueados
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DisenoResponseDTO>> listarDisenos() {
         return ResponseEntity.ok(disenoService.listarDisenosAprobados());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DisenoResponseDTO> getDisenoPorId(@PathVariable Long id) {
         return ResponseEntity.ok(disenoService.getDisenoById(id));
     }

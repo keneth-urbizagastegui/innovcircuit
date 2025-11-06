@@ -29,7 +29,6 @@ public class CategoriaController {
 
     // Endpoint para LEER todas las categorías
     @GetMapping
-    @PreAuthorize("isAuthenticated()") // CUALQUIERA LOGUEADO PUEDE VER
     public ResponseEntity<List<CategoriaResponseDTO>> getAllCategorias() {
         List<CategoriaResponseDTO> categorias = categoriaService.getAllCategorias();
         return new ResponseEntity<>(categorias, HttpStatus.OK);

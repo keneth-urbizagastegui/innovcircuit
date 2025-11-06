@@ -10,4 +10,7 @@ import java.util.List;
 public interface DisenoRepository extends JpaRepository<Diseno, Long> {
     // Buscar diseños solo si están APROBADOS
     List<Diseno> findByEstado(String estado);
+
+    // Buscar todos los diseños de un proveedor (por su ID)
+    List<Diseno> findByProveedorId(Long proveedorId);
 }

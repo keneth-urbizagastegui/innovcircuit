@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod; // Permitir reglas específicas por método HTTP
 
 @Configuration
 @EnableWebSecurity
@@ -30,9 +31,21 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // API stateless, CSRF no aplica
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No sesiones
             .authorizeHttpRequests(auth -> auth
+                // Rutas públicas
                 .requestMatchers("/api/v1/auth/**").permitAll() // Permitir registro y login
-                .requestMatchers("/api/v1/categorias/**").authenticated() // Requiere estar logueado
-                .anyRequest().authenticated() // Proteger el resto
+                .requestMatchers("/uploads/**").permitAll() // Archivos estáticos subidos
+
+                // Catálogo público (Diseños y Categorías): permitir GET sin autenticación
+                .requestMatchers(HttpMethod.GET, "/api/v1/disenos").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/disenos/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/categorias").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
+
+                // Panel de Administración: proteger todo bajo /api/v1/admin/**
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMINISTRADOR")
+
+                // Proteger el resto de endpoints (crear, aprobar, like, descargar, etc.)
+                .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
