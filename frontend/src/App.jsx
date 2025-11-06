@@ -9,6 +9,7 @@ import SubirDisenoPage from './pages/SubirDisenoPage';
 import DisenoDetallePage from './pages/DisenoDetallePage';
 import CarritoPage from './pages/CarritoPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminUsuariosPage from './pages/AdminUsuariosPage';
 import DashboardPage from './pages/DashboardPage';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         {/* Ruta protegida para ADMINISTRADOR */}
         <Route element={<ProtectedRoute allowedRoles={["ADMINISTRADOR"]} />}> 
           <Route path="admin" element={<AdminDashboardPage />} />
+          <Route path="admin/usuarios" element={<AdminUsuariosPage />} />
         </Route>
       </Route>
     </Routes>
