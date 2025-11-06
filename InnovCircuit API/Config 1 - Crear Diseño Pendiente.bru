@@ -1,0 +1,30 @@
+meta {
+  name: Config 1 - Crear Diseño Pendiente
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8080/api/v1/disenos
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcm92ZWVkb3JAaW5ub3ZjaXJjdWl0LmNvbSIsInJvbCI6IlBST1ZFRURPUiIsImlhdCI6MTc2MjM5NTE3NSwiZXhwIjoxNzYyNDMxMTc1fQ.Y0emvhVWLdT616w1Xvn0uUMRjHWysB_Ob9dz30qX9f4
+}
+
+body:json {
+  {
+    "nombre": "Diseño Pendiente Test",
+    "categoriaId": 1,
+    "precio": 10.0,
+    "gratuito": false,
+    "descripcion": "Un diseño que no debe poder comprarse."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

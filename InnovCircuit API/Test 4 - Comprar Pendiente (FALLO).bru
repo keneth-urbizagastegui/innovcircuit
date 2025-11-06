@@ -1,0 +1,26 @@
+meta {
+  name: Test 4 - Comprar Pendiente (FALLO)
+  type: http
+  seq: 9
+}
+
+post {
+  url: http://localhost:8080/api/v1/ventas/comprar
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjbGllbnRlQGlubm92Y2lyY3VpdC5jb20iLCJyb2wiOiJDTElFTlRFIiwiaWF0IjoxNzYyMzk1MjA2LCJleHAiOjE3NjI0MzEyMDZ9.PBBRigs-CQpB7c4bZ27vzH8utyJgEzAZJ-dWY4Lxyck
+}
+
+body:json {
+  {
+    "disenoIds": [1]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

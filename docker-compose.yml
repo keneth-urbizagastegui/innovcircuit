@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:15
+    container_name: innovcircuit-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: innovcircuit_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - innovcircuit-net
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: innovcircuit-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@innovcircuit.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - innovcircuit-net
+  # ----- NUEVO SERVICIO: FRONTEND -----
+  frontend:
+    container_name: innovcircuit-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    networks:
+      - innovcircuit-net
+    depends_on:
+      - db
+      - backend
+
+  # ----- NUEVO SERVICIO: BACKEND -----
+  backend:
+    container_name: innovcircuit-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - innovcircuit-net
+    depends_on:
+      - db
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/innovcircuit_db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin123
+
+volumes:
+  postgres_data:
+    name: postgres_data
+
+networks:
+  innovcircuit-net:
+    name: innovcircuit-net

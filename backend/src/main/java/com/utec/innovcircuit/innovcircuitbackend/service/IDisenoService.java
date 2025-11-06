@@ -1,0 +1,30 @@
+package com.utec.innovcircuit.innovcircuitbackend.service;
+
+import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoRequestDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoResponseDTO;
+
+import java.util.List;
+
+public interface IDisenoService {
+    // Para Proveedor
+    DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor);
+    // Variante con archivo de imagen
+    DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor, org.springframework.web.multipart.MultipartFile imagenFile);
+
+    // Variante con imagen y archivo de esquemático (zip/rar)
+    DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor,
+                                  org.springframework.web.multipart.MultipartFile imagenFile,
+                                  org.springframework.web.multipart.MultipartFile esquematicoFile);
+
+    // Para Administrador
+    DisenoResponseDTO aprobarDiseno(Long disenoId);
+
+    // Para Todos (Autenticados)
+    List<DisenoResponseDTO> listarDisenosAprobados();
+
+    DisenoResponseDTO getDisenoById(Long disenoId);
+
+    // Interacciones en detalle
+    void darLike(Long disenoId);
+    String registrarDescarga(Long disenoId);
+}
