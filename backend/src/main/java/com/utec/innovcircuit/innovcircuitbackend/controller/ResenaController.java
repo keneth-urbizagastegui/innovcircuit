@@ -2,6 +2,7 @@ package com.utec.innovcircuit.innovcircuitbackend.controller;
 
 import com.utec.innovcircuit.innovcircuitbackend.dto.ResenaRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.ResenaResponseDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.ResenaRespuestaRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.service.IResenaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +35,15 @@ public class ResenaController {
     @GetMapping("/resena-test")
     public ResponseEntity<String> resenaTest() {
         return ResponseEntity.ok("resena-test-ok");
+    }
+
+    // Endpoint para que el PROVEEDOR responda una reseña
+    @PostMapping("/resenas/{id}/responder")
+    @PreAuthorize("hasRole('PROVEEDOR')")
+    public ResponseEntity<ResenaResponseDTO> responderResena(@PathVariable("id") Long id,
+                                                             @RequestBody ResenaRespuestaRequestDTO request,
+                                                             Principal principal) {
+        ResenaResponseDTO res = resenaService.responderResena(id, principal.getName(), request.getRespuesta());
+        return ResponseEntity.ok(res);
     }
 }

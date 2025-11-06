@@ -11,4 +11,7 @@ public class ResenaResponseDTO {
     private LocalDateTime fecha;
     private String nombreCliente;
     private String avatarCliente;
+    // Respuesta del proveedor
+    private String respuestaProveedor;
+    private LocalDateTime fechaRespuesta;
 }

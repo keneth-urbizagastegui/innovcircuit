@@ -6,6 +6,8 @@ import com.utec.innovcircuit.innovcircuitbackend.model.*;
 import com.utec.innovcircuit.innovcircuitbackend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -14,9 +16,9 @@ import java.util.stream.Collectors;
 @Service
 public class ResenaServiceImpl implements IResenaService {
     @Autowired private ResenaRepository resenaRepository;
-    @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private DisenoRepository disenoRepository;
     @Autowired private VentaRepository ventaRepository;
+    @Autowired private UsuarioRepository usuarioRepository;
 
     @Override
     public ResenaResponseDTO crearResena(ResenaRequestDTO requestDTO, String emailCliente) {
@@ -54,6 +56,28 @@ public class ResenaServiceImpl implements IResenaService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public ResenaResponseDTO responderResena(Long resenaId, String emailProveedor, String respuesta) {
+        Resena resena = resenaRepository.findById(resenaId)
+                .orElseThrow(() -> new NoSuchElementException("Reseña no encontrada"));
+
+        // Buscar proveedor autenticado
+        Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
+                .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
+
+        // Validación de propiedad: el diseño de la reseña debe pertenecer al proveedor
+        if (resena.getDiseno() == null || resena.getDiseno().getProveedor() == null ||
+                !resena.getDiseno().getProveedor().getId().equals(proveedor.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "No autorizado: el diseño no pertenece al proveedor autenticado");
+        }
+
+        resena.setRespuestaProveedor(respuesta);
+        resena.setFechaRespuesta(LocalDateTime.now());
+        Resena guardada = resenaRepository.save(resena);
+        return convertToDTO(guardada);
+    }
+
     private ResenaResponseDTO convertToDTO(Resena resena) {
         ResenaResponseDTO dto = new ResenaResponseDTO();
         dto.setId(resena.getId());
@@ -62,6 +86,8 @@ public class ResenaServiceImpl implements IResenaService {
         dto.setFecha(resena.getFecha());
         dto.setNombreCliente(resena.getCliente().getNombre());
         dto.setAvatarCliente(resena.getCliente().getAvatarUrl());
+        dto.setRespuestaProveedor(resena.getRespuestaProveedor());
+        dto.setFechaRespuesta(resena.getFechaRespuesta());
         return dto;
     }
 }

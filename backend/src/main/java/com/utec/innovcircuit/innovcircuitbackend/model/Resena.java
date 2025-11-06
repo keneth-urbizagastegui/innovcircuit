@@ -31,4 +31,10 @@ public class Resena {
     @ManyToOne
     @JoinColumn(name = "diseno_id", nullable = false)
     private Diseno diseno;
+
+    // Respuesta del proveedor
+    @Column(columnDefinition = "TEXT")
+    private String respuestaProveedor;
+
+    private java.time.LocalDateTime fechaRespuesta;
 }

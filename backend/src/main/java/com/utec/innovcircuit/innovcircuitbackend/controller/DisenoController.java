@@ -27,10 +27,10 @@ public class DisenoController {
     @Autowired
     private IResenaService resenaService;
 
-    // RF-6, RF-9: Para todos los usuarios logueados
+    // RF-6, RF-9: Para todos los usuarios logueados, con búsqueda opcional por nombre (q)
     @GetMapping
-    public ResponseEntity<List<DisenoResponseDTO>> listarDisenos() {
-        return ResponseEntity.ok(disenoService.listarDisenosAprobados());
+    public ResponseEntity<List<DisenoResponseDTO>> listarDisenos(@RequestParam(name = "q", required = false) String q) {
+        return ResponseEntity.ok(disenoService.listarDisenosAprobados(q));
     }
 
     @GetMapping("/{id}")

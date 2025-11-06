@@ -73,4 +73,17 @@ public class UsuarioServiceImpl implements IUsuarioService {
             throw new RuntimeException("Credenciales inválidas");
         }
     }
+
+    @Override
+    public Usuario actualizarPerfil(String email, String nombre, String avatarUrl) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        if (nombre != null) {
+            usuario.setNombre(nombre);
+        }
+        if (avatarUrl != null) {
+            usuario.setAvatarUrl(avatarUrl);
+        }
+        return usuarioRepository.save(usuario);
+    }
 }

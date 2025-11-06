@@ -91,9 +91,14 @@ public class DisenoServiceImpl implements IDisenoService {
     }
 
     @Override
-    public List<DisenoResponseDTO> listarDisenosAprobados() {
-        return disenoRepository.findByEstado("APROBADO")
-                .stream()
+    public List<DisenoResponseDTO> listarDisenosAprobados(String keyword) {
+        List<Diseno> disenos;
+        if (keyword == null || keyword.trim().isEmpty()) {
+            disenos = disenoRepository.findByEstado("APROBADO");
+        } else {
+            disenos = disenoRepository.findByEstadoAndNombreContainingIgnoreCase("APROBADO", keyword.trim());
+        }
+        return disenos.stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }

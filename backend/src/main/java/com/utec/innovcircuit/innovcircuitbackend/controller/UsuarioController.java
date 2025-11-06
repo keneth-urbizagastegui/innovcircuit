@@ -3,12 +3,16 @@ package com.utec.innovcircuit.innovcircuitbackend.controller;
 import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.VentaResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.PerfilRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.service.IDisenoService;
 import com.utec.innovcircuit.innovcircuitbackend.service.IVentaService;
+import com.utec.innovcircuit.innovcircuitbackend.service.IUsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +27,8 @@ public class UsuarioController {
     private IVentaService ventaService;
     @Autowired
     private IDisenoService disenoService;
+    @Autowired
+    private IUsuarioService usuarioService;
 
     // Endpoint para que el CLIENTE vea sus compras
     @GetMapping("/mis-compras")
@@ -43,5 +49,14 @@ public class UsuarioController {
     @PreAuthorize("hasRole('PROVEEDOR')")
     public ResponseEntity<EstadisticasProveedorDTO> getMiDashboard(Principal principal) {
         return ResponseEntity.ok(ventaService.getEstadisticasProveedor(principal.getName()));
+    }
+
+    // Gestión de perfil propio
+    @PutMapping("/mi-perfil")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> actualizarMiPerfil(@RequestBody PerfilRequestDTO dto,
+                                                   Principal principal) {
+        usuarioService.actualizarPerfil(principal.getName(), dto.getNombre(), dto.getAvatarUrl());
+        return ResponseEntity.ok().build();
     }
 }

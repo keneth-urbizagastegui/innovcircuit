@@ -14,8 +14,8 @@ public interface IDisenoService {
     // Para Administrador
     DisenoResponseDTO aprobarDiseno(Long disenoId);
 
-    // Para Todos (Autenticados)
-    List<DisenoResponseDTO> listarDisenosAprobados();
+    // Para Todos (Autenticados) - con búsqueda opcional por nombre
+    List<DisenoResponseDTO> listarDisenosAprobados(String keyword);
 
     DisenoResponseDTO getDisenoById(Long disenoId);
 

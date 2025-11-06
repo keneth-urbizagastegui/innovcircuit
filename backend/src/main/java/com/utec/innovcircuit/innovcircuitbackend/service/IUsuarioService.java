@@ -8,4 +8,7 @@ import com.utec.innovcircuit.innovcircuitbackend.model.Usuario;
 public interface IUsuarioService {
     Usuario registrarUsuario(UsuarioRegistroDTO registroDTO);
     LoginResponseDTO login(UsuarioLoginDTO loginDTO);
+
+    // Actualización de perfil del usuario autenticado
+    Usuario actualizarPerfil(String email, String nombre, String avatarUrl);
 }

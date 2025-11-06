@@ -11,6 +11,9 @@ public interface DisenoRepository extends JpaRepository<Diseno, Long> {
     // Buscar diseños solo si están APROBADOS
     List<Diseno> findByEstado(String estado);
 
+    // Buscar diseños APROBADOS por nombre (búsqueda parcial, ignorando mayúsculas/minúsculas)
+    List<Diseno> findByEstadoAndNombreContainingIgnoreCase(String estado, String nombre);
+
     // Buscar todos los diseños de un proveedor (por su ID)
     List<Diseno> findByProveedorId(Long proveedorId);
 }
