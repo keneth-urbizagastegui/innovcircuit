@@ -91,4 +91,23 @@ public class DisenoController {
     public ResponseEntity<List<ResenaResponseDTO>> getResenasPorDiseno(@PathVariable Long disenoId) {
         return ResponseEntity.ok(resenaService.getResenasPorDiseno(disenoId));
     }
+
+    // PUT /{id}: Editar diseño (solo PROVEEDOR y dueño del diseño)
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('PROVEEDOR')")
+    public ResponseEntity<DisenoResponseDTO> editarDiseno(@PathVariable Long id,
+                                                          @Valid @RequestBody DisenoRequestDTO requestDTO,
+                                                          Principal principal) {
+        String emailProveedor = principal.getName();
+        return ResponseEntity.ok(disenoService.editarDiseno(id, requestDTO, emailProveedor));
+    }
+
+    // DELETE /{id}: Eliminar diseño (solo PROVEEDOR y dueño del diseño)
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('PROVEEDOR')")
+    public ResponseEntity<Void> eliminarDiseno(@PathVariable Long id, Principal principal) {
+        String emailProveedor = principal.getName();
+        disenoService.eliminarDiseno(id, emailProveedor);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -29,4 +29,8 @@ public interface IDisenoService {
 
     // Historial del proveedor: todos sus diseños (cualquier estado)
     List<DisenoResponseDTO> getDisenosPorProveedor(String emailProveedor);
+
+    // Gestión de Diseños (Proveedor)
+    DisenoResponseDTO editarDiseno(Long disenoId, DisenoRequestDTO requestDTO, String emailProveedor);
+    void eliminarDiseno(Long disenoId, String emailProveedor);
 }

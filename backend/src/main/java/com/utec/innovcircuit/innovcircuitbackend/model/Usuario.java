@@ -24,5 +24,8 @@ public abstract class Usuario {
 
     @Column
     private String avatarUrl;
+
+    @Column(nullable = false)
+    private String estado = "ACTIVO"; // ACTIVO, BLOQUEADO, etc.
     // El @DiscriminatorColumn 'rol' se llenará automáticamente
 }

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -184,5 +186,58 @@ public class DisenoServiceImpl implements IDisenoService {
                 .stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    // --- Gestión de Diseños (Proveedor) ---
+    @Override
+    @Transactional
+    public DisenoResponseDTO editarDiseno(Long disenoId, DisenoRequestDTO requestDTO, String emailProveedor) {
+        // 1. Buscar diseño
+        Diseno diseno = disenoRepository.findById(disenoId)
+                .orElseThrow(() -> new NoSuchElementException("Diseño no encontrado"));
+
+        // 2. Buscar proveedor autenticado
+        Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
+                .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
+
+        // 3. Validación de propiedad
+        if (diseno.getProveedor() == null || !diseno.getProveedor().getId().equals(proveedor.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No autorizado: el diseño no pertenece al proveedor autenticado");
+        }
+
+        // 4. Actualizar campos
+        diseno.setNombre(requestDTO.getNombre());
+        diseno.setDescripcion(requestDTO.getDescripcion());
+        diseno.setPrecio(requestDTO.getPrecio());
+        diseno.setGratuito(requestDTO.isGratuito());
+
+        // 5. Actualizar categoría
+        Categoria categoria = categoriaRepository.findById(requestDTO.getCategoriaId())
+                .orElseThrow(() -> new NoSuchElementException("Categoría no encontrada"));
+        diseno.setCategoria(categoria);
+
+        // 6. Guardar
+        Diseno saved = disenoRepository.save(diseno);
+        return mapToResponseDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public void eliminarDiseno(Long disenoId, String emailProveedor) {
+        // 1. Buscar diseño
+        Diseno diseno = disenoRepository.findById(disenoId)
+                .orElseThrow(() -> new NoSuchElementException("Diseño no encontrado"));
+
+        // 2. Buscar proveedor autenticado
+        Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
+                .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
+
+        // 3. Validación de propiedad
+        if (diseno.getProveedor() == null || !diseno.getProveedor().getId().equals(proveedor.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No autorizado: el diseño no pertenece al proveedor autenticado");
+        }
+
+        // 4. Eliminar
+        disenoRepository.delete(diseno);
     }
 }

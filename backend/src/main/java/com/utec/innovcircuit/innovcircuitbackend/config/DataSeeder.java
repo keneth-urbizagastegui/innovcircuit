@@ -55,6 +55,7 @@ public class DataSeeder implements CommandLineRunner {
         admin.setEmail("admin@innovcircuit.com");
         admin.setPassword(passCifrado);
         admin.setAvatarUrl(baseAvatar + "-admin");
+        admin.setEstado("ACTIVO");
         usuarioRepository.save(admin);
 
         Proveedor prov = new Proveedor();
@@ -62,6 +63,7 @@ public class DataSeeder implements CommandLineRunner {
         prov.setEmail("proveedor@innovcircuit.com");
         prov.setPassword(passCifrado);
         prov.setAvatarUrl(baseAvatar + "-prov");
+        prov.setEstado("ACTIVO");
         usuarioRepository.save(prov);
 
         Cliente cliente = new Cliente();
@@ -69,6 +71,7 @@ public class DataSeeder implements CommandLineRunner {
         cliente.setEmail("cliente@innovcircuit.com");
         cliente.setPassword(passCifrado);
         cliente.setAvatarUrl(baseAvatar + "-cli");
+        cliente.setEstado("ACTIVO");
         usuarioRepository.save(cliente);
     }
 
