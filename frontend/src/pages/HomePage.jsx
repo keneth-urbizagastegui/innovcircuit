@@ -1,37 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext'; // Ya no lo necesitamos aquí
 import disenoService from '../services/disenoService';
 import DisenoCard from '../components/DisenoCard';
 import { Grid, Typography, CircularProgress, Box, Alert } from '@mui/material';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom'; // Ya no se usa
 
 const HomePage = () => {
-  const auth = useAuth();
+  // const auth = useAuth(); // Ya no es necesario para esta lógica
   const [disenos, setDisenos] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Empezar cargando
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (auth.isAuthenticated()) {
-      setLoading(true);
-      disenoService
-        .listarDisenosAprobados()
-        .then((response) => {
-          setDisenos(response.data);
-          setLoading(false);
-        })
-        .catch(() => {
-          setError('Error al cargar los diseños. Token inválido o API caída.');
-          setLoading(false);
-        });
-    }
-  }, [auth.isAuthenticated()]);
+    // Cargar diseños al montar el componente, para todos.
+    setLoading(true);
+    disenoService
+      .listarDisenosAprobados()
+      .then((response) => {
+        setDisenos(response.data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Error al cargar los diseños. La API puede estar caída.');
+        setLoading(false);
+      });
+  }, []);
 
-  // Renderizado condicional
+  // Renderizado condicional (público, sin depender de auth)
   let content;
-  if (!auth.isAuthenticated()) {
-    content = <Typography>Por favor, <Link to="/login">inicia sesión</Link> para ver el catálogo.</Typography>;
-  } else if (loading) {
+  if (loading) {
     content = <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
   } else if (error) {
     content = <Alert severity="error">{error}</Alert>;

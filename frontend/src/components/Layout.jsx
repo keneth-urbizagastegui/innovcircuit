@@ -32,6 +32,12 @@ const Layout = () => {
           {/* Lógica de Autenticación */}
           {auth.isAuthenticated() ? (
             <>
+              {/* Enlace al Dashboard para Cliente y Proveedor */}
+              {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
+                <Button color="inherit" component={Link} to="/dashboard" sx={{ mr: 2 }}>
+                  Mi Panel
+                </Button>
+              )}
               {/* Enlace visible para proveedores */}
               {auth.user?.rol === 'PROVEEDOR' && (
                 <Button color="inherit" component={Link} to="/subir-diseno" sx={{ mr: 2 }}>
@@ -45,6 +51,12 @@ const Layout = () => {
                     <ShoppingCartIcon />
                   </Badge>
                 </IconButton>
+              )}
+              {/* Enlace visible solo para administradores */}
+              {auth.user?.rol === 'ADMINISTRADOR' && (
+                <Button color="inherit" component={Link} to="/admin" sx={{ mr: 2 }}>
+                  Panel de Admin
+                </Button>
               )}
               <Button color="inherit" onClick={handleLogout}>
                 Logout

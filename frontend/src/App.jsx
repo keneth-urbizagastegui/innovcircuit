@@ -8,6 +8,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SubirDisenoPage from './pages/SubirDisenoPage';
 import DisenoDetallePage from './pages/DisenoDetallePage';
 import CarritoPage from './pages/CarritoPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
   return (
@@ -20,12 +22,20 @@ function App() {
         <Route path="register" element={<RegisterPage />} />
         {/* Ruta dinámica para página de detalle */}
         <Route path="diseno/:id" element={<DisenoDetallePage />} />
+        {/* Ruta de Dashboard (Cliente y Proveedor) */}
+        <Route element={<ProtectedRoute allowedRoles={["CLIENTE", "PROVEEDOR"]} />}> 
+          <Route path="dashboard" element={<DashboardPage />} />
+        </Route>
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute allowedRoles={["PROVEEDOR"]} />}> 
           <Route path="subir-diseno" element={<SubirDisenoPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["CLIENTE"]} />}> 
           <Route path="carrito" element={<CarritoPage />} />
+        </Route>
+        {/* Ruta protegida para ADMINISTRADOR */}
+        <Route element={<ProtectedRoute allowedRoles={["ADMINISTRADOR"]} />}> 
+          <Route path="admin" element={<AdminDashboardPage />} />
         </Route>
       </Route>
     </Routes>
