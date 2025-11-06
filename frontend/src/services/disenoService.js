@@ -2,9 +2,10 @@ import apiClient from './api';
 
 const disenoService = {
   // RF6: Listar diseños (aprobados)
-  listarDisenosAprobados: () => {
+  listarDisenosAprobados: (keyword) => {
     // El interceptor añadirá el token "Authorization" a esta petición
-    return apiClient.get('/disenos');
+    const params = keyword ? { q: keyword } : undefined;
+    return apiClient.get('/disenos', { params });
   },
   // Obtener un diseño por ID
   getDisenoById: (id) => {

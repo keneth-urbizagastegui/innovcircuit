@@ -11,6 +11,7 @@ import CarritoPage from './pages/CarritoPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUsuariosPage from './pages/AdminUsuariosPage';
 import DashboardPage from './pages/DashboardPage';
+import PerfilPage from './pages/PerfilPage';
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
         {/* Ruta de Dashboard (Cliente y Proveedor) */}
         <Route element={<ProtectedRoute allowedRoles={["CLIENTE", "PROVEEDOR"]} />}> 
           <Route path="dashboard" element={<DashboardPage />} />
+          {/* Perfil para CLIENTE y PROVEEDOR */}
+          <Route path="perfil" element={<PerfilPage />} />
         </Route>
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute allowedRoles={["PROVEEDOR"]} />}> 

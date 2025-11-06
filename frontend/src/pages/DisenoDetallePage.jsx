@@ -21,6 +21,9 @@ const DisenoDetallePage = () => {
   const [resenas, setResenas] = useState([]);
   const [resenasLoading, setResenasLoading] = useState(true);
   const [resenasError, setResenasError] = useState('');
+  // Responder reseñas (Proveedor)
+  const [respuestaInputs, setRespuestaInputs] = useState({}); // { [resenaId]: string }
+  const [responding, setResponding] = useState({}); // { [resenaId]: boolean }
   // Formulario nueva reseña (solo CLIENTE)
   const [calificacion, setCalificacion] = useState(0);
   const [comentario, setComentario] = useState('');
@@ -68,6 +71,22 @@ const DisenoDetallePage = () => {
       })
       .catch(() => setResenasError('Error al cargar las reseñas.'))
       .finally(() => setResenasLoading(false));
+  };
+
+  const handleResponderResena = async (resenaId) => {
+    const texto = (respuestaInputs[resenaId] || '').trim();
+    if (!texto) return;
+    setResponding(prev => ({ ...prev, [resenaId]: true }));
+    try {
+      await resenaService.responderResena(resenaId, { respuesta: texto });
+      // Limpia input y recarga reseñas
+      setRespuestaInputs(prev => ({ ...prev, [resenaId]: '' }));
+      cargarResenas();
+    } catch (err) {
+      console.error('Error al responder reseña', err);
+    } finally {
+      setResponding(prev => ({ ...prev, [resenaId]: false }));
+    }
   };
 
   const handleCrearResena = (e) => {
@@ -185,12 +204,38 @@ const DisenoDetallePage = () => {
                   <ListItemText
                     primary={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="subtitle1">{r?.clienteNombre || 'Cliente'}</Typography>
+                        <Typography variant="subtitle1">{r?.nombreCliente || r?.clienteNombre || 'Cliente'}</Typography>
                         <Rating value={Number(r?.calificacion) || 0} readOnly size="small" />
                       </Box>
                     }
                     secondary={<Typography variant="body2">{r?.comentario || ''}</Typography>}
                   />
+                  {/* Respuesta del proveedor existente */}
+                  {r?.respuestaProveedor && (
+                    <Box sx={{ mt: 1, ml: 7, p: 1.5, borderLeft: '3px solid', borderColor: 'primary.light', bgcolor: 'action.hover', borderRadius: 1 }}>
+                      <Typography variant="subtitle2">Respuesta del proveedor:</Typography>
+                      <Typography variant="body2">{r.respuestaProveedor}</Typography>
+                    </Box>
+                  )}
+                  {/* Formulario de respuesta para el proveedor dueño del diseño */}
+                  {user?.id === diseno?.proveedor?.id && !r?.respuestaProveedor && (
+                    <Box sx={{ mt: 1, ml: 7, display: 'flex', gap: 1 }}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        placeholder="Escribe tu respuesta..."
+                        value={respuestaInputs[r.id] || ''}
+                        onChange={(e) => setRespuestaInputs(prev => ({ ...prev, [r.id]: e.target.value }))}
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={() => handleResponderResena(r.id)}
+                        disabled={responding[r.id]}
+                      >
+                        {responding[r.id] ? 'Enviando...' : 'Responder'}
+                      </Button>
+                    </Box>
+                  )}
                 </ListItem>
               ))}
             </List>

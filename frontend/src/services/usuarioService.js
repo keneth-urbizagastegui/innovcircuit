@@ -12,6 +12,11 @@ const usuarioService = {
   // Nuevo: estadísticas del proveedor
   getMiDashboard: () => {
     return apiClient.get('/usuario/mi-dashboard');
+  },
+  // Nuevo: actualizar mi perfil (nombre y avatarUrl)
+  actualizarMiPerfil: (data) => {
+    // data = { nombre?: string, avatarUrl?: string }
+    return apiClient.put('/usuario/mi-perfil', data);
   }
 };
 

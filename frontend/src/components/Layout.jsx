@@ -38,6 +38,12 @@ const Layout = () => {
                   Mi Panel
                 </Button>
               )}
+              {/* Enlace al Perfil para usuarios autenticados (al menos Cliente y Proveedor) */}
+              {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
+                <Button color="inherit" component={Link} to="/perfil" sx={{ mr: 2 }}>
+                  Mi Perfil
+                </Button>
+              )}
               {/* Enlace visible para proveedores */}
               {auth.user?.rol === 'PROVEEDOR' && (
                 <Button color="inherit" component={Link} to="/subir-diseno" sx={{ mr: 2 }}>

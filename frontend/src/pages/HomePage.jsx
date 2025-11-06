@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 // import { useAuth } from '../context/AuthContext'; // Ya no lo necesitamos aquí
 import disenoService from '../services/disenoService';
 import DisenoCard from '../components/DisenoCard';
-import { Grid, Typography, CircularProgress, Box, Alert } from '@mui/material';
+import { Grid, Typography, CircularProgress, Box, Alert, TextField, IconButton } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 // import { Link } from 'react-router-dom'; // Ya no se usa
 
 const HomePage = () => {
@@ -10,6 +11,7 @@ const HomePage = () => {
   const [disenos, setDisenos] = useState([]);
   const [loading, setLoading] = useState(true); // Empezar cargando
   const [error, setError] = useState('');
+  const [keyword, setKeyword] = useState('');
 
   useEffect(() => {
     // Cargar diseños al montar el componente, para todos.
@@ -25,6 +27,26 @@ const HomePage = () => {
         setLoading(false);
       });
   }, []);
+
+  const handleSearch = () => {
+    setLoading(true);
+    setError('');
+    disenoService
+      .listarDisenosAprobados(keyword && keyword.trim() ? keyword.trim() : undefined)
+      .then((response) => {
+        setDisenos(response.data);
+      })
+      .catch(() => {
+        setError('Error al buscar diseños.');
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   // Renderizado condicional (público, sin depender de auth)
   let content;
@@ -49,6 +71,20 @@ const HomePage = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>Catálogo de Diseños Aprobados</Typography>
+      {/* Barra de búsqueda */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Buscar diseños (ej. Arduino, Radio, Sensor)"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <IconButton color="primary" onClick={handleSearch} aria-label="Buscar">
+          <SearchIcon />
+        </IconButton>
+      </Box>
       {content}
     </Box>
   );
