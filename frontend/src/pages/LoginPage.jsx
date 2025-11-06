@@ -20,7 +20,17 @@ const LoginPage = () => {
       auth.login(response.data.token);
       navigate('/');
     } catch (err) {
-      setError('Credenciales inválidas. Inténtalo de nuevo.');
+      // Mostrar mensajes más claros según el tipo de error
+      if (err?.response) {
+        if (err.response.status === 401) {
+          setError('Credenciales inválidas. Inténtalo de nuevo.');
+        } else {
+          const backendMsg = typeof err.response.data === 'string' ? err.response.data : '';
+          setError(backendMsg || `Error del servidor (${err.response.status}). Inténtalo más tarde.`);
+        }
+      } else {
+        setError('No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose.');
+      }
     }
   };
 

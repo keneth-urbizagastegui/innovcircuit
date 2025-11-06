@@ -14,6 +14,10 @@ const adminService = {
   // Llama al nuevo endpoint del AdminController
   rechazarDiseno: (id) => {
     return apiClient.post(`/admin/disenos/${id}/rechazar`);
+  },
+  // Nuevo: estadísticas globales del admin
+  getEstadisticasAdmin: () => {
+    return apiClient.get('/admin/estadisticas');
   }
 };
 

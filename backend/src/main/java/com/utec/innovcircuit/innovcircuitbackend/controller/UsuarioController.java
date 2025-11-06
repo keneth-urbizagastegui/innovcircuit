@@ -2,6 +2,7 @@ package com.utec.innovcircuit.innovcircuitbackend.controller;
 
 import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.VentaResponseDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO;
 import com.utec.innovcircuit.innovcircuitbackend.service.IDisenoService;
 import com.utec.innovcircuit.innovcircuitbackend.service.IVentaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,12 @@ public class UsuarioController {
     @PreAuthorize("hasRole('PROVEEDOR')")
     public ResponseEntity<List<DisenoResponseDTO>> getMisDisenos(Principal principal) {
         return ResponseEntity.ok(disenoService.getDisenosPorProveedor(principal.getName()));
+    }
+
+    // Endpoint para que el PROVEEDOR vea sus estadísticas (ventas y ganancias)
+    @GetMapping("/mi-dashboard")
+    @PreAuthorize("hasRole('PROVEEDOR')")
+    public ResponseEntity<EstadisticasProveedorDTO> getMiDashboard(Principal principal) {
+        return ResponseEntity.ok(ventaService.getEstadisticasProveedor(principal.getName()));
     }
 }

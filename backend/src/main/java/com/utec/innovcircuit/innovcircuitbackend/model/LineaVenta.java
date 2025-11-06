@@ -21,4 +21,12 @@ public class LineaVenta {
 
     @Column(nullable = false)
     private Double precioAlComprar; // Precio en el momento de la compra
+
+    // Comisión de la plataforma por esta línea
+    @Column
+    private Double comisionPlataforma;
+
+    // Monto neto que corresponde al proveedor por esta línea
+    @Column
+    private Double montoProveedor;
 }

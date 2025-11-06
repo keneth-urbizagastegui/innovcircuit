@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import usuarioService from '../services/usuarioService';
-import { Typography, Box, Paper, List, ListItem, ListItemText, Divider, CircularProgress, Alert, IconButton } from '@mui/material';
+import { Typography, Box, Paper, List, ListItem, ListItemText, Divider, CircularProgress, Alert, IconButton, Grid } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import disenoService from '../services/disenoService';
@@ -12,6 +12,9 @@ const DashboardPage = () => {
   const [disenos, setDisenos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsError, setStatsError] = useState('');
 
   const recargarMisDisenos = () => {
     usuarioService.getMisDisenos()
@@ -30,6 +33,13 @@ const DashboardPage = () => {
         .finally(() => setLoading(false));
     } else if (user?.rol === 'PROVEEDOR') {
       recargarMisDisenos();
+      // Cargar estadísticas del proveedor
+      setStatsLoading(true);
+      setStatsError('');
+      usuarioService.getMiDashboard()
+        .then(res => setStats(res.data))
+        .catch(() => setStatsError('Error al cargar estadísticas'))
+        .finally(() => setStatsLoading(false));
     } else {
       setLoading(false);
     }
@@ -79,6 +89,30 @@ const DashboardPage = () => {
         <Box sx={{ mt: 3 }}>
           <Typography variant="h5">Mis Diseños Subidos</Typography>
           <Divider sx={{ my: 2 }} />
+          {/* Estadísticas del proveedor */}
+          <Box sx={{ mb: 2 }}>
+            {statsError && <Alert severity="error" sx={{ mb: 2 }}>{statsError}</Alert>}
+            {statsLoading ? (
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <CircularProgress size={24} />
+              </Box>
+            ) : (
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12} sm={6}>
+                  <Paper elevation={2} sx={{ p: 2 }}>
+                    <Typography variant="subtitle1">Total Vendido</Typography>
+                    <Typography variant="h6">${Number(stats?.totalVendido ?? 0).toFixed(2)}</Typography>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Paper elevation={2} sx={{ p: 2 }}>
+                    <Typography variant="subtitle1">Ganancia Neta (Tras comisiones)</Typography>
+                    <Typography variant="h6">${Number(stats?.gananciaNeta ?? 0).toFixed(2)}</Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+            )}
+          </Box>
           <List>
             {disenos.length === 0 ? <Typography>No has subido diseños.</Typography> : null}
             {disenos.map(diseno => (

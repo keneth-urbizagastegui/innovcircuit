@@ -2,6 +2,8 @@ package com.utec.innovcircuit.innovcircuitbackend.service;
 
 import com.utec.innovcircuit.innovcircuitbackend.dto.CompraRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.VentaResponseDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasAdminDTO;
 import java.util.List;
 
 public interface IVentaService {
@@ -9,4 +11,10 @@ public interface IVentaService {
 
     // Historial del cliente: todas sus compras
     List<VentaResponseDTO> getComprasPorCliente(String emailCliente);
+
+    // Estadísticas para proveedor
+    EstadisticasProveedorDTO getEstadisticasProveedor(String emailProveedor);
+
+    // Estadísticas para admin
+    EstadisticasAdminDTO getEstadisticasAdmin();
 }

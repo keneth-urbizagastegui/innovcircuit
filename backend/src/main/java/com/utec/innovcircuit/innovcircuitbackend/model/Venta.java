@@ -20,6 +20,14 @@ public class Venta {
     @Column(nullable = false)
     private Double montoTotal;
 
+    // Suma de las comisiones de plataforma correspondientes a todas las líneas de esta venta
+    @Column
+    private Double comisionTotal;
+
+    // Suma del monto neto para proveedores correspondiente a todas las líneas de esta venta
+    @Column
+    private Double montoProveedorTotal;
+
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;

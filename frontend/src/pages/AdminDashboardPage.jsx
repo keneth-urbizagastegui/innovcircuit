@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../services/adminService';
-import { Typography, Box, Paper, List, ListItem, ListItemText, Button, CircularProgress, Alert } from '@mui/material';
+import { Typography, Box, Paper, List, ListItem, ListItemText, Button, CircularProgress, Alert, Grid } from '@mui/material';
 
 const AdminDashboardPage = () => {
   const [pendientes, setPendientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState('');
 
   const cargarPendientes = () => {
     setLoading(true);
@@ -21,8 +24,23 @@ const AdminDashboardPage = () => {
       });
   };
 
+  const cargarEstadisticas = () => {
+    setStatsLoading(true);
+    setStatsError('');
+    adminService.getEstadisticasAdmin()
+      .then(res => {
+        setStats(res.data);
+        setStatsLoading(false);
+      })
+      .catch(() => {
+        setStatsError('Error al cargar estadísticas.');
+        setStatsLoading(false);
+      });
+  };
+
   useEffect(() => {
     cargarPendientes();
+    cargarEstadisticas();
   }, []);
 
   const handleAprobar = (id) => {
@@ -44,6 +62,30 @@ const AdminDashboardPage = () => {
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
       <Typography variant="h4" gutterBottom>Panel de Administración</Typography>
+      {/* Estadísticas globales */}
+      {statsError && <Alert severity="error" sx={{ mb: 2 }}>{statsError}</Alert>}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6}>
+          <Paper elevation={2} sx={{ p: 2, minHeight: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Typography variant="subtitle1">Ventas Globales</Typography>
+            {statsLoading ? (
+              <CircularProgress size={20} sx={{ mt: 1 }} />
+            ) : (
+              <Typography variant="h6">${Number(stats?.totalVentasGlobal ?? 0).toFixed(2)}</Typography>
+            )}
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Paper elevation={2} sx={{ p: 2, minHeight: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Typography variant="subtitle1">Comisiones Generadas</Typography>
+            {statsLoading ? (
+              <CircularProgress size={20} sx={{ mt: 1 }} />
+            ) : (
+              <Typography variant="h6">${Number(stats?.totalComisiones ?? 0).toFixed(2)}</Typography>
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
       <Typography variant="h6" gutterBottom>Diseños Pendientes de Revisión</Typography>
       {error && <Alert severity="error">{error}</Alert>}
       <List>
