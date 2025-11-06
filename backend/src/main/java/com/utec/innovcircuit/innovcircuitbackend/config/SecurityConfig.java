@@ -38,13 +38,15 @@ public class SecurityConfig {
                 // Catálogo público (Diseños y Categorías): permitir GET sin autenticación
                 .requestMatchers(HttpMethod.GET, "/api/v1/disenos").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/disenos/**").permitAll()
+                // Las rutas de reseñas bajo /api/v1/disenos/** ya están cubiertas por la regla anterior,
+                // evitamos patrones redundantes que pueden causar errores de coincidencia en Spring Security 6
                 .requestMatchers(HttpMethod.GET, "/api/v1/categorias").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
 
                 // Panel de Administración: proteger todo bajo /api/v1/admin/**
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMINISTRADOR")
 
-                // Proteger el resto de endpoints (crear, aprobar, like, descargar, etc.)
+                // Cualquier otra solicitud requiere autenticación
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

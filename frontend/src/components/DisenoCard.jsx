@@ -3,18 +3,18 @@ import { Card, CardMedia, CardContent, Typography, CardActions, Box, Avatar } fr
 import { Link } from 'react-router-dom';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'; // Icono de Likes
 import DownloadIcon from '@mui/icons-material/Download'; // Icono de Descargas
+import { resolveImageUrl, resolveAvatarUrl, FALLBACK_CARD_IMAGE, FALLBACK_AVATAR, onErrorSetSrc } from '../utils/imageUtils';
 
 const DisenoCard = ({ diseno }) => {
   // Fallback por si la API aún no envía el objeto proveedor
   const proveedor = diseno.proveedor || { nombre: 'N/A', avatarUrl: '' };
+  const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 48, { rounded: true });
+  const imageSrc = resolveImageUrl(diseno.imagenUrl) || FALLBACK_CARD_IMAGE;
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Proveedor Info */}
       <Box sx={{ display: 'flex', alignItems: 'center', p: 1.5 }}>
-        <Avatar
-          src={proveedor.avatarUrl || 'https://via.placeholder.com/150.png?text=User'}
-          sx={{ width: 24, height: 24, mr: 1 }}
-        />
+        <Avatar src={avatarSrc} onError={onErrorSetSrc(FALLBACK_AVATAR)} sx={{ width: 24, height: 24, mr: 1 }} />
         <Typography variant="body2">{proveedor.nombre}</Typography>
       </Box>
       {/* Link en la Imagen */}
@@ -22,7 +22,8 @@ const DisenoCard = ({ diseno }) => {
         <CardMedia
           component="img"
           height="160"
-          image={diseno.imagenUrl || 'https://via.placeholder.com/300x200.png?text=Sin+Imagen'}
+          image={imageSrc}
+          onError={onErrorSetSrc(FALLBACK_CARD_IMAGE)}
           alt={diseno.nombre}
         />
         {/* Titulo */}

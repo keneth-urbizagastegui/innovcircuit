@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.service.IDisenoService;
+import com.utec.innovcircuit.innovcircuitbackend.service.IResenaService;
+import com.utec.innovcircuit.innovcircuitbackend.dto.ResenaResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,6 +24,8 @@ public class DisenoController {
 
     @Autowired
     private IDisenoService disenoService;
+    @Autowired
+    private IResenaService resenaService;
 
     // RF-6, RF-9: Para todos los usuarios logueados
     @GetMapping
@@ -80,5 +84,11 @@ public class DisenoController {
         String safeUrl = (url != null) ? url : ""; // evitar NPE con Map.of
         Map<String, String> response = Map.of("url", safeUrl);
         return ResponseEntity.ok(response);
+    }
+
+    // Endpoint PÚBLICO: obtener reseñas de un diseño (ubicado aquí para alinearse con rutas públicas de /disenos/**)
+    @GetMapping("/{disenoId}/resenas")
+    public ResponseEntity<List<ResenaResponseDTO>> getResenasPorDiseno(@PathVariable Long disenoId) {
+        return ResponseEntity.ok(resenaService.getResenasPorDiseno(disenoId));
     }
 }

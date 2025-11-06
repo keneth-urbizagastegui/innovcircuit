@@ -33,7 +33,9 @@ try {
 $dto = @{ nombre = 'Diseño subido por multipart'; descripcion = 'Prueba de subida desde script'; precio = 12.34; gratuito = $false; categoriaId = $catId } | ConvertTo-Json -Depth 5
 
 # Usar un archivo existente en el repo como imagen de prueba (SVG)
-$imagePath = Join-Path $PSScriptRoot 'frontend\public\vite.svg'
+# El archivo está en frontend/public/vite.svg; partimos desde la raíz del repo
+$repoRoot = Split-Path $PSScriptRoot -Parent
+$imagePath = Join-Path $repoRoot 'frontend\public\vite.svg'
 if (-not (Test-Path $imagePath)) {
   Write-Host "Archivo de prueba no encontrado: $imagePath" -ForegroundColor Red
   exit 1

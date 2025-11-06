@@ -27,9 +27,12 @@ public class ResenaController {
         return new ResponseEntity<>(resena, HttpStatus.CREATED);
     }
 
-    // Endpoint PÚBLICO para que TODOS vean las reseñas de un diseño
-    @GetMapping("/disenos/{disenoId}/resenas")
-    public ResponseEntity<List<ResenaResponseDTO>> getResenas(@PathVariable Long disenoId) {
-        return ResponseEntity.ok(resenaService.getResenasPorDiseno(disenoId));
+    // Nota: El GET "/disenos/{disenoId}/resenas" se movió a DisenoController para
+    // alinearse con las rutas públicas de "/api/v1/disenos/**" definidas en SecurityConfig.
+
+    // Endpoint de prueba para diagnosticar permisos
+    @GetMapping("/resena-test")
+    public ResponseEntity<String> resenaTest() {
+        return ResponseEntity.ok("resena-test-ok");
     }
 }

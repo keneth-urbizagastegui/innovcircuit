@@ -3,9 +3,12 @@ import { useParams } from 'react-router-dom';
 import disenoService from '../services/disenoService';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Typography, Box, CircularProgress, Alert, Button, Paper, Grid, Avatar, Divider } from '@mui/material';
+import { Typography, Box, CircularProgress, Alert, Button, Paper, Grid, Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, TextField } from '@mui/material';
+import Rating from '@mui/material/Rating';
+import resenaService from '../services/resenaService';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DownloadIcon from '@mui/icons-material/Download';
+import { resolveImageUrl, resolveAvatarUrl, buildUiAvatar, FALLBACK_IMAGE, FALLBACK_AVATAR, onErrorSetSrc } from '../utils/imageUtils';
 
 const DisenoDetallePage = () => {
   const { id } = useParams();
@@ -14,6 +17,14 @@ const DisenoDetallePage = () => {
   const [diseno, setDiseno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  // Reseñas
+  const [resenas, setResenas] = useState([]);
+  const [resenasLoading, setResenasLoading] = useState(true);
+  const [resenasError, setResenasError] = useState('');
+  // Formulario nueva reseña (solo CLIENTE)
+  const [calificacion, setCalificacion] = useState(0);
+  const [comentario, setComentario] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const cargarDiseno = () => {
     setLoading(true);
@@ -25,6 +36,7 @@ const DisenoDetallePage = () => {
 
   useEffect(() => {
     cargarDiseno();
+    cargarResenas();
   }, [id]);
 
   const handleLike = () => {
@@ -47,6 +59,35 @@ const DisenoDetallePage = () => {
       .catch(() => setError('Error al registrar la descarga.'));
   };
 
+  const cargarResenas = () => {
+    setResenasLoading(true);
+    setResenasError('');
+    resenaService.getResenasPorDiseno(id)
+      .then(response => {
+        setResenas(Array.isArray(response.data) ? response.data : []);
+      })
+      .catch(() => setResenasError('Error al cargar las reseñas.'))
+      .finally(() => setResenasLoading(false));
+  };
+
+  const handleCrearResena = (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    const payload = { disenoId: Number(id), calificacion, comentario };
+    resenaService.crearResena(payload)
+      .then(() => {
+        setComentario('');
+        setCalificacion(0);
+        cargarResenas();
+      })
+      .catch((err) => {
+        const msg = err?.response?.data?.message || 'Error al crear la reseña.';
+        setError(msg);
+      })
+      .finally(() => setSubmitting(false));
+  };
+
   const handleAddToCart = () => {
     if (diseno) cart.addItem(diseno);
   };
@@ -62,6 +103,8 @@ const DisenoDetallePage = () => {
   }
 
   const proveedor = diseno.proveedor || { nombre: 'N/A', avatarUrl: '' };
+  const mainImageSrc = resolveImageUrl(diseno.imagenUrl) || FALLBACK_IMAGE;
+  const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 64, { rounded: true });
 
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
@@ -72,7 +115,8 @@ const DisenoDetallePage = () => {
             component="img"
             sx={{ width: '100%', objectFit: 'cover', borderRadius: 2 }}
             alt={diseno.nombre}
-            src={diseno.imagenUrl || 'https://via.placeholder.com/600x400.png?text=Sin+Imagen'}
+            src={mainImageSrc}
+            onError={onErrorSetSrc(FALLBACK_IMAGE)}
           />
         </Grid>
 
@@ -82,7 +126,7 @@ const DisenoDetallePage = () => {
 
           {/* Info del Proveedor */}
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Avatar src={proveedor.avatarUrl || 'https://via.placeholder.com/150.png?text=User'} sx={{ mr: 1 }} />
+            <Avatar src={avatarSrc} onError={onErrorSetSrc(FALLBACK_AVATAR)} sx={{ mr: 1 }} />
             <Typography variant="h6">{proveedor.nombre}</Typography>
           </Box>
 
@@ -117,6 +161,66 @@ const DisenoDetallePage = () => {
             {diseno.descripcion || 'Este diseño no tiene descripción.'}
           </Typography>
         </Grid>
+
+        {/* Reseñas */}
+        <Grid item xs={12} sx={{ mt: 4 }}>
+          <Typography variant="h5">Reseñas</Typography>
+          <Divider sx={{ my: 1 }} />
+
+          {resenasLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : resenasError ? (
+            <Alert severity="error">{resenasError}</Alert>
+          ) : resenas.length === 0 ? (
+            <Typography variant="body2">Aún no hay reseñas para este diseño.</Typography>
+          ) : (
+            <List>
+              {resenas.map((r) => (
+                <ListItem key={r.id} alignItems="flex-start">
+            <ListItemAvatar>
+              <Avatar src={buildUiAvatar(r?.clienteNombre || 'Usuario', 32, { rounded: true })} alt={r?.clienteNombre || 'Usuario'} onError={onErrorSetSrc(FALLBACK_AVATAR)} />
+            </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="subtitle1">{r?.clienteNombre || 'Cliente'}</Typography>
+                        <Rating value={Number(r?.calificacion) || 0} readOnly size="small" />
+                      </Box>
+                    }
+                    secondary={<Typography variant="body2">{r?.comentario || ''}</Typography>}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          )}
+        </Grid>
+
+        {/* Formulario de Nueva Reseña - Solo CLIENTE */}
+        {user?.rol === 'CLIENTE' && (
+          <Grid item xs={12} sx={{ mt: 2 }}>
+            <Typography variant="h6">Escribir una Reseña</Typography>
+            <Divider sx={{ my: 1 }} />
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            <Box component="form" onSubmit={handleCrearResena} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography>Calificación:</Typography>
+                <Rating value={calificacion} onChange={(_, v) => setCalificacion(v || 0)} />
+              </Box>
+              <TextField
+                label="Comentario"
+                multiline
+                minRows={3}
+                value={comentario}
+                onChange={(e) => setComentario(e.target.value)}
+              />
+              <Button type="submit" variant="contained" disabled={submitting || calificacion === 0}>
+                {submitting ? 'Enviando...' : 'Enviar Reseña'}
+              </Button>
+            </Box>
+          </Grid>
+        )}
       </Grid>
     </Paper>
   );
