@@ -6,12 +6,7 @@ import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoResponseDTO;
 import java.util.List;
 
 public interface IDisenoService {
-    // Para Proveedor
-    DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor);
-    // Variante con archivo de imagen
-    DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor, org.springframework.web.multipart.MultipartFile imagenFile);
-
-    // Variante con imagen y archivo de esquemático (zip/rar)
+    // Para Proveedor: subir diseño con archivos opcionales (imagen y esquemático)
     DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor,
                                   org.springframework.web.multipart.MultipartFile imagenFile,
                                   org.springframework.web.multipart.MultipartFile esquematicoFile);

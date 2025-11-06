@@ -32,61 +32,7 @@ public class DisenoServiceImpl implements IDisenoService {
     @Autowired
     private FileStorageService fileStorageService;
 
-    @Override
-    public DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor) {
-        // 1. Buscar categoría
-        Categoria categoria = categoriaRepository.findById(requestDTO.getCategoriaId())
-                .orElseThrow(() -> new NoSuchElementException("Categoría no encontrada"));
-
-        // 2. Buscar proveedor por email (desde el token)
-        Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
-                .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
-
-        // 3. Crear entidad Diseno con estado PENDIENTE
-        Diseno diseno = new Diseno();
-        diseno.setNombre(requestDTO.getNombre());
-        diseno.setDescripcion(requestDTO.getDescripcion());
-        diseno.setPrecio(requestDTO.getPrecio());
-        diseno.setGratuito(requestDTO.isGratuito());
-        diseno.setEstado("PENDIENTE");
-        diseno.setCategoria(categoria);
-        diseno.setProveedor(proveedor);
-
-        // 4. Guardar y devolver DTO
-        Diseno saved = disenoRepository.save(diseno);
-        return mapToResponseDTO(saved);
-    }
-
-    @Override
-    public DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor, MultipartFile imagenFile) {
-        // 1. Buscar categoría
-        Categoria categoria = categoriaRepository.findById(requestDTO.getCategoriaId())
-                .orElseThrow(() -> new NoSuchElementException("Categoría no encontrada"));
-
-        // 2. Buscar proveedor por email (desde el token)
-        Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
-                .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
-
-        // 3. Crear entidad Diseno con estado PENDIENTE
-        Diseno diseno = new Diseno();
-        diseno.setNombre(requestDTO.getNombre());
-        diseno.setDescripcion(requestDTO.getDescripcion());
-        diseno.setPrecio(requestDTO.getPrecio());
-        diseno.setGratuito(requestDTO.isGratuito());
-        diseno.setEstado("PENDIENTE");
-        diseno.setCategoria(categoria);
-        diseno.setProveedor(proveedor);
-
-        // 4. Guardar archivo (si existe) y asignar imagenUrl
-        String imagenUrl = fileStorageService.storeFile(imagenFile);
-        if (imagenUrl != null) {
-            diseno.setImagenUrl(imagenUrl);
-        }
-
-        // 5. Guardar y devolver DTO
-        Diseno saved = disenoRepository.save(diseno);
-        return mapToResponseDTO(saved);
-    }
+    // Eliminadas variantes sobrecargadas: usamos un solo método con archivos opcionales
 
     @Override
     public DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor,
@@ -110,13 +56,19 @@ public class DisenoServiceImpl implements IDisenoService {
         diseno.setCategoria(categoria);
         diseno.setProveedor(proveedor);
 
-        // 4. Guardar archivos (si existen) y asignar URLs
-        String imagenUrl = fileStorageService.storeFile(imagenFile);
+        // 4. Guardar archivos SOLO si no son nulos ni vacíos y asignar URLs
+        String imagenUrl = null;
+        if (imagenFile != null && !imagenFile.isEmpty()) {
+            imagenUrl = fileStorageService.storeFile(imagenFile);
+        }
         if (imagenUrl != null) {
             diseno.setImagenUrl(imagenUrl);
         }
 
-        String esquematicoUrl = fileStorageService.storeFile(esquematicoFile);
+        String esquematicoUrl = null;
+        if (esquematicoFile != null && !esquematicoFile.isEmpty()) {
+            esquematicoUrl = fileStorageService.storeFile(esquematicoFile);
+        }
         if (esquematicoUrl != null) {
             diseno.setEsquematicoUrl(esquematicoUrl);
         }

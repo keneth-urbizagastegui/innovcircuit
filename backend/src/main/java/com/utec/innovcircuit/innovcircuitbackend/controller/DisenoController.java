@@ -42,7 +42,7 @@ public class DisenoController {
     public ResponseEntity<DisenoResponseDTO> subirDiseno(
             @RequestParam("disenoDTO") String disenoRequestDTOString,
             @RequestPart(value = "imagenFile", required = false) MultipartFile imagenFile,
-            @RequestPart("esquematicoFile") MultipartFile esquematicoFile,
+            @RequestPart(value = "esquematicoFile", required = false) MultipartFile esquematicoFile,
             Principal principal) {
         try {
             // Convertir el String DTO de vuelta a un objeto Java
