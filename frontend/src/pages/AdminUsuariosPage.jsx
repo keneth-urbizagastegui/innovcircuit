@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Paper, Typography, Box, CircularProgress, Alert, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
+import ConfirmDialog from '../components/ConfirmDialog';
 import adminUsuariosService from '../services/adminUsuariosService';
 
 const AdminUsuariosPage = () => {
@@ -27,12 +28,20 @@ const AdminUsuariosPage = () => {
       .catch(() => setError('No se pudo actualizar el estado del usuario'));
   };
 
-  const handleEliminar = (usuario) => {
-    const ok = window.confirm(`¿Eliminar usuario ${usuario.nombre} (${usuario.email})?`);
-    if (!ok) return;
-    adminUsuariosService.eliminarUsuario(usuario.id)
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+
+  const solicitarEliminar = (usuario) => {
+    setUsuarioSeleccionado(usuario);
+    setConfirmOpen(true);
+  };
+
+  const confirmarEliminar = () => {
+    if (!usuarioSeleccionado) return;
+    adminUsuariosService.eliminarUsuario(usuarioSeleccionado.id)
       .then(() => cargarUsuarios())
-      .catch(() => setError('No se pudo eliminar el usuario'));
+      .catch(() => setError('No se pudo eliminar el usuario'))
+      .finally(() => { setConfirmOpen(false); setUsuarioSeleccionado(null); });
   };
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
@@ -64,12 +73,23 @@ const AdminUsuariosPage = () => {
                 <Button variant="contained" color={u.estado === 'ACTIVO' ? 'warning' : 'success'} sx={{ mr: 1 }} onClick={() => handleToggleEstado(u)}>
                   {u.estado === 'ACTIVO' ? 'Bloquear' : 'Activar'}
                 </Button>
-                <Button variant="contained" color="error" onClick={() => handleEliminar(u)}>Eliminar</Button>
+                <Button variant="contained" color="error" onClick={() => solicitarEliminar(u)}>Eliminar</Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* Confirmación de eliminación */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Confirmar eliminación"
+        message={usuarioSeleccionado ? `¿Eliminar usuario ${usuarioSeleccionado.nombre} (${usuarioSeleccionado.email})?` : ''}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={confirmarEliminar}
+        onCancel={() => { setConfirmOpen(false); setUsuarioSeleccionado(null); }}
+      />
     </Paper>
   );
 };

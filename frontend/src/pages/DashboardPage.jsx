@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import usuarioService from '../services/usuarioService';
-import { Typography, Box, Paper, List, ListItem, ListItemText, Divider, CircularProgress, Alert, IconButton, Grid, Button } from '@mui/material';
+import { Typography, Box, Paper, List, ListItem, ListItemText, Divider, CircularProgress, Alert, IconButton, Grid, Button, Modal } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import disenoService from '../services/disenoService';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -15,6 +16,8 @@ const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState('');
+  const [reporteOpen, setReporteOpen] = useState(false);
+  const [reporteJson, setReporteJson] = useState('');
 
   const recargarMisDisenos = () => {
     usuarioService.getMisDisenos()
@@ -45,12 +48,15 @@ const DashboardPage = () => {
     }
   }, [user]);
 
-  const handleEliminarDiseno = (id) => {
-    const ok = window.confirm('¿Eliminar este diseño? Esta acción no se puede deshacer.');
-    if (!ok) return;
-    disenoService.eliminarDiseno(id)
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [disenoAEliminar, setDisenoAEliminar] = useState(null);
+  const solicitarEliminarDiseno = (id) => { setDisenoAEliminar(id); setConfirmOpen(true); };
+  const confirmarEliminarDiseno = () => {
+    if (!disenoAEliminar) return;
+    disenoService.eliminarDiseno(disenoAEliminar)
       .then(() => recargarMisDisenos())
-      .catch(() => setError('No se pudo eliminar el diseño'));
+      .catch(() => setError('No se pudo eliminar el diseño'))
+      .finally(() => { setConfirmOpen(false); setDisenoAEliminar(null); });
   };
 
   const handleEditarDiseno = (id) => {
@@ -74,8 +80,8 @@ const DashboardPage = () => {
           <Box sx={{ mb: 2 }}>
             <Button variant="outlined" onClick={() => {
               usuarioService.getReporteMisCompras()
-                .then(res => alert(JSON.stringify(res.data, null, 2)))
-                .catch(() => alert('Error al generar reporte de compras'));
+                .then(res => { setReporteJson(JSON.stringify(res.data, null, 2)); setReporteOpen(true); })
+                .catch(() => { setReporteJson('Error al generar reporte de compras'); setReporteOpen(true); });
             }}>
               Generar Reporte de Mis Compras
             </Button>
@@ -131,7 +137,7 @@ const DashboardPage = () => {
                     <IconButton edge="end" aria-label="editar" sx={{ mr: 1 }} onClick={() => handleEditarDiseno(diseno.id)}>
                       <EditIcon />
                     </IconButton>
-                    <IconButton edge="end" aria-label="eliminar" color="error" onClick={() => handleEliminarDiseno(diseno.id)}>
+                    <IconButton edge="end" aria-label="eliminar" color="error" onClick={() => solicitarEliminarDiseno(diseno.id)}>
                       <DeleteIcon />
                     </IconButton>
                   </Box>
@@ -146,6 +152,29 @@ const DashboardPage = () => {
           </List>
         </Box>
       )}
+      {/* Confirmación de eliminación de diseño */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Eliminar diseño"
+        message="¿Eliminar este diseño? Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={confirmarEliminarDiseno}
+        onCancel={() => { setConfirmOpen(false); setDisenoAEliminar(null); }}
+      />
+
+      {/* Modal para mostrar JSON del reporte */}
+      <Modal open={reporteOpen} onClose={() => setReporteOpen(false)} aria-labelledby="reporte-json-modal">
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', p: 3, width: { xs: '90%', sm: 600 }, boxShadow: 24, borderRadius: 1 }}>
+          <Typography id="reporte-json-modal" variant="h6" gutterBottom>Reporte de Compras</Typography>
+          <Box sx={{ maxHeight: 400, overflow: 'auto', bgcolor: '#111', color: '#0f0', p: 2, borderRadius: 1 }}>
+            <pre style={{ margin: 0 }}>{reporteJson}</pre>
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <Button onClick={() => setReporteOpen(false)}>Cerrar</Button>
+          </Box>
+        </Box>
+      </Modal>
     </Paper>
   );
 };

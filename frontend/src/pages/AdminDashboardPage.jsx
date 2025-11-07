@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../services/adminService';
-import { Typography, Box, Paper, List, ListItem, ListItemText, Button, CircularProgress, Alert, Grid } from '@mui/material';
+import { Typography, Box, Paper, List, ListItem, ListItemText, Button, CircularProgress, Alert, Grid, Modal } from '@mui/material';
 
 const AdminDashboardPage = () => {
   const [pendientes, setPendientes] = useState([]);
@@ -9,6 +9,8 @@ const AdminDashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [statsError, setStatsError] = useState('');
+  const [reporteOpen, setReporteOpen] = useState(false);
+  const [reporteJson, setReporteJson] = useState('');
 
   const cargarPendientes = () => {
     setLoading(true);
@@ -65,10 +67,8 @@ const AdminDashboardPage = () => {
       <Box sx={{ mb: 2 }}>
         <Button variant="outlined" onClick={() => {
           adminService.getReporteVentas()
-            .then(res => {
-              alert(JSON.stringify(res.data, null, 2));
-            })
-            .catch(() => alert('Error al generar reporte de ventas'));
+            .then(res => { setReporteJson(JSON.stringify(res.data, null, 2)); setReporteOpen(true); })
+            .catch(() => { setReporteJson('Error al generar reporte de ventas'); setReporteOpen(true); });
         }}>
           Generar Reporte de Ventas
         </Button>
@@ -119,6 +119,18 @@ const AdminDashboardPage = () => {
           ))
         )}
       </List>
+      {/* Modal para mostrar JSON del reporte */}
+      <Modal open={reporteOpen} onClose={() => setReporteOpen(false)} aria-labelledby="reporte-ventas-json-modal">
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', p: 3, width: { xs: '90%', sm: 600 }, boxShadow: 24, borderRadius: 1 }}>
+          <Typography id="reporte-ventas-json-modal" variant="h6" gutterBottom>Reporte de Ventas</Typography>
+          <Box sx={{ maxHeight: 400, overflow: 'auto', bgcolor: '#111', color: '#0f0', p: 2, borderRadius: 1 }}>
+            <pre style={{ margin: 0 }}>{reporteJson}</pre>
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <Button onClick={() => setReporteOpen(false)}>Cerrar</Button>
+          </Box>
+        </Box>
+      </Modal>
     </Paper>
   );
 };
