@@ -1,9 +1,10 @@
 import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Container, Box, Button, CssBaseline, Badge, IconButton } from '@mui/material';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { ShoppingCart } from 'lucide-react';
 
 const Layout = () => {
   const auth = useAuth();
@@ -17,90 +18,58 @@ const Layout = () => {
   };
 
   return (
-    <>
-      <CssBaseline />
-      <AppBar position="sticky" color="default">
-        <Toolbar sx={{ gap: 2 }}>
-          {/* Título/Logo */}
-          <Typography
-            variant="h6"
-            component={Link}
-            to="/"
-            sx={{ color: 'primary.main', textDecoration: 'none', fontWeight: 800, letterSpacing: 0.4 }}
-          >
+    <div className="min-h-screen bg-white">
+      <header className="sticky top-0 z-40 w-full border-b bg-white">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+          <Link to="/" className="text-sky-600 font-extrabold tracking-wide">
             InnovCircuit
-          </Typography>
-          {/* Barra de búsqueda eliminada por requerimiento */}
-          {/* Lógica de Autenticación */}
-          {auth.isAuthenticated() ? (
-            <>
-              {/* Enlace al Dashboard para Cliente y Proveedor */}
-              {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
-                <Button color="inherit" component={Link} to="/dashboard" sx={{ mr: 2 }}>
-                  Mi Panel
-                </Button>
-              )}
-              {/* Enlace al Perfil para usuarios autenticados (al menos Cliente y Proveedor) */}
-              {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
-                <Button color="inherit" component={Link} to="/perfil" sx={{ mr: 2 }}>
-                  Mi Perfil
-                </Button>
-              )}
-              {/* Enlace visible para proveedores */}
-              {auth.user?.rol === 'PROVEEDOR' && (
-                <Button color="inherit" component={Link} to="/subir-diseno" sx={{ mr: 2 }}>
-                  Subir Diseño
-                </Button>
-              )}
-              {/* Enlace visible para clientes con ícono y badge */}
-              {auth.user?.rol === 'CLIENTE' && (
-                <IconButton color="inherit" component={Link} to="/carrito" sx={{ mr: 2 }}>
-                  <Badge badgeContent={items?.length || 0} color="error">
-                    <ShoppingCartIcon />
-                  </Badge>
-                </IconButton>
-              )}
-              {/* Enlace visible solo para administradores */}
-              {auth.user?.rol === 'ADMINISTRADOR' && (
-                <Button color="inherit" component={Link} to="/admin" sx={{ mr: 2 }}>
-                  Panel de Admin
-                </Button>
-              )}
-              {/* Gestión de Usuarios (solo Admin) */}
-              {auth.user?.rol === 'ADMINISTRADOR' && (
-                <Button color="inherit" component={Link} to="/admin/usuarios" sx={{ mr: 2 }}>
-                  Gestionar Usuarios
-                </Button>
-              )}
-              {/* Configuración (solo Admin) */}
-              {auth.user?.rol === 'ADMINISTRADOR' && (
-                <Button color="inherit" component={Link} to="/admin/configuracion" sx={{ mr: 2 }}>
-                  Configuración
-                </Button>
-              )}
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button color="inherit" component={Link} to="/login">
-                Login
-              </Button>
-              <Button color="inherit" component={Link} to="/register">
-                Registro
-              </Button>
-            </>
-          )}
-        </Toolbar>
-      </AppBar>
-      {/* Contenedor principal donde se renderizarán las páginas */}
-      <Container component="main" sx={{ mt: 4, mb: 4 }}>
-        <Box>
-          <Outlet />
-        </Box>
-      </Container>
-    </>
+          </Link>
+          <div className="ml-auto flex items-center gap-2">
+            {auth.isAuthenticated() ? (
+              <>
+                {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
+                  <Button as={Link} to="/dashboard" variant="ghost">Mi Panel</Button>
+                )}
+                {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
+                  <Button as={Link} to="/perfil" variant="ghost">Mi Perfil</Button>
+                )}
+                {auth.user?.rol === 'PROVEEDOR' && (
+                  <Button as={Link} to="/subir-diseno" variant="ghost">Subir Diseño</Button>
+                )}
+                {auth.user?.rol === 'CLIENTE' && (
+                  <Link to="/carrito" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-slate-100">
+                    <ShoppingCart className="h-5 w-5 text-slate-700" />
+                    {items?.length > 0 && (
+                      <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
+                        {items.length}
+                      </span>
+                    )}
+                  </Link>
+                )}
+                {auth.user?.rol === 'ADMINISTRADOR' && (
+                  <Button as={Link} to="/admin" variant="ghost">Panel de Admin</Button>
+                )}
+                {auth.user?.rol === 'ADMINISTRADOR' && (
+                  <Button as={Link} to="/admin/usuarios" variant="ghost">Gestionar Usuarios</Button>
+                )}
+                {auth.user?.rol === 'ADMINISTRADOR' && (
+                  <Button as={Link} to="/admin/configuracion" variant="ghost">Configuración</Button>
+                )}
+                <Button onClick={handleLogout} variant="outline">Logout</Button>
+              </>
+            ) : (
+              <>
+                <Button as={Link} to="/login" variant="ghost">Login</Button>
+                <Button as={Link} to="/register" variant="default">Registro</Button>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        <Outlet />
+      </main>
+    </div>
   );
 };
 

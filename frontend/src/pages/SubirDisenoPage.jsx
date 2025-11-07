@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import categoriaService from '../services/categoriaService';
 import apiClient from '../services/api';
-import { TextField, Button, Checkbox, FormControlLabel, Select, MenuItem, InputLabel, FormControl, Typography, Box, CircularProgress, Alert } from '@mui/material';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
+import { Select } from '../components/ui/select';
 
 const SubirDisenoPage = () => {
   const { user } = useAuth();
@@ -72,83 +75,82 @@ const SubirDisenoPage = () => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 600, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom>
-        Subir Nuevo Diseño
-      </Typography>
+    <form onSubmit={handleSubmit} className="max-w-[600px] mx-auto p-6 bg-white rounded-xl border border-border shadow-sm space-y-4">
+      <h1 className="text-2xl font-semibold">Subir Nuevo Diseño</h1>
 
-      {error && <Alert severity="error">{error}</Alert>}
-      {success && <Alert severity="success">{success}</Alert>}
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
+      )}
+      {success && (
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700">{success}</div>
+      )}
 
-      <TextField
-        label="Nombre del Diseño"
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        fullWidth
-        required
-        margin="normal"
-      />
+      <div>
+        <label className="block text-sm font-medium mb-1">Nombre del Diseño</label>
+        <Input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+      </div>
 
-      <TextField
-        label="Descripción"
-        value={descripcion}
-        onChange={(e) => setDescripcion(e.target.value)}
-        fullWidth
-        multiline
-        rows={4}
-        margin="normal"
-      />
+      <div>
+        <label className="block text-sm font-medium mb-1">Descripción</label>
+        <Textarea rows={8} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
+      </div>
 
-      <TextField
-        label="Precio"
-        type="number"
-        value={precio}
-        onChange={(e) => setPrecio(parseFloat(e.target.value))}
-        fullWidth
-        required
-        margin="normal"
-        disabled={gratuito}
-      />
+      <div>
+        <label className="block text-sm font-medium mb-1">Precio</label>
+        <Input type="number" value={precio} onChange={(e) => setPrecio(parseFloat(e.target.value))} required disabled={gratuito} />
+      </div>
 
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={gratuito}
-            onChange={(e) => {
-              const isFree = e.target.checked;
-              setGratuito(isFree);
-              if (isFree) setPrecio(0);
-            }}
-          />
-        }
-        label="Es gratuito (precio será 0)"
-      />
+      <div className="flex items-center gap-2">
+        <input
+          id="gratuito"
+          type="checkbox"
+          checked={gratuito}
+          onChange={(e) => {
+            const isFree = e.target.checked;
+            setGratuito(isFree);
+            if (isFree) setPrecio(0);
+          }}
+          className="h-4 w-4 rounded border-slate-300"
+        />
+        <label htmlFor="gratuito" className="text-sm">Es gratuito (precio será 0)</label>
+      </div>
 
-      <FormControl fullWidth margin="normal" required>
-        <InputLabel>Categoría</InputLabel>
-        <Select value={categoriaId} label="Categoría" onChange={(e) => setCategoriaId(e.target.value)}>
+      <div>
+        <label className="block text-sm font-medium mb-1">Categoría</label>
+        <Select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)} required>
+          <option value="" disabled>Seleccione una categoría</option>
           {categorias.map((cat) => (
-            <MenuItem key={cat.id} value={cat.id}>
-              {cat.nombre}
-            </MenuItem>
+            <option key={cat.id} value={cat.id}>{cat.nombre}</option>
           ))}
         </Select>
-      </FormControl>
+      </div>
 
-      <Button variant="contained" component="label" fullWidth sx={{ my: 1 }}>
-        {imagenFile ? `Imagen: ${imagenFile.name}` : 'Subir Imagen Principal (PNG/JPG)'}
-        <input type="file" accept="image/*" hidden onChange={(e) => setImagenFile(e.target.files[0])} />
-      </Button>
+      <div>
+        <label className="block text-sm font-medium mb-1">Imagen Principal (PNG/JPG)</label>
+        <div className="flex items-center gap-2">
+          <Button as="label" variant="outline" className="cursor-pointer">
+            {imagenFile ? `Imagen: ${imagenFile.name}` : 'Seleccionar archivo'}
+            <input type="file" accept="image/*" hidden onChange={(e) => setImagenFile(e.target.files[0])} />
+          </Button>
+        </div>
+      </div>
 
-      <Button variant="contained" component="label" fullWidth sx={{ my: 1 }}>
-        {esquematicoFile ? `Esquemático: ${esquematicoFile.name}` : 'Subir Archivo de Diseño (ZIP/RAR)'}
-        <input type="file" accept=".zip,.rar" hidden onChange={(e) => setEsquematicoFile(e.target.files[0])} />
-      </Button>
+      <div>
+        <label className="block text-sm font-medium mb-1">Archivo de Diseño (ZIP/RAR)</label>
+        <div className="flex items-center gap-2">
+          <Button as="label" variant="outline" className="cursor-pointer">
+            {esquematicoFile ? `Esquemático: ${esquematicoFile.name}` : 'Seleccionar archivo'}
+            <input type="file" accept=".zip,.rar" hidden onChange={(e) => setEsquematicoFile(e.target.files[0])} />
+          </Button>
+        </div>
+      </div>
 
-      <Button type="submit" variant="contained" color="primary" size="large" fullWidth sx={{ mt: 2 }} disabled={loading}>
-        {loading ? <CircularProgress size={24} /> : 'Subir Diseño'}
-      </Button>
-    </Box>
+      <div className="pt-2">
+        <Button type="submit" className="w-full" loading={loading}>
+          Subir Diseño
+        </Button>
+      </div>
+    </form>
   );
 };
 

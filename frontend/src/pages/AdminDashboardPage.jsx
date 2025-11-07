@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../services/adminService';
-import { Typography, Box, Paper, List, ListItem, ListItemText, Button, CircularProgress, Alert, Grid, Modal } from '@mui/material';
+import { Button } from '../components/ui/button';
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
 
 const AdminDashboardPage = () => {
   const [pendientes, setPendientes] = useState([]);
@@ -58,80 +59,85 @@ const AdminDashboardPage = () => {
   };
 
   if (loading) {
-    return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+    return (
+      <div className="flex justify-center mt-4">
+        <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" aria-label="Cargando" />
+      </div>
+    );
   }
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>Panel de Administración</Typography>
-      <Box sx={{ mb: 2 }}>
-        <Button variant="outlined" onClick={() => {
+    <div className="p-6 bg-white rounded-xl border border-border shadow-sm">
+      <h1 className="text-2xl font-semibold text-foreground mb-4">Panel de Administración</h1>
+      <div className="mb-2">
+        <Button variant="outline" onClick={() => {
           adminService.getReporteVentas()
             .then(res => { setReporteJson(JSON.stringify(res.data, null, 2)); setReporteOpen(true); })
             .catch(() => { setReporteJson('Error al generar reporte de ventas'); setReporteOpen(true); });
         }}>
           Generar Reporte de Ventas
         </Button>
-      </Box>
+      </div>
       {/* Estadísticas globales */}
-      {statsError && <Alert severity="error" sx={{ mb: 2 }}>{statsError}</Alert>}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6}>
-          <Paper elevation={2} sx={{ p: 2, minHeight: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Typography variant="subtitle1">Ventas Globales</Typography>
-            {statsLoading ? (
-              <CircularProgress size={20} sx={{ mt: 1 }} />
-            ) : (
-              <Typography variant="h6">${Number(stats?.totalVentasGlobal ?? 0).toFixed(2)}</Typography>
-            )}
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Paper elevation={2} sx={{ p: 2, minHeight: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Typography variant="subtitle1">Comisiones Generadas</Typography>
-            {statsLoading ? (
-              <CircularProgress size={20} sx={{ mt: 1 }} />
-            ) : (
-              <Typography variant="h6">${Number(stats?.totalComisiones ?? 0).toFixed(2)}</Typography>
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
-      <Typography variant="h6" gutterBottom>Diseños Pendientes de Revisión</Typography>
-      {error && <Alert severity="error">{error}</Alert>}
-      <List>
+      {statsError && (
+        <div className="mb-2 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{statsError}</div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
+          <div className="text-sm text-muted-foreground">Ventas Globales</div>
+          {statsLoading ? (
+            <div className="mt-1 h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          ) : (
+            <div className="text-lg font-semibold">${Number(stats?.totalVentasGlobal ?? 0).toFixed(2)}</div>
+          )}
+        </div>
+        <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
+          <div className="text-sm text-muted-foreground">Comisiones Generadas</div>
+          {statsLoading ? (
+            <div className="mt-1 h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          ) : (
+            <div className="text-lg font-semibold">${Number(stats?.totalComisiones ?? 0).toFixed(2)}</div>
+          )}
+        </div>
+      </div>
+      <h2 className="text-xl font-semibold mb-2">Diseños Pendientes de Revisión</h2>
+      {error && (
+        <div className="mb-2 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
+      )}
+      <div className="divide-y">
         {pendientes.length === 0 ? (
-          <Typography>No hay diseños pendientes.</Typography>
+          <p className="text-muted-foreground">No hay diseños pendientes.</p>
         ) : (
           pendientes.map(diseno => (
-            <ListItem key={diseno.id} divider>
-              <ListItemText
-                primary={diseno.nombre}
-                secondary={`Por: ${diseno.proveedor?.nombre || 'N/A'} | Categoría: ${diseno.nombreCategoria || 'N/A'}`}
-              />
-              <Button variant="contained" color="success" sx={{ mr: 1 }} onClick={() => handleAprobar(diseno.id)}>
-                Aprobar
-              </Button>
-              <Button variant="contained" color="error" onClick={() => handleRechazar(diseno.id)}>
-                Rechazar
-              </Button>
-            </ListItem>
+            <div key={diseno.id} className="py-3 flex items-center justify-between">
+              <div>
+                <div className="font-medium">{diseno.nombre}</div>
+                <div className="text-sm text-muted-foreground">Por: {diseno.proveedor?.nombre || 'N/A'} | Categoría: {diseno.nombreCategoria || 'N/A'}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="success" onClick={() => handleAprobar(diseno.id)}>Aprobar</Button>
+                <Button variant="destructive" onClick={() => handleRechazar(diseno.id)}>Rechazar</Button>
+              </div>
+            </div>
           ))
         )}
-      </List>
+      </div>
       {/* Modal para mostrar JSON del reporte */}
-      <Modal open={reporteOpen} onClose={() => setReporteOpen(false)} aria-labelledby="reporte-ventas-json-modal">
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', p: 3, width: { xs: '90%', sm: 600 }, boxShadow: 24, borderRadius: 1 }}>
-          <Typography id="reporte-ventas-json-modal" variant="h6" gutterBottom>Reporte de Ventas</Typography>
-          <Box sx={{ maxHeight: 400, overflow: 'auto', bgcolor: '#111', color: '#0f0', p: 2, borderRadius: 1 }}>
-            <pre style={{ margin: 0 }}>{reporteJson}</pre>
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <Button onClick={() => setReporteOpen(false)}>Cerrar</Button>
-          </Box>
-        </Box>
-      </Modal>
-    </Paper>
+      <Dialog open={reporteOpen} onClose={() => setReporteOpen(false)} className="w-[90%] sm:w-[600px] p-4">
+        <DialogHeader>
+          <DialogTitle>Reporte de Ventas</DialogTitle>
+          <DialogDescription>
+            Resultado en formato JSON
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-[400px] overflow-auto bg-black text-green-400 p-3 rounded">
+          <pre className="m-0">{reporteJson}</pre>
+        </div>
+        <DialogFooter>
+          <Button onClick={() => setReporteOpen(false)}>Cerrar</Button>
+        </DialogFooter>
+      </Dialog>
+    </div>
   );
 };
 

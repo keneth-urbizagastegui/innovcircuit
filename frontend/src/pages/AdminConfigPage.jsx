@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Paper, Typography, Box, TextField, Button, CircularProgress, Alert, Grid } from '@mui/material';
 import adminService from '../services/adminService';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 
 const AdminConfigPage = () => {
   const [configs, setConfigs] = useState([]);
@@ -52,43 +54,50 @@ const AdminConfigPage = () => {
       });
   };
 
-  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+  if (loading) return (
+    <div className="flex justify-center mt-4">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-sky-500" />
+    </div>
+  );
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>Configuración (Admin)</Typography>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+    <Card className="p-4">
+      <CardHeader className="pb-2">
+        <CardTitle>Configuración (Admin)</CardTitle>
+      </CardHeader>
+      {error && (
+        <div className="mb-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mb-2 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+          {success}
+        </div>
+      )}
       {configs.length === 0 ? (
-        <Typography>No hay configuraciones registradas.</Typography>
+        <div className="text-slate-700">No hay configuraciones registradas.</div>
       ) : (
-        <Grid container spacing={2}>
-          {configs.map(conf => (
-            <Grid item xs={12} md={6} key={conf.id || conf.clave}>
-              <Paper elevation={1} sx={{ p: 2 }}>
-                <Typography variant="subtitle1" gutterBottom>{conf.clave}</Typography>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <TextField
-                    label="Valor"
+        <CardContent className="p-0">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {configs.map(conf => (
+              <div key={conf.id || conf.clave} className="rounded-lg border border-slate-200 bg-white p-3">
+                <div className="mb-2 text-sm font-medium text-slate-800">{conf.clave}</div>
+                <div className="flex items-center gap-2">
+                  <Input
                     value={values[conf.clave] ?? ''}
                     onChange={(e) => handleChange(conf.clave, e.target.value)}
-                    fullWidth
-                    size="small"
                   />
-                  <Button
-                    variant="contained"
-                    onClick={() => handleGuardar(conf.clave)}
-                    disabled={savingKey === conf.clave}
-                  >
+                  <Button onClick={() => handleGuardar(conf.clave)} disabled={savingKey === conf.clave}>
                     {savingKey === conf.clave ? 'Guardando...' : 'Guardar'}
                   </Button>
-                </Box>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
       )}
-    </Paper>
+    </Card>
   );
 };
 

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import ventaService from '../services/ventaService';
-import { Typography, Box, Button, Paper, List, ListItem, ListItemText, Divider, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 
 const CarritoPage = () => {
   const { items, removeItem, clearCart } = useCart();
@@ -33,59 +34,56 @@ const CarritoPage = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Carrito de Compras
-      </Typography>
+    <Card className="p-4">
+      <CardHeader className="pb-2">
+        <CardTitle>Carrito de Compras</CardTitle>
+      </CardHeader>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <div className="mb-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}
-        </Alert>
+        </div>
       )}
       {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
+        <div className="mb-2 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
           {success}
-        </Alert>
+        </div>
       )}
 
-      <List>
+      <CardContent className="p-0">
         {items.length === 0 ? (
-          <Typography>Tu carrito está vacío.</Typography>
+          <p className="text-slate-700">Tu carrito está vacío.</p>
         ) : (
-          items.map((item) => (
-            <ListItem
-              key={item.id}
-              secondaryAction={
-                <Button edge="end" color="error" onClick={() => removeItem(item.id)}>
+          <ul className="divide-y divide-slate-200">
+            {items.map((item) => (
+              <li key={item.id} className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{item.nombre}</p>
+                  <p className="text-sm text-slate-600">${item.precio.toFixed(2)}</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => removeItem(item.id)}>
                   Quitar
                 </Button>
-              }
-            >
-              <ListItemText primary={item.nombre} secondary={`$${item.precio.toFixed(2)}`} />
-            </ListItem>
-          ))
+              </li>
+            ))}
+          </ul>
         )}
-      </List>
 
-      <Divider sx={{ my: 2 }} />
+        <div className="my-2 h-px bg-slate-200" />
 
-      <Typography variant="h5" align="right">
-        Total: ${total.toFixed(2)}
-      </Typography>
+        <div className="text-right text-lg font-semibold">
+          Total: ${total.toFixed(2)}
+        </div>
 
-      <Button
-        variant="contained"
-        color="primary"
-        size="large"
-        fullWidth
-        sx={{ mt: 2 }}
-        disabled={items.length === 0 || loading}
-        onClick={handleCheckout}
-      >
-        {loading ? 'Procesando...' : 'Proceder al Pago'}
-      </Button>
-    </Paper>
+        <Button
+          className="mt-3 w-full"
+          disabled={items.length === 0 || loading}
+          onClick={handleCheckout}
+        >
+          {loading ? 'Procesando...' : 'Proceder al Pago'}
+        </Button>
+      </CardContent>
+    </Card>
   );
 };
 

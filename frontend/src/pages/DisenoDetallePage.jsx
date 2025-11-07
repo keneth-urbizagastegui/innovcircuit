@@ -3,13 +3,23 @@ import { useParams } from 'react-router-dom';
 import disenoService from '../services/disenoService';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Typography, Box, CircularProgress, Alert, Button, Paper, Grid, Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, TextField, Modal, Chip } from '@mui/material';
-import Rating from '@mui/material/Rating';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Avatar } from '../components/ui/avatar';
+import { Badge } from '../components/ui/badge';
+import { Heart, Download, Loader2 } from 'lucide-react';
 import resenaService from '../services/resenaService';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import DownloadIcon from '@mui/icons-material/Download';
 import { resolveImageUrl, resolveAvatarUrl, buildUiAvatar, FALLBACK_IMAGE, FALLBACK_AVATAR, onErrorSetSrc } from '../utils/imageUtils';
 import iaService from '../services/iaService';
+
+// Simple componente para mostrar calificación con estrellas
+const StarRating = ({ value }) => {
+  const v = Math.max(0, Math.min(5, Number(value) || 0));
+  return (
+    <span className="text-yellow-500 text-sm">{'★'.repeat(v)}{'☆'.repeat(5 - v)}</span>
+  );
+};
 
 const DisenoDetallePage = () => {
   const { id } = useParams();
@@ -149,13 +159,21 @@ const DisenoDetallePage = () => {
   };
 
   if (loading) {
-    return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+    return (
+      <div className="flex justify-center mt-6">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
   }
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return (
+      <div className="rounded-md border border-red-300 bg-red-50 text-red-700 p-3">
+        {error}
+      </div>
+    );
   }
   if (!diseno) {
-    return <Typography>Diseño no encontrado.</Typography>;
+    return <div>Diseño no encontrado.</div>;
   }
 
   const proveedor = diseno.proveedor || { nombre: 'N/A', avatarUrl: '' };
@@ -166,214 +184,222 @@ const DisenoDetallePage = () => {
 
   return (
     <>
-    <Paper elevation={3} sx={{ p: 4 }}>
-      <Grid container spacing={4}>
-        {/* Columna Izquierda (Imagen) */}
-        <Grid item xs={12} md={7}>
-          <Box
-            component="img"
-            sx={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: 2, backgroundColor: 'background.default' }}
-            alt={diseno.nombre}
-            src={mainImageSrc}
-            loading="lazy"
-            onError={onErrorSetSrc(FALLBACK_IMAGE)}
-          />
-        </Grid>
+    <Card className="p-4 md:p-6">
+      <CardContent className="p-0">
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Columna Izquierda (Imagen) */}
+          <div>
+            <img
+              className="w-full aspect-[4/3] object-cover rounded-md bg-gray-100"
+              alt={diseno.nombre}
+              src={mainImageSrc}
+              loading="lazy"
+              onError={onErrorSetSrc(FALLBACK_IMAGE)}
+            />
+          </div>
 
-        {/* Columna Derecha (Info) */}
-        <Grid item xs={12} md={5}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="h3" gutterBottom>{diseno.nombre}</Typography>
-            {popular && <Chip label="Popular" color="warning" />}
-          </Box>
+          {/* Columna Derecha (Info) */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-3xl font-bold">{diseno.nombre}</h1>
+              {popular && <Badge variant="secondary">Popular</Badge>}
+            </div>
 
-          {/* Info del Proveedor */}
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Avatar src={avatarSrc} onError={onErrorSetSrc(FALLBACK_AVATAR)} sx={{ width: 40, height: 40, mr: 1, border: '1px solid', borderColor: 'divider' }} />
-            <Typography variant="h6">{proveedor.nombre}</Typography>
-          </Box>
+            {/* Info del Proveedor */}
+            <div className="flex items-center mb-3">
+              <Avatar className="mr-2 border" src={avatarSrc} alt={proveedor.nombre}>
+                {(proveedor.nombre || 'N/A').slice(0, 2).toUpperCase()}
+              </Avatar>
+              <div className="text-lg font-semibold">{proveedor.nombre}</div>
+            </div>
 
-          {/* Estadísticas */}
-          <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
-            <Button startIcon={<FavoriteIcon />} onClick={handleLike}>
-              {diseno.likesCount} Likes
-            </Button>
-            <Button startIcon={<DownloadIcon />} onClick={handleDownload}>
-              {diseno.descargasCount} Descargas
-            </Button>
-          </Box>
+            {/* Estadísticas */}
+            <div className="flex gap-4 mb-4">
+              <Button variant="outline" onClick={handleLike}>
+                <Heart className="mr-2 h-4 w-4" /> {diseno.likesCount} Likes
+              </Button>
+              <Button variant="outline" onClick={handleDownload}>
+                <Download className="mr-2 h-4 w-4" /> {diseno.descargasCount} Descargas
+              </Button>
+            </div>
 
-          {/* Precio */}
-          <Typography variant="h4" color={isGratis ? 'success.main' : 'primary'} sx={{ my: 2 }}>
-            {isGratis ? 'Gratis' : `$${typeof diseno.precio === 'number' ? diseno.precio.toFixed(2) : diseno.precio}`}
-          </Typography>
+            {/* Precio */}
+            <div className={`text-2xl font-bold my-2 ${isGratis ? 'text-green-600' : 'text-blue-600'}`}>
+              {isGratis ? 'Gratis' : `$${typeof diseno.precio === 'number' ? diseno.precio.toFixed(2) : diseno.precio}`}
+            </div>
 
-          {/* Botones de Acción (solo para Clientes) */}
-          {user?.rol === 'CLIENTE' && (
-            <Button variant="contained" size="large" onClick={handleAddToCart} fullWidth>
-              Añadir al Carrito
-            </Button>
-          )}
+            {/* Botones de Acción (solo para Clientes) */}
+            {user?.rol === 'CLIENTE' && (
+              <Button className="w-full" onClick={handleAddToCart}>
+                Añadir al Carrito
+              </Button>
+            )}
 
-          {/* Botón Asistente de Diseño (IA) - requiere autenticación */}
-          {user && (
-            <Button variant="outlined" color="secondary" sx={{ mt: 2 }} onClick={handleOpenIa} fullWidth>
-              Asistente de Diseño (IA)
-            </Button>
-          )}
-        </Grid>
+            {/* Botón Asistente de Diseño (IA) - requiere autenticación */}
+            {user && (
+              <Button variant="secondary" className="w-full mt-2" onClick={handleOpenIa}>
+                Asistente de Diseño (IA)
+              </Button>
+            )}
+          </div>
+        </div>
 
         {/* Especificaciones */}
-        <Grid item xs={12} md={5}>
-          <Typography variant="h6">Especificaciones</Typography>
-          <Divider sx={{ my: 1 }} />
-          <List dense>
+        <div className="mt-6 md:w-1/2">
+          <h2 className="text-lg font-semibold">Especificaciones</h2>
+          <div className="my-2 h-px bg-gray-200" />
+          <ul className="space-y-1 text-sm">
             {diseno?.nombreCategoria && (
-              <ListItem>
-                <ListItemText primary="Categoría" secondary={diseno.nombreCategoria} />
-              </ListItem>
+              <li className="flex justify-between"><span className="font-medium">Categoría</span><span>{diseno.nombreCategoria}</span></li>
             )}
             {diseno?.estado && (
-              <ListItem>
-                <ListItemText primary="Estado" secondary={diseno.estado} />
-              </ListItem>
+              <li className="flex justify-between"><span className="font-medium">Estado</span><span>{diseno.estado}</span></li>
             )}
-            <ListItem>
-              <ListItemText primary="Tipo" secondary={isGratis ? 'Gratis' : 'De pago'} />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Likes" secondary={String(diseno.likesCount || 0)} />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Descargas" secondary={String(diseno.descargasCount || 0)} />
-            </ListItem>
-          </List>
-        </Grid>
+            <li className="flex justify-between"><span className="font-medium">Tipo</span><span>{isGratis ? 'Gratis' : 'De pago'}</span></li>
+            <li className="flex justify-between"><span className="font-medium">Likes</span><span>{String(diseno.likesCount || 0)}</span></li>
+            <li className="flex justify-between"><span className="font-medium">Descargas</span><span>{String(diseno.descargasCount || 0)}</span></li>
+          </ul>
+        </div>
 
         {/* Descripción (Abajo) */}
-        <Grid item xs={12} sx={{ mt: 3 }}>
-          <Typography variant="h5">Descripción</Typography>
-          <Divider sx={{ my: 1 }} />
-          <Typography variant="body1" paragraph>
+        <div className="mt-4">
+          <h2 className="text-xl font-semibold">Descripción</h2>
+          <div className="my-2 h-px bg-gray-200" />
+          <p className="text-sm leading-6">
             {diseno.descripcion || 'Este diseño no tiene descripción.'}
-          </Typography>
-        </Grid>
+          </p>
+        </div>
 
         {/* Reseñas */}
-        <Grid item xs={12} sx={{ mt: 4 }}>
-          <Typography variant="h5">Reseñas</Typography>
-          <Divider sx={{ my: 1 }} />
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold">Reseñas</h2>
+          <div className="my-2 h-px bg-gray-200" />
 
           {resenasLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <CircularProgress size={24} />
-            </Box>
+            <div className="flex justify-center mt-2"><Loader2 className="h-5 w-5 animate-spin" /></div>
           ) : resenasError ? (
-            <Alert severity="error">{resenasError}</Alert>
+            <div className="rounded-md border border-red-300 bg-red-50 text-red-700 p-3">{resenasError}</div>
           ) : resenas.length === 0 ? (
-            <Typography variant="body2">Aún no hay reseñas para este diseño.</Typography>
+            <div className="text-sm text-gray-600">Aún no hay reseñas para este diseño.</div>
           ) : (
-            <List>
+            <ul className="space-y-4">
               {resenas.map((r) => (
-                <ListItem key={r.id} alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar src={buildUiAvatar(r?.clienteNombre || 'Usuario', 32, { rounded: true })} alt={r?.clienteNombre || 'Usuario'} onError={onErrorSetSrc(FALLBACK_AVATAR)} />
-            </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="subtitle1">{r?.nombreCliente || r?.clienteNombre || 'Cliente'}</Typography>
-                        <Rating value={Number(r?.calificacion) || 0} readOnly size="small" />
-                      </Box>
-                    }
-                    secondary={<Typography variant="body2">{r?.comentario || ''}</Typography>}
-                  />
-                  {/* Respuesta del proveedor existente */}
-                  {r?.respuestaProveedor && (
-                    <Box sx={{ mt: 1, ml: 7, p: 1.5, borderLeft: '3px solid', borderColor: 'primary.light', bgcolor: 'action.hover', borderRadius: 1 }}>
-                      <Typography variant="subtitle2">Respuesta del proveedor:</Typography>
-                      <Typography variant="body2">{r.respuestaProveedor}</Typography>
-                    </Box>
-                  )}
-                  {/* Formulario de respuesta para el proveedor dueño del diseño */}
-                  {user?.id === diseno?.proveedor?.id && !r?.respuestaProveedor && (
-                    <Box sx={{ mt: 1, ml: 7, display: 'flex', gap: 1 }}>
-                      <TextField
-                        size="small"
-                        fullWidth
-                        placeholder="Escribe tu respuesta..."
-                        value={respuestaInputs[r.id] || ''}
-                        onChange={(e) => setRespuestaInputs(prev => ({ ...prev, [r.id]: e.target.value }))}
-                      />
-                      <Button
-                        variant="contained"
-                        onClick={() => handleResponderResena(r.id)}
-                        disabled={responding[r.id]}
-                      >
-                        {responding[r.id] ? 'Enviando...' : 'Responder'}
-                      </Button>
-                    </Box>
-                  )}
-                </ListItem>
+                <li key={r.id} className="">
+                  <div className="flex items-start gap-3">
+                    <Avatar src={buildUiAvatar(r?.clienteNombre || 'Usuario', 32, { rounded: true })} alt={r?.clienteNombre || 'Usuario'}>
+                      {(r?.clienteNombre || 'US').slice(0,2).toUpperCase()}
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="font-medium">{r?.nombreCliente || r?.clienteNombre || 'Cliente'}</div>
+                        <StarRating value={r?.calificacion} />
+                      </div>
+                      <div className="text-sm text-gray-700">{r?.comentario || ''}</div>
+
+                      {/* Respuesta del proveedor existente */}
+                      {r?.respuestaProveedor && (
+                        <div className="mt-2 ml-4 p-2 border-l-4 border-blue-300 bg-gray-50 rounded">
+                          <div className="text-sm font-semibold">Respuesta del proveedor:</div>
+                          <div className="text-sm">{r.respuestaProveedor}</div>
+                        </div>
+                      )}
+
+                      {/* Formulario de respuesta para el proveedor dueño del diseño */}
+                      {user?.id === diseno?.proveedor?.id && !r?.respuestaProveedor && (
+                        <div className="mt-2 ml-4 flex gap-2">
+                          <Input
+                            placeholder="Escribe tu respuesta..."
+                            value={respuestaInputs[r.id] || ''}
+                            onChange={(e) => setRespuestaInputs(prev => ({ ...prev, [r.id]: e.target.value }))}
+                          />
+                          <Button onClick={() => handleResponderResena(r.id)} disabled={responding[r.id]}>
+                            {responding[r.id] ? 'Enviando...' : 'Responder'}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </li>
               ))}
-            </List>
+            </ul>
           )}
-        </Grid>
+        </div>
 
         {/* Formulario de Nueva Reseña - Solo CLIENTE */}
         {user?.rol === 'CLIENTE' && (
-          <Grid item xs={12} sx={{ mt: 2 }}>
-            <Typography variant="h6">Escribir una Reseña</Typography>
-            <Divider sx={{ my: 1 }} />
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            <Box component="form" onSubmit={handleCrearResena} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Typography>Calificación:</Typography>
-                <Rating value={calificacion} onChange={(_, v) => setCalificacion(v || 0)} />
-              </Box>
-              <TextField
-                label="Comentario"
-                multiline
-                minRows={3}
-                value={comentario}
-                onChange={(e) => setComentario(e.target.value)}
-              />
-              <Button type="submit" variant="contained" disabled={submitting || calificacion === 0}>
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">Escribir una Reseña</h3>
+            <div className="my-2 h-px bg-gray-200" />
+            {error && (
+              <div className="rounded-md border border-red-300 bg-red-50 text-red-700 p-3 mb-2">{error}</div>
+            )}
+            <form onSubmit={handleCrearResena} className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium">Calificación:</label>
+                <select
+                  className="border rounded px-2 py-1 text-sm"
+                  value={calificacion}
+                  onChange={(e) => setCalificacion(Number(e.target.value))}
+                >
+                  <option value={0}>Selecciona</option>
+                  {[1,2,3,4,5].map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium">Comentario</label>
+                <textarea
+                  className="border rounded px-3 py-2 text-sm min-h-[100px]"
+                  value={comentario}
+                  onChange={(e) => setComentario(e.target.value)}
+                />
+              </div>
+              <Button type="submit" disabled={submitting || calificacion === 0}>
                 {submitting ? 'Enviando...' : 'Enviar Reseña'}
               </Button>
-            </Box>
-          </Grid>
+            </form>
+          </div>
         )}
-      </Grid>
-    </Paper>
+      </CardContent>
+    </Card>
     {/* Modal: Asistente de Diseño (IA) */}
-    <Modal open={iaOpen} onClose={handleCloseIa} aria-labelledby="ia-chatbot-modal">
-      <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, maxWidth: '90%', bgcolor: 'background.paper', boxShadow: 24, p: 3, borderRadius: 2 }}>
-        <Typography id="ia-chatbot-modal" variant="h6" gutterBottom>
-          Asistente de Diseño (IA)
-        </Typography>
-        {iaError && <Alert severity="error" sx={{ mb: 2 }}>{iaError}</Alert>}
-        <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 1.5, height: 300, overflowY: 'auto', mb: 2, bgcolor: 'background.default' }}>
-          {iaMessages.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">Inicia la conversación con una pregunta técnica sobre este diseño.</Typography>
-          ) : (
-            iaMessages.map((m, idx) => (
-              <Box key={idx} sx={{ display: 'flex', justifyContent: m.sender === 'user' ? 'flex-end' : 'flex-start', mb: 1 }}>
-                <Box sx={{ maxWidth: '80%', p: 1.5, borderRadius: 2, bgcolor: m.sender === 'user' ? 'primary.light' : 'action.hover' }}>
-                  <Typography variant="body2">{m.text}</Typography>
-                </Box>
-              </Box>
-            ))
+    {iaOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/50" onClick={handleCloseIa} />
+        <div className="relative bg-white rounded-md shadow-lg w-[600px] max-w-[90%] p-4">
+          <div className="text-lg font-semibold mb-2">Asistente de Diseño (IA)</div>
+          {iaError && (
+            <div className="rounded-md border border-red-300 bg-red-50 text-red-700 p-3 mb-2">{iaError}</div>
           )}
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField fullWidth placeholder="Escribe tu pregunta..." value={iaQuestion} onChange={(e) => setIaQuestion(e.target.value)} disabled={iaSending} />
-          <Button variant="contained" onClick={handleIaSend} disabled={iaSending || !iaQuestion.trim()}>
-            {iaSending ? 'Enviando...' : 'Enviar'}
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
+          <div className="border rounded p-3 h-[300px] overflow-y-auto mb-3 bg-gray-50">
+            {iaMessages.length === 0 ? (
+              <div className="text-sm text-gray-600">Inicia la conversación con una pregunta técnica sobre este diseño.</div>
+            ) : (
+              iaMessages.map((m, idx) => (
+                <div key={idx} className={`flex mb-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[80%] p-2 rounded ${m.sender === 'user' ? 'bg-blue-100' : 'bg-gray-200'}`}>
+                    <div className="text-sm">{m.text}</div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Escribe tu pregunta..."
+              value={iaQuestion}
+              onChange={(e) => setIaQuestion(e.target.value)}
+              disabled={iaSending}
+            />
+            <Button onClick={handleIaSend} disabled={iaSending || !iaQuestion.trim()}>
+              {iaSending ? 'Enviando...' : 'Enviar'}
+            </Button>
+          </div>
+          <button className="absolute top-2 right-2 text-sm text-gray-500" onClick={handleCloseIa}>Cerrar</button>
+        </div>
+      </div>
+    )}
     </>
   );
 };

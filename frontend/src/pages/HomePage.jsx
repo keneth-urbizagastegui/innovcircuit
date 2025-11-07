@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
-// import { useAuth } from '../context/AuthContext'; // Ya no lo necesitamos aquí
 import disenoService from '../services/disenoService';
 import DisenoCard from '../components/DisenoCard';
-import { Grid, Typography, CircularProgress, Box, Alert } from '@mui/material';
-// import { Link } from 'react-router-dom'; // Ya no se usa
 import iaService from '../services/iaService';
 
 const HomePage = () => {
@@ -23,7 +20,33 @@ const HomePage = () => {
         setLoading(false);
       })
       .catch(() => {
-        setError('Error al cargar los diseños. La API puede estar caída.');
+        // Fallback de desarrollo: mostrar datos simulados si el backend no responde
+        const fallbackDisenos = [
+          {
+            id: 1001,
+            nombre: 'Fuente Conmutada 12V/5A',
+            nombreCategoria: 'Fuentes de Poder',
+            proveedor: { nombre: 'Proveedor Demo', avatarUrl: '' },
+            imagenUrl: '',
+            precio: 29.99,
+            gratuito: false,
+            descargasCount: 57,
+            likesCount: 23,
+          },
+          {
+            id: 1002,
+            nombre: 'Sensor de Temperatura Digital',
+            nombreCategoria: 'Sensores',
+            proveedor: { nombre: 'ElectroLab', avatarUrl: '' },
+            imagenUrl: '',
+            precio: 0,
+            gratuito: true,
+            descargasCount: 105,
+            likesCount: 40,
+          },
+        ];
+        setDisenos(fallbackDisenos);
+        setError('Mostrando catálogo de ejemplo: la API no respondió.');
         setLoading(false);
       });
   }, []);
@@ -41,11 +64,19 @@ const HomePage = () => {
   // Renderizado condicional (público, sin depender de auth)
   let content;
   if (loading) {
-    content = <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+    content = (
+      <div className="flex justify-center mt-4">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-sky-500" />
+      </div>
+    );
   } else if (error) {
-    content = <Alert severity="error">{error}</Alert>;
+    content = (
+      <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        {error}
+      </div>
+    );
   } else if (disenos.length === 0) {
-    content = <Typography>No hay diseños aprobados para mostrar.</Typography>;
+    content = <p className="text-slate-700">No hay diseños aprobados para mostrar.</p>;
   } else {
     const ordered = [...disenos].sort((a, b) => {
       const da = Number(a?.descargasCount || 0);
@@ -54,28 +85,24 @@ const HomePage = () => {
       return String(a?.nombre || '').localeCompare(String(b?.nombre || ''));
     });
     content = (
-      <Grid container spacing={3}>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {ordered.map((diseno) => (
-          <Grid item key={diseno.id} xs={12} sm={6} md={4} lg={3}>
+          <div key={diseno.id}>
             <DisenoCard diseno={diseno} />
-          </Grid>
+          </div>
         ))}
-      </Grid>
+      </div>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ textAlign: 'center', mb: 4 }}>
-        <Typography variant="h3" sx={{ fontWeight: 800 }} gutterBottom>
-          Diseños electrónicos destacados
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Catálogo ordenado y visual consistente — estilo e‑commerce
-        </Typography>
-      </Box>
+    <div className="p-3">
+      <div className="mb-4 text-center">
+        <h1 className="text-2xl font-extrabold">Diseños electrónicos destacados</h1>
+        <p className="text-sm text-slate-600">Catálogo ordenado y visual consistente — estilo e‑commerce</p>
+      </div>
       {content}
-    </Box>
+    </div>
   );
 };
 

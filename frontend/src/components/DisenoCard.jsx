@@ -1,8 +1,10 @@
 import React from 'react';
-import { Card, CardMedia, CardContent, Typography, CardActions, Box, Avatar, Chip, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'; // Icono de Likes
-import DownloadIcon from '@mui/icons-material/Download'; // Icono de Descargas
+import { Heart, Download } from 'lucide-react';
+import { Card, CardHeader, CardContent, CardFooter, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Avatar } from './ui/avatar';
+import { Button } from './ui/button';
 import { resolveImageUrl, resolveAvatarUrl, FALLBACK_CARD_IMAGE, FALLBACK_AVATAR, onErrorSetSrc } from '../utils/imageUtils';
 
 const DisenoCard = ({ diseno }) => {
@@ -13,57 +15,51 @@ const DisenoCard = ({ diseno }) => {
   const isGratis = Boolean(diseno.gratuito) || Number(diseno.precio || 0) === 0;
   const popular = Number(diseno.descargasCount || 0) >= 25; // umbral simple
   return (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3 }}>
-      {/* Proveedor Info */}
-      <Box sx={{ display: 'flex', alignItems: 'center', p: 1.25 }}>
-        <Avatar src={avatarSrc} onError={onErrorSetSrc(FALLBACK_AVATAR)} sx={{ width: 28, height: 28, mr: 1, border: '1px solid', borderColor: 'divider' }} />
-        <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>{proveedor.nombre}</Typography>
-        {popular && <Chip size="small" label="Popular" color="warning" sx={{ ml: 1 }} />}
-      </Box>
-      {/* Link en la Imagen */}
-      <Box component={Link} to={`/diseno/${diseno.id}`} sx={{ textDecoration: 'none' }}>
-        <CardMedia
-          component="img"
-          height="220"
-          image={imageSrc}
+    <Card className="flex h-full flex-col">
+      <CardHeader className="flex items-center gap-2 py-3">
+        <Avatar src={avatarSrc} alt={proveedor.nombre}>
+          {proveedor?.nombre?.[0] ?? 'P'}
+        </Avatar>
+        <div className="flex-1 text-sm text-slate-600">{proveedor.nombre}</div>
+        {popular && <Badge variant="secondary">Popular</Badge>}
+      </CardHeader>
+
+      <Link to={`/diseno/${diseno.id}`} className="block">
+        <img
+          src={imageSrc}
           onError={onErrorSetSrc(FALLBACK_CARD_IMAGE)}
           loading="lazy"
-          sx={{ objectFit: 'cover', backgroundColor: 'background.default' }}
           alt={diseno.nombre}
+          className="h-56 w-full object-cover"
         />
-        {/* Titulo */}
-        <CardContent sx={{ flexGrow: 1, py: 1 }}>
-          <Typography gutterBottom variant="h6" component="h2" sx={{ fontSize: '1rem', color: 'text.primary', lineHeight: 1.3 }}>
-            {diseno.nombre}
-          </Typography>
+        <CardContent className="py-3">
+          <CardTitle className="text-base">{diseno.nombre}</CardTitle>
           {diseno?.nombreCategoria && (
-            <Typography variant="caption" color="text.secondary">
-              {diseno.nombreCategoria}
-            </Typography>
+            <p className="text-xs text-slate-500">{diseno.nombreCategoria}</p>
           )}
         </CardContent>
-      </Box>
-      {/* Estadísticas y Precio */}
-      <CardActions sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, pb: 2, mt: 'auto' }}>
-        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <FavoriteBorderIcon fontSize="small" color="action" />
-            <Typography variant="body2" color="text.secondary">{diseno.likesCount}</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <DownloadIcon fontSize="small" color="action" />
-            <Typography variant="body2" color="text.secondary">{diseno.descargasCount}</Typography>
-          </Box>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="h6" color={isGratis ? 'success.main' : 'primary'} sx={{ mr: 1 }}>
+      </Link>
+
+      <CardFooter className="mt-auto flex items-center justify-between">
+        <div className="flex items-center gap-3 text-slate-600">
+          <div className="flex items-center gap-1">
+            <Heart size={16} className="text-slate-500" />
+            <span className="text-sm">{diseno.likesCount}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Download size={16} className="text-slate-500" />
+            <span className="text-sm">{diseno.descargasCount}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={isGratis ? 'text-green-600 font-semibold' : 'text-sky-600 font-semibold'}>
             {isGratis ? 'Gratis' : `$${Number(diseno.precio || 0).toFixed(2)}`}
-          </Typography>
-          <Button component={Link} to={`/diseno/${diseno.id}`} size="small" variant="outlined">
+          </span>
+          <Button as={Link} to={`/diseno/${diseno.id}`} variant="outline" size="sm">
             Ver más
           </Button>
-        </Box>
-      </CardActions>
+        </div>
+      </CardFooter>
     </Card>
   );
 };

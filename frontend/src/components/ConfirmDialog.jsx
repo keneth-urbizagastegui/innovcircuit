@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
+import { Button } from './ui/button';
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 
 /**
  * Reusable confirmation dialog
@@ -14,17 +15,23 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography }
  */
 const ConfirmDialog = ({ open, title, message, confirmText = 'Confirmar', cancelText = 'Cancelar', onConfirm, onCancel }) => {
   return (
-    <Dialog open={open} onClose={onCancel} aria-labelledby="confirm-dialog-title">
-      {title && <DialogTitle id="confirm-dialog-title">{title}</DialogTitle>}
-      {message && (
-        <DialogContent>
-          <Typography variant="body1">{message}</Typography>
-        </DialogContent>
+    <Dialog open={open} onClose={onCancel}>
+      {title && (
+        <DialogHeader>
+          <DialogTitle id="confirm-dialog-title">{title}</DialogTitle>
+        </DialogHeader>
       )}
-      <DialogActions>
-        <Button onClick={onCancel} color="inherit">{cancelText}</Button>
-        <Button onClick={onConfirm} variant="contained" color="error">{confirmText}</Button>
-      </DialogActions>
+      {message && (
+        <DialogDescription>{message}</DialogDescription>
+      )}
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} aria-label={cancelText}>
+          {cancelText}
+        </Button>
+        <Button variant="destructive" onClick={onConfirm} aria-label={confirmText}>
+          {confirmText}
+        </Button>
+      </DialogFooter>
     </Dialog>
   );
 };

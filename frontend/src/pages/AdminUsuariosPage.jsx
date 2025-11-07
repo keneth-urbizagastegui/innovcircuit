@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Paper, Typography, Box, CircularProgress, Alert, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
 import ConfirmDialog from '../components/ConfirmDialog';
 import adminUsuariosService from '../services/adminUsuariosService';
+import { Button } from '../components/ui/button';
 
 const AdminUsuariosPage = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -44,41 +44,58 @@ const AdminUsuariosPage = () => {
       .finally(() => { setConfirmOpen(false); setUsuarioSeleccionado(null); });
   };
 
-  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+  if (loading) return (
+    <div className="flex items-center justify-center mt-8">
+      <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" aria-label="Cargando" />
+    </div>
+  );
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>Gestionar Usuarios</Typography>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Nombre</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Rol</TableCell>
-            <TableCell>Estado</TableCell>
-            <TableCell align="right">Acciones</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {usuarios.map(u => (
-            <TableRow key={u.id}>
-              <TableCell>{u.id}</TableCell>
-              <TableCell>{u.nombre}</TableCell>
-              <TableCell>{u.email}</TableCell>
-              <TableCell>{u.rol}</TableCell>
-              <TableCell>{u.estado}</TableCell>
-              <TableCell align="right">
-                <Button variant="contained" color={u.estado === 'ACTIVO' ? 'warning' : 'success'} sx={{ mr: 1 }} onClick={() => handleToggleEstado(u)}>
-                  {u.estado === 'ACTIVO' ? 'Bloquear' : 'Activar'}
-                </Button>
-                <Button variant="contained" color="error" onClick={() => solicitarEliminar(u)}>Eliminar</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="p-6 bg-white rounded-xl border border-border shadow-sm">
+      <h1 className="text-2xl font-semibold text-foreground mb-4">Gestionar Usuarios</h1>
+      {error && (
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="bg-muted">
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">ID</th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Nombre</th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Email</th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Rol</th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Estado</th>
+              <th className="px-3 py-2 text-right font-medium text-muted-foreground">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {usuarios.map((u) => (
+              <tr key={u.id} className="border-t">
+                <td className="px-3 py-2">{u.id}</td>
+                <td className="px-3 py-2">{u.nombre}</td>
+                <td className="px-3 py-2">{u.email}</td>
+                <td className="px-3 py-2">{u.rol}</td>
+                <td className="px-3 py-2">{u.estado}</td>
+                <td className="px-3 py-2 text-right">
+                  <Button
+                    variant={u.estado === 'ACTIVO' ? 'secondary' : 'default'}
+                    className="mr-2"
+                    onClick={() => handleToggleEstado(u)}
+                  >
+                    {u.estado === 'ACTIVO' ? 'Bloquear' : 'Activar'}
+                  </Button>
+                  <Button variant="destructive" onClick={() => solicitarEliminar(u)}>
+                    Eliminar
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Confirmación de eliminación */}
       <ConfirmDialog
@@ -90,7 +107,7 @@ const AdminUsuariosPage = () => {
         onConfirm={confirmarEliminar}
         onCancel={() => { setConfirmOpen(false); setUsuarioSeleccionado(null); }}
       />
-    </Paper>
+    </div>
   );
 };
 

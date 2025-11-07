@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import authService from '../services/authService';
 import { useNavigate } from 'react-router-dom';
-import { Container, Box, TextField, Button, Typography, Alert, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
 
 const RegisterPage = () => {
   const [nombre, setNombre] = useState('');
@@ -31,52 +33,43 @@ const RegisterPage = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h5" gutterBottom>
-          Registro de Nuevo Usuario
-        </Typography>
-        {error && <Alert severity="error">{error}</Alert>}
-        {success && <Alert severity="success">{success}</Alert>}
-        <TextField
-          label="Nombre"
-          type="text"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          required
-          fullWidth
-        />
-        <TextField
-          label="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          fullWidth
-        />
-        <TextField
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          fullWidth
-        />
-        <FormControl fullWidth>
-          <InputLabel id="register-rol-label">Rol</InputLabel>
-          <Select
-            labelId="register-rol-label"
-            label="Rol"
-            value={rol}
-            onChange={(e) => setRol(e.target.value)}
-          >
-            <MenuItem value="CLIENTE">Cliente (Quiero comprar)</MenuItem>
-            <MenuItem value="PROVEEDOR">Proveedor (Quiero vender)</MenuItem>
-          </Select>
-        </FormControl>
-        <Button type="submit" variant="contained">Registrarse</Button>
-      </Box>
-    </Container>
+    <div className="mx-auto max-w-md">
+      <Card>
+        <CardHeader>
+          <CardTitle>Registro de Nuevo Usuario</CardTitle>
+        </CardHeader>
+        {error && (
+          <div className="mx-6 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="mx-6 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+            {success}
+          </div>
+        )}
+        <CardContent>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <label className="text-sm font-medium text-slate-700">Nombre</label>
+            <Input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+            <label className="text-sm font-medium text-slate-700">Email</label>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <label className="text-sm font-medium text-slate-700">Password</label>
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <label className="text-sm font-medium text-slate-700">Rol</label>
+            <select
+              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400"
+              value={rol}
+              onChange={(e) => setRol(e.target.value)}
+            >
+              <option value="CLIENTE">Cliente (Quiero comprar)</option>
+              <option value="PROVEEDOR">Proveedor (Quiero vender)</option>
+            </select>
+            <Button type="submit">Registrarse</Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

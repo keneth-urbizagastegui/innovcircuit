@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Paper, InputBase, IconButton } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { Search } from 'lucide-react';
 
 const SearchBar = ({ onSearch, placeholder = 'Buscar diseños...', size = 'medium', autoFocus = false, fullWidth = true }) => {
   const [query, setQuery] = useState('');
@@ -11,27 +12,23 @@ const SearchBar = ({ onSearch, placeholder = 'Buscar diseños...', size = 'mediu
     if (onSearch) onSearch(q);
   };
 
-  const height = size === 'large' ? 52 : 40;
+  const isLarge = size === 'large';
+  const containerClasses = `flex items-center gap-2 rounded-full border border-slate-200 bg-white shadow-sm ${fullWidth ? 'w-full' : 'w-auto'} ${isLarge ? 'px-4 py-2.5' : 'px-3 py-2'}`;
+  const inputClasses = `flex-1 bg-transparent border-0 focus:ring-0 focus-visible:ring-0 placeholder:text-slate-500 ${isLarge ? 'text-base' : 'text-sm'}`;
 
   return (
-    <Paper
-      component="form"
-      onSubmit={handleSubmit}
-      sx={{ display: 'flex', alignItems: 'center', p: 0.5, pl: 1.5, borderRadius: 10, width: fullWidth ? '100%' : 'auto' }}
-      elevation={3}
-    >
-      <InputBase
-        sx={{ ml: 1, flex: 1, height }}
+    <form onSubmit={handleSubmit} className={containerClasses} aria-label={placeholder} role="search">
+      <Input
+        className={inputClasses}
         placeholder={placeholder}
-        inputProps={{ 'aria-label': placeholder }}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         autoFocus={autoFocus}
       />
-      <IconButton type="submit" color="primary" aria-label="buscar" sx={{ p: 1 }}>
-        <SearchIcon />
-      </IconButton>
-    </Paper>
+      <Button type="submit" variant="default" aria-label="buscar">
+        <Search className="h-4 w-4" />
+      </Button>
+    </form>
   );
 };
 

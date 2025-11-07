@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import usuarioService from '../services/usuarioService';
-import { Typography, Box, Paper, List, ListItem, ListItemText, Divider, CircularProgress, Alert, IconButton, Grid, Button, Modal } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Button } from '../components/ui/button';
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
+import { Pencil, Trash2 } from 'lucide-react';
 import disenoService from '../services/disenoService';
 import ConfirmDialog from '../components/ConfirmDialog';
 
@@ -65,92 +65,91 @@ const DashboardPage = () => {
     alert('Función de edición pendiente de implementación.');
   };
 
-  if (loading) return <CircularProgress />;
-  if (error) return <Alert severity="error">{error}</Alert>;
+  if (loading) return (
+    <div className="flex items-center justify-center mt-8">
+      <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" aria-label="Cargando" />
+    </div>
+  );
+  if (error) return (
+    <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
+  );
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>Mi Panel</Typography>
-      <Typography variant="h6">Hola, {user?.sub}</Typography>
+    <div className="p-6 bg-white rounded-xl border border-border shadow-sm">
+      <h1 className="text-2xl font-semibold text-foreground mb-2">Mi Panel</h1>
+      <p className="text-muted-foreground">Hola, {user?.sub}</p>
 
       {user?.rol === 'CLIENTE' && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h5">Historial de Compras</Typography>
-          <Divider sx={{ my: 2 }} />
-          <Box sx={{ mb: 2 }}>
-            <Button variant="outlined" onClick={() => {
+        <div className="mt-4">
+          <h2 className="text-xl font-semibold mb-2">Historial de Compras</h2>
+          <div className="h-px bg-border my-2" />
+          <div className="mb-2">
+            <Button variant="outline" onClick={() => {
               usuarioService.getReporteMisCompras()
                 .then(res => { setReporteJson(JSON.stringify(res.data, null, 2)); setReporteOpen(true); })
                 .catch(() => { setReporteJson('Error al generar reporte de compras'); setReporteOpen(true); });
             }}>
               Generar Reporte de Mis Compras
             </Button>
-          </Box>
-          <List>
-            {compras.length === 0 ? <Typography>No has realizado compras.</Typography> : null}
+          </div>
+          <div className="divide-y">
+            {compras.length === 0 ? <p className="text-muted-foreground">No has realizado compras.</p> : null}
             {compras.map(compra => (
-              <ListItem key={compra.id} divider>
-                <ListItemText
-                  primary={`Compra ID: ${compra.id} - Total: $${Number(compra.montoTotal).toFixed(2)}`}
-                  secondary={`Fecha: ${new Date(compra.fecha).toLocaleDateString()}`}
-                />
-              </ListItem>
+              <div key={compra.id} className="py-3">
+                <div className="font-medium">Compra ID: {compra.id} - Total: ${Number(compra.montoTotal).toFixed(2)}</div>
+                <div className="text-sm text-muted-foreground">Fecha: {new Date(compra.fecha).toLocaleDateString()}</div>
+              </div>
             ))}
-          </List>
-        </Box>
+          </div>
+        </div>
       )}
 
       {user?.rol === 'PROVEEDOR' && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h5">Mis Diseños Subidos</Typography>
-          <Divider sx={{ my: 2 }} />
+        <div className="mt-4">
+          <h2 className="text-xl font-semibold mb-2">Mis Diseños Subidos</h2>
+          <div className="h-px bg-border my-2" />
           {/* Estadísticas del proveedor */}
-          <Box sx={{ mb: 2 }}>
-            {statsError && <Alert severity="error" sx={{ mb: 2 }}>{statsError}</Alert>}
-            {statsLoading ? (
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <CircularProgress size={24} />
-              </Box>
-            ) : (
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <Grid item xs={12} sm={6}>
-                  <Paper elevation={2} sx={{ p: 2 }}>
-                    <Typography variant="subtitle1">Total Vendido</Typography>
-                    <Typography variant="h6">${Number(stats?.totalVendido ?? 0).toFixed(2)}</Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Paper elevation={2} sx={{ p: 2 }}>
-                    <Typography variant="subtitle1">Ganancia Neta (Tras comisiones)</Typography>
-                    <Typography variant="h6">${Number(stats?.gananciaNeta ?? 0).toFixed(2)}</Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
+          <div className="mb-2">
+            {statsError && (
+              <div className="mb-2 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{statsError}</div>
             )}
-          </Box>
-          <List>
-            {disenos.length === 0 ? <Typography>No has subido diseños.</Typography> : null}
+            {statsLoading ? (
+              <div className="flex gap-2">
+                <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" aria-label="Cargando" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
+                  <div className="text-sm text-muted-foreground">Total Vendido</div>
+                  <div className="text-lg font-semibold">${Number(stats?.totalVendido ?? 0).toFixed(2)}</div>
+                </div>
+                <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
+                  <div className="text-sm text-muted-foreground">Ganancia Neta (Tras comisiones)</div>
+                  <div className="text-lg font-semibold">${Number(stats?.gananciaNeta ?? 0).toFixed(2)}</div>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="divide-y">
+            {disenos.length === 0 ? <p className="text-muted-foreground">No has subido diseños.</p> : null}
             {disenos.map(diseno => (
-              <ListItem key={diseno.id} divider
-                secondaryAction={
-                  <Box>
-                    <IconButton edge="end" aria-label="editar" sx={{ mr: 1 }} onClick={() => handleEditarDiseno(diseno.id)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton edge="end" aria-label="eliminar" color="error" onClick={() => solicitarEliminarDiseno(diseno.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                }
-              >
-                <ListItemText
-                  primary={diseno.nombre}
-                  secondary={`Estado: ${diseno.estado} | Precio: $${Number(diseno.precio ?? 0).toFixed(2)}`}
-                />
-              </ListItem>
+              <div key={diseno.id} className="py-3 flex items-center justify-between">
+                <div>
+                  <div className="font-medium">{diseno.nombre}</div>
+                  <div className="text-sm text-muted-foreground">Estado: {diseno.estado} | Precio: ${Number(diseno.precio ?? 0).toFixed(2)}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" aria-label="editar" onClick={() => handleEditarDiseno(diseno.id)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="destructive" aria-label="eliminar" onClick={() => solicitarEliminarDiseno(diseno.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             ))}
-          </List>
-        </Box>
+          </div>
+        </div>
       )}
       {/* Confirmación de eliminación de diseño */}
       <ConfirmDialog
@@ -164,18 +163,21 @@ const DashboardPage = () => {
       />
 
       {/* Modal para mostrar JSON del reporte */}
-      <Modal open={reporteOpen} onClose={() => setReporteOpen(false)} aria-labelledby="reporte-json-modal">
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', p: 3, width: { xs: '90%', sm: 600 }, boxShadow: 24, borderRadius: 1 }}>
-          <Typography id="reporte-json-modal" variant="h6" gutterBottom>Reporte de Compras</Typography>
-          <Box sx={{ maxHeight: 400, overflow: 'auto', bgcolor: '#111', color: '#0f0', p: 2, borderRadius: 1 }}>
-            <pre style={{ margin: 0 }}>{reporteJson}</pre>
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <Button onClick={() => setReporteOpen(false)}>Cerrar</Button>
-          </Box>
-        </Box>
-      </Modal>
-    </Paper>
+      <Dialog open={reporteOpen} onClose={() => setReporteOpen(false)} className="w-[90%] sm:w-[600px] p-4">
+        <DialogHeader>
+          <DialogTitle>Reporte de Compras</DialogTitle>
+          <DialogDescription>
+            Resultado en formato JSON
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-[400px] overflow-auto bg-black text-green-400 p-3 rounded">
+          <pre className="m-0">{reporteJson}</pre>
+        </div>
+        <DialogFooter>
+          <Button onClick={() => setReporteOpen(false)}>Cerrar</Button>
+        </DialogFooter>
+      </Dialog>
+    </div>
   );
 };
 

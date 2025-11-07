@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Alert, Paper, Avatar, Divider } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import usuarioService from '../services/usuarioService';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Avatar } from '../components/ui/avatar';
 
 const PerfilPage = () => {
   const { user } = useAuth();
@@ -28,31 +31,38 @@ const PerfilPage = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>Mi Perfil</Typography>
-      <Divider sx={{ mb: 2 }} />
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Avatar src={avatarUrl} alt={nombre || 'Usuario'} />
-          <Typography variant="subtitle1">{user?.email}</Typography>
-        </Box>
-        <TextField
-          label="Nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-        />
-        <TextField
-          label="URL del Avatar"
-          value={avatarUrl}
-          onChange={(e) => setAvatarUrl(e.target.value)}
-        />
-        <Button type="submit" variant="contained" disabled={loading}>
-          {loading ? 'Guardando...' : 'Guardar Cambios'}
-        </Button>
-      </Box>
-    </Paper>
+    <Card className="p-3">
+      <CardHeader className="pb-2">
+        <CardTitle>Mi Perfil</CardTitle>
+      </CardHeader>
+
+      {error && (
+        <div className="mb-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mb-2 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+          {success}
+        </div>
+      )}
+
+      <CardContent className="p-0">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <Avatar src={avatarUrl} alt={nombre || 'Usuario'} />
+            <div className="text-sm text-slate-700">{user?.email}</div>
+          </div>
+          <label className="text-sm font-medium text-slate-700">Nombre</label>
+          <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <label className="text-sm font-medium text-slate-700">URL del Avatar</label>
+          <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} />
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Guardando...' : 'Guardar Cambios'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 

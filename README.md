@@ -4,7 +4,7 @@ Plataforma de venta de diseños electrónicos con un frontend en React (Vite) y 
 
 ## 🚀 Stack Tecnológico
 - Backend: Spring Boot (Java 17), Spring Security (JWT).
-- Frontend: React 19 (Vite), MUI.
+- Frontend: React 19 (Vite), Tailwind CSS + shadcn/ui.
 - Base de Datos: PostgreSQL.
 - Despliegue: Docker (Nginx, Tomcat).
 
@@ -137,13 +137,13 @@ curl -X GET http://localhost:8080/api/v1/usuario/reporte/mis-compras \
 Respuesta: `List<VentaResponseDTO>` con detalle por compra (líneas, comisiones y montos proveedor).
 
 ## UI/UX – Diálogos y Modales (Frontend)
-- Confirmaciones: Se reemplazó `window.confirm` por un componente reutilizable `ConfirmDialog` (MUI Dialog).
+- Confirmaciones: Se reemplazó `window.confirm` por un componente reutilizable `ConfirmDialog` (componente propio con Tailwind + shadcn/ui).
   - Uso: `import ConfirmDialog from './src/components/ConfirmDialog';`
   - Props: `open`, `title`, `message`, `confirmText`, `cancelText`, `onConfirm`, `onCancel`.
   - Implementado en: `frontend/src/pages/AdminUsuariosPage.jsx` (Eliminar Usuario) y `frontend/src/pages/DashboardPage.jsx` (Eliminar Diseño).
-- Reportes JSON: Se reemplazó `window.alert(JSON.stringify(...))` por modales MUI que muestran el JSON formateado con `<pre>`.
+- Reportes JSON: Se reemplazó `window.alert(JSON.stringify(...))` por modales que muestran el JSON formateado con `<pre>` usando componentes shadcn/ui.
   - Implementado en: `frontend/src/pages/AdminDashboardPage.jsx` (Reporte de Ventas) y `frontend/src/pages/DashboardPage.jsx` (Reporte de Mis Compras).
-  - Beneficios: Mejor legibilidad, accesibilidad y consistencia visual con MUI.
+  - Beneficios: Mejor legibilidad, accesibilidad y consistencia visual con Tailwind/shadcn.
 
 ### 7. Gestión de Diseños (PROVEEDOR)
 
