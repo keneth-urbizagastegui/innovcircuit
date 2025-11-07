@@ -24,7 +24,7 @@ public class IAServiceImpl {
     @Autowired
     private ResenaRepository resenaRepository;
 
-    // Orquestación del Chatbot técnico por diseño (simulada)
+    // Orquestación del Chatbot técnico por diseño (Simulación Avanzada)
     public ChatResponseDTO chatbotDiseno(Long disenoId, ChatRequestDTO request) {
         Diseno diseno = disenoRepository.findById(disenoId)
                 .orElseThrow(() -> new NoSuchElementException("Diseño no encontrado"));
@@ -48,16 +48,45 @@ public class IAServiceImpl {
             contexto.append("\n");
         }
 
-        // Simulación de llamada a IA: devuelve respuesta incluyendo la pregunta
-        String respuestaSimulada = "IA Respondiendo a: " + (request != null ? request.getPregunta() : "(sin pregunta)");
-        return new ChatResponseDTO(respuestaSimulada);
+        // Simulación avanzada: construimos una consulta tipo "Google Search" con el contexto + pregunta
+        String pregunta = (request != null ? request.getPregunta() : "").trim();
+        String query = (diseno.getNombre() + " "
+                + (diseno.getCategoria() != null ? diseno.getCategoria().getNombre() : "") + " "
+                + pregunta).trim();
+
+        // Nota: En una implementación real, aquí se integraría un cliente HTTP para consultar un motor de búsqueda
+        // como Google Programmable Search o similar y parsear los resultados.
+        // Como "Simulación Avanzada", devolvemos una respuesta basada en el contexto y mostrando la consulta generada.
+        String respuesta = "Consulta sugerida: '" + query + "'.\n" +
+                "Resumen técnico basado en el contexto: El diseño '" + diseno.getNombre() + "' en la categoría '" +
+                (diseno.getCategoria() != null ? diseno.getCategoria().getNombre() : "N/A") +
+                "' tiene un precio de " + diseno.getPrecio() + ". " +
+                "Usuarios reportan (" + resenas.size() + " reseñas). " +
+                "Pregunta: '" + pregunta + "'.";
+        return new ChatResponseDTO(respuesta);
     }
 
-    // Búsqueda Semántica Asistida (simulada usando búsqueda por nombre)
+    // Búsqueda Semántica Asistida (Simulación Avanzada)
     public List<DisenoResponseDTO> buscarAsistido(String prompt) {
-        List<Diseno> resultados = disenoRepository
-                .findByEstadoAndNombreContainingIgnoreCase("APROBADO", prompt == null ? "" : prompt.trim());
-        return resultados.stream().map(this::mapToResponseDTO).collect(Collectors.toList());
+        String p = prompt == null ? "" : prompt.trim();
+        // 1) Listamos todos los diseños aprobados
+        List<Diseno> aprobados = disenoRepository.findByEstado("APROBADO");
+        if (p.isEmpty()) {
+            // Sin prompt: devolvemos aprobados (comportamiento por defecto)
+            return aprobados.stream().map(this::mapToResponseDTO).collect(Collectors.toList());
+        }
+        // 2) Simulación avanzada: filtramos diseños cuyo nombre coincida con tokens del prompt
+        String[] tokens = p.toLowerCase().split("\\s+");
+        List<Diseno> filtrados = aprobados.stream()
+                .filter(d -> {
+                    String nombre = d.getNombre() != null ? d.getNombre().toLowerCase() : "";
+                    for (String t : tokens) {
+                        if (t.length() >= 3 && nombre.contains(t)) return true;
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+        return filtrados.stream().map(this::mapToResponseDTO).collect(Collectors.toList());
     }
 
     // Conversión local de Entidad a DTO (similar a DisenoServiceImpl)

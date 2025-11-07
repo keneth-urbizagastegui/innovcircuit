@@ -41,4 +41,39 @@ public class FileStorageService {
             throw new RuntimeException("No se pudo guardar el archivo " + fileName, ex);
         }
     }
+
+    /**
+     * Elimina el archivo asociado a la URL o al nombre de archivo.
+     * Acepta entradas como "/uploads/UUID_nombre.zip" y extrae "UUID_nombre.zip".
+     * Si el archivo existe en el directorio de almacenamiento, lo elimina.
+     */
+    public void deleteFile(String urlOrFilename) {
+        if (urlOrFilename == null || urlOrFilename.isBlank()) return;
+        String fileName = extractFileName(urlOrFilename);
+        if (fileName == null || fileName.isBlank()) return;
+        try {
+            Path targetLocation = this.fileStorageLocation.resolve(fileName).normalize();
+            Files.deleteIfExists(targetLocation);
+        } catch (IOException ex) {
+            // No propagamos para no bloquear la eliminación del diseño; registramos si fuese necesario
+            System.err.println("[FileStorageService] No se pudo eliminar el archivo: " + fileName + " -> " + ex.getMessage());
+        }
+    }
+
+    // Extrae el nombre del archivo de una URL del estilo "/uploads/<nombre>" o devuelve el valor si ya es un nombre
+    private String extractFileName(String urlOrFilename) {
+        String trimmed = urlOrFilename.trim();
+        // Si contiene "/uploads/", tomamos todo lo que sigue a ese prefijo
+        String prefix = "/uploads/";
+        int idx = trimmed.indexOf(prefix);
+        if (idx >= 0) {
+            return trimmed.substring(idx + prefix.length());
+        }
+        // Si viene como ruta absoluta o relativa, intentamos tomar el último segmento
+        int lastSlash = Math.max(trimmed.lastIndexOf('/'), trimmed.lastIndexOf('\\'));
+        if (lastSlash >= 0 && lastSlash < trimmed.length() - 1) {
+            return trimmed.substring(lastSlash + 1);
+        }
+        return trimmed; // caso simple: ya es nombre de archivo
+    }
 }

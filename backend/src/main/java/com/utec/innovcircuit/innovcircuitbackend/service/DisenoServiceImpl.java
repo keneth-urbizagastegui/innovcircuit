@@ -242,7 +242,15 @@ public class DisenoServiceImpl implements IDisenoService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No autorizado: el diseño no pertenece al proveedor autenticado");
         }
 
-        // 4. Eliminar
+        // 4. Eliminar archivos asociados (si existen) para evitar fuga de recursos
+        try {
+            fileStorageService.deleteFile(diseno.getImagenUrl());
+            fileStorageService.deleteFile(diseno.getEsquematicoUrl());
+        } catch (Exception ignored) {
+            // No bloquear la eliminación del diseño por errores al borrar archivos
+        }
+
+        // 5. Eliminar entidad
         disenoRepository.delete(diseno);
     }
 }
