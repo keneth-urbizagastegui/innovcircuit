@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 // import { useAuth } from '../context/AuthContext'; // Ya no lo necesitamos aquí
 import disenoService from '../services/disenoService';
 import DisenoCard from '../components/DisenoCard';
-import { Grid, Typography, CircularProgress, Box, Alert, TextField, IconButton, Button } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { Grid, Typography, CircularProgress, Box, Alert, Button } from '@mui/material';
+import SearchBar from '../components/SearchBar';
+import { useLocation } from 'react-router-dom';
 // import { Link } from 'react-router-dom'; // Ya no se usa
 import iaService from '../services/iaService';
 
@@ -13,6 +14,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true); // Empezar cargando
   const [error, setError] = useState('');
   const [keyword, setKeyword] = useState('');
+  const location = useLocation();
 
   useEffect(() => {
     // Cargar diseños al montar el componente, para todos.
@@ -59,11 +61,21 @@ const HomePage = () => {
       .finally(() => setLoading(false));
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
+  // Sincronizar búsqueda con parámetro ?q= de la URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q') || '';
+    if (q && q !== keyword) {
+      setKeyword(q);
+      setLoading(true);
+      setError('');
+      disenoService
+        .listarDisenosAprobados(q)
+        .then((response) => setDisenos(response.data))
+        .catch(() => setError('Error al buscar diseños.'))
+        .finally(() => setLoading(false));
     }
-  };
+  }, [location.search]);
 
   // Renderizado condicional (público, sin depender de auth)
   let content;
@@ -87,23 +99,27 @@ const HomePage = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>Catálogo de Diseños Aprobados</Typography>
-      {/* Barra de búsqueda */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Buscar diseños (ej. Arduino, Radio, Sensor)"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <IconButton color="primary" onClick={handleSearch} aria-label="Buscar">
-          <SearchIcon />
-        </IconButton>
-        <Button variant="outlined" color="secondary" onClick={handleIaSearch}>
-          Búsqueda IA
-        </Button>
+      {/* Hero moderno */}
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography variant="h3" sx={{ fontWeight: 800 }} gutterBottom>
+          Descubre y comparte diseños electrónicos
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
+          Busca, explora y descarga proyectos listos para imprimir y prototipar
+        </Typography>
+        <Box sx={{ maxWidth: 720, mx: 'auto', display: 'flex', gap: 1 }}>
+          <SearchBar
+            size="large"
+            placeholder="Buscar diseños (Arduino, Radio, Sensor...)"
+            onSearch={(q) => {
+              setKeyword(q);
+              handleSearch();
+            }}
+          />
+          <Button variant="outlined" color="secondary" onClick={handleIaSearch}>
+            Búsqueda IA
+          </Button>
+        </Box>
       </Box>
       {content}
     </Box>

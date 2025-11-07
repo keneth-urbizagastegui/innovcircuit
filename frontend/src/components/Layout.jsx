@@ -1,14 +1,16 @@
 import React from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Container, Box, Button, CssBaseline, Badge, IconButton } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import SearchBar from './SearchBar';
 
 const Layout = () => {
   const auth = useAuth();
   const { items } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     auth.logout();
@@ -18,17 +20,32 @@ const Layout = () => {
   return (
     <>
       <CssBaseline />
-      <AppBar position="static">
-        <Toolbar>
+      <AppBar position="sticky" color="default">
+        <Toolbar sx={{ gap: 2 }}>
           {/* Título/Logo */}
           <Typography
             variant="h6"
             component={Link}
             to="/"
-            sx={{ flexGrow: 1, color: 'white', textDecoration: 'none' }}
+            sx={{ color: 'primary.main', textDecoration: 'none', fontWeight: 800, letterSpacing: 0.4 }}
           >
             InnovCircuit
           </Typography>
+          {/* Barra de búsqueda rápida */}
+          <Box sx={{ flexGrow: 1, maxWidth: 600, display: { xs: 'none', md: 'block' } }}>
+            <SearchBar
+              placeholder="Buscar diseños (Arduino, Sensor, Radio...)"
+              onSearch={(q) => {
+                const params = new URLSearchParams(location.search);
+                if (q) {
+                  params.set('q', q);
+                } else {
+                  params.delete('q');
+                }
+                navigate({ pathname: '/', search: params.toString() });
+              }}
+            />
+          </Box>
           {/* Lógica de Autenticación */}
           {auth.isAuthenticated() ? (
             <>
