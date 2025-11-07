@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import disenoService from '../services/disenoService';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Typography, Box, CircularProgress, Alert, Button, Paper, Grid, Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, TextField, Modal } from '@mui/material';
+import { Typography, Box, CircularProgress, Alert, Button, Paper, Grid, Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, TextField, Modal, Chip } from '@mui/material';
 import Rating from '@mui/material/Rating';
 import resenaService from '../services/resenaService';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -161,6 +161,8 @@ const DisenoDetallePage = () => {
   const proveedor = diseno.proveedor || { nombre: 'N/A', avatarUrl: '' };
   const mainImageSrc = resolveImageUrl(diseno.imagenUrl) || FALLBACK_IMAGE;
   const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 40, { rounded: true });
+  const popular = Number(diseno.descargasCount || 0) >= 25;
+  const isGratis = Boolean(diseno.gratuito) || Number(diseno.precio || 0) === 0;
 
   return (
     <>
@@ -180,7 +182,10 @@ const DisenoDetallePage = () => {
 
         {/* Columna Derecha (Info) */}
         <Grid item xs={12} md={5}>
-          <Typography variant="h3" gutterBottom>{diseno.nombre}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="h3" gutterBottom>{diseno.nombre}</Typography>
+            {popular && <Chip label="Popular" color="warning" />}
+          </Box>
 
           {/* Info del Proveedor */}
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -199,8 +204,8 @@ const DisenoDetallePage = () => {
           </Box>
 
           {/* Precio */}
-          <Typography variant="h4" color="primary" sx={{ my: 2 }}>
-            ${typeof diseno.precio === 'number' ? diseno.precio.toFixed(2) : diseno.precio}
+          <Typography variant="h4" color={isGratis ? 'success.main' : 'primary'} sx={{ my: 2 }}>
+            {isGratis ? 'Gratis' : `$${typeof diseno.precio === 'number' ? diseno.precio.toFixed(2) : diseno.precio}`}
           </Typography>
 
           {/* Botones de Acción (solo para Clientes) */}
@@ -216,6 +221,33 @@ const DisenoDetallePage = () => {
               Asistente de Diseño (IA)
             </Button>
           )}
+        </Grid>
+
+        {/* Especificaciones */}
+        <Grid item xs={12} md={5}>
+          <Typography variant="h6">Especificaciones</Typography>
+          <Divider sx={{ my: 1 }} />
+          <List dense>
+            {diseno?.nombreCategoria && (
+              <ListItem>
+                <ListItemText primary="Categoría" secondary={diseno.nombreCategoria} />
+              </ListItem>
+            )}
+            {diseno?.estado && (
+              <ListItem>
+                <ListItemText primary="Estado" secondary={diseno.estado} />
+              </ListItem>
+            )}
+            <ListItem>
+              <ListItemText primary="Tipo" secondary={isGratis ? 'Gratis' : 'De pago'} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="Likes" secondary={String(diseno.likesCount || 0)} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="Descargas" secondary={String(diseno.descargasCount || 0)} />
+            </ListItem>
+          </List>
         </Grid>
 
         {/* Descripción (Abajo) */}
