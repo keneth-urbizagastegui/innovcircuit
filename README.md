@@ -136,6 +136,15 @@ curl -X GET http://localhost:8080/api/v1/usuario/reporte/mis-compras \
 ```
 Respuesta: `List<VentaResponseDTO>` con detalle por compra (líneas, comisiones y montos proveedor).
 
+## UI/UX – Diálogos y Modales (Frontend)
+- Confirmaciones: Se reemplazó `window.confirm` por un componente reutilizable `ConfirmDialog` (MUI Dialog).
+  - Uso: `import ConfirmDialog from './src/components/ConfirmDialog';`
+  - Props: `open`, `title`, `message`, `confirmText`, `cancelText`, `onConfirm`, `onCancel`.
+  - Implementado en: `frontend/src/pages/AdminUsuariosPage.jsx` (Eliminar Usuario) y `frontend/src/pages/DashboardPage.jsx` (Eliminar Diseño).
+- Reportes JSON: Se reemplazó `window.alert(JSON.stringify(...))` por modales MUI que muestran el JSON formateado con `<pre>`.
+  - Implementado en: `frontend/src/pages/AdminDashboardPage.jsx` (Reporte de Ventas) y `frontend/src/pages/DashboardPage.jsx` (Reporte de Mis Compras).
+  - Beneficios: Mejor legibilidad, accesibilidad y consistencia visual con MUI.
+
 ### 7. Gestión de Diseños (PROVEEDOR)
 
 Editar un diseño propio:
