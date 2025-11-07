@@ -6,11 +6,13 @@ import { useAuth } from '../context/AuthContext';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
 import { Avatar } from '../components/ui/avatar';
 import { Badge } from '../components/ui/badge';
 import { Heart, Download, Loader2 } from 'lucide-react';
 import resenaService from '../services/resenaService';
 import { resolveImageUrl, resolveAvatarUrl, buildUiAvatar, FALLBACK_IMAGE, FALLBACK_AVATAR, onErrorSetSrc } from '../utils/imageUtils';
+import { formatCurrencyPEN } from '../utils/currency';
 import iaService from '../services/iaService';
 
 // Simple componente para mostrar calificación con estrellas
@@ -224,9 +226,9 @@ const DisenoDetallePage = () => {
             </div>
 
             {/* Precio */}
-            <div className={`text-2xl font-bold my-2 ${isGratis ? 'text-green-600' : 'text-blue-600'}`}>
-              {isGratis ? 'Gratis' : `$${typeof diseno.precio === 'number' ? diseno.precio.toFixed(2) : diseno.precio}`}
-            </div>
+  <div className={`text-2xl font-bold my-2 ${isGratis ? 'text-green-600' : 'text-slate-800'}`}>
+    {isGratis ? 'Gratis' : formatCurrencyPEN(diseno.precio)}
+  </div>
 
             {/* Botones de Acción (solo para Clientes) */}
             {user?.rol === 'CLIENTE' && (
@@ -298,7 +300,7 @@ const DisenoDetallePage = () => {
 
                       {/* Respuesta del proveedor existente */}
                       {r?.respuestaProveedor && (
-                        <div className="mt-2 ml-4 p-2 border-l-4 border-blue-300 bg-gray-50 rounded">
+                        <div className="mt-2 ml-4 p-2 border-l-4 border-slate-300 bg-gray-50 rounded">
                           <div className="text-sm font-semibold">Respuesta del proveedor:</div>
                           <div className="text-sm">{r.respuestaProveedor}</div>
                         </div>
@@ -363,43 +365,44 @@ const DisenoDetallePage = () => {
         )}
       </CardContent>
     </Card>
-    {/* Modal: Asistente de Diseño (IA) */}
-    {iaOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/50" onClick={handleCloseIa} />
-        <div className="relative bg-white rounded-md shadow-lg w-[600px] max-w-[90%] p-4">
-          <div className="text-lg font-semibold mb-2">Asistente de Diseño (IA)</div>
-          {iaError && (
-            <div className="rounded-md border border-red-300 bg-red-50 text-red-700 p-3 mb-2">{iaError}</div>
-          )}
-          <div className="border rounded p-3 h-[300px] overflow-y-auto mb-3 bg-gray-50">
-            {iaMessages.length === 0 ? (
-              <div className="text-sm text-gray-600">Inicia la conversación con una pregunta técnica sobre este diseño.</div>
-            ) : (
-              iaMessages.map((m, idx) => (
-                <div key={idx} className={`flex mb-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-2 rounded ${m.sender === 'user' ? 'bg-blue-100' : 'bg-gray-200'}`}>
-                    <div className="text-sm">{m.text}</div>
-                  </div>
+    {/* Dialog: Asistente de Diseño (IA) */}
+    <Dialog open={iaOpen} onClose={handleCloseIa} className="max-w-xl">
+      <DialogHeader>
+        <DialogTitle>Asistente de Diseño (IA)</DialogTitle>
+      </DialogHeader>
+      <DialogDescription>
+        {iaError && (
+          <div className="rounded-md border border-red-300 bg-red-50 text-red-700 p-3 mb-2">{iaError}</div>
+        )}
+        <div className="border rounded p-3 h-[300px] overflow-y-auto mb-3 bg-gray-50">
+          {iaMessages.length === 0 ? (
+            <div className="text-sm text-gray-600">Inicia la conversación con una pregunta técnica sobre este diseño.</div>
+          ) : (
+            iaMessages.map((m, idx) => (
+              <div key={idx} className={`flex mb-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] p-2 rounded ${m.sender === 'user' ? 'bg-slate-100' : 'bg-gray-200'}`}>
+                  <div className="text-sm">{m.text}</div>
                 </div>
-              ))
-            )}
-          </div>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Escribe tu pregunta..."
-              value={iaQuestion}
-              onChange={(e) => setIaQuestion(e.target.value)}
-              disabled={iaSending}
-            />
-            <Button onClick={handleIaSend} disabled={iaSending || !iaQuestion.trim()}>
-              {iaSending ? 'Enviando...' : 'Enviar'}
-            </Button>
-          </div>
-          <button className="absolute top-2 right-2 text-sm text-gray-500" onClick={handleCloseIa}>Cerrar</button>
+              </div>
+            ))
+          )}
         </div>
-      </div>
-    )}
+      </DialogDescription>
+      <DialogFooter>
+        <div className="flex w-full gap-2">
+          <Input
+            placeholder="Escribe tu pregunta..."
+            value={iaQuestion}
+            onChange={(e) => setIaQuestion(e.target.value)}
+            disabled={iaSending}
+          />
+          <Button onClick={handleIaSend} disabled={iaSending || !iaQuestion.trim()}>
+            {iaSending ? 'Enviando...' : 'Enviar'}
+          </Button>
+          <Button variant="outline" onClick={handleCloseIa}>Cerrar</Button>
+        </div>
+      </DialogFooter>
+    </Dialog>
     </>
   );
 };

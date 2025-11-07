@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../services/adminService';
 import { Button } from '../components/ui/button';
+import { formatCurrencyPEN } from '../utils/currency';
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
 
 const AdminDashboardPage = () => {
@@ -88,7 +89,7 @@ const AdminDashboardPage = () => {
           {statsLoading ? (
             <div className="mt-1 h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
           ) : (
-            <div className="text-lg font-semibold">${Number(stats?.totalVentasGlobal ?? 0).toFixed(2)}</div>
+            <div className="text-lg font-semibold">{formatCurrencyPEN(Number(stats?.totalVentasGlobal ?? 0))}</div>
           )}
         </div>
         <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
@@ -96,7 +97,7 @@ const AdminDashboardPage = () => {
           {statsLoading ? (
             <div className="mt-1 h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
           ) : (
-            <div className="text-lg font-semibold">${Number(stats?.totalComisiones ?? 0).toFixed(2)}</div>
+            <div className="text-lg font-semibold">{formatCurrencyPEN(Number(stats?.totalComisiones ?? 0))}</div>
           )}
         </div>
       </div>

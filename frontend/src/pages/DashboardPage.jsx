@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import usuarioService from '../services/usuarioService';
 import { Button } from '../components/ui/button';
+import { formatCurrencyPEN } from '../utils/currency';
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
 import { Pencil, Trash2 } from 'lucide-react';
 import disenoService from '../services/disenoService';
@@ -96,7 +97,7 @@ const DashboardPage = () => {
             {compras.length === 0 ? <p className="text-muted-foreground">No has realizado compras.</p> : null}
             {compras.map(compra => (
               <div key={compra.id} className="py-3">
-                <div className="font-medium">Compra ID: {compra.id} - Total: ${Number(compra.montoTotal).toFixed(2)}</div>
+                <div className="font-medium">Compra ID: {compra.id} - Total: S/{Number(compra.montoTotal).toFixed(2)}</div>
                 <div className="text-sm text-muted-foreground">Fecha: {new Date(compra.fecha).toLocaleDateString()}</div>
               </div>
             ))}
@@ -121,11 +122,11 @@ const DashboardPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
                 <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
                   <div className="text-sm text-muted-foreground">Total Vendido</div>
-                  <div className="text-lg font-semibold">${Number(stats?.totalVendido ?? 0).toFixed(2)}</div>
+                  <div className="text-lg font-semibold">S/{Number(stats?.totalVendido ?? 0).toFixed(2)}</div>
                 </div>
                 <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
                   <div className="text-sm text-muted-foreground">Ganancia Neta (Tras comisiones)</div>
-                  <div className="text-lg font-semibold">${Number(stats?.gananciaNeta ?? 0).toFixed(2)}</div>
+                  <div className="text-lg font-semibold">{formatCurrencyPEN(Number(stats?.gananciaNeta ?? 0))}</div>
                 </div>
               </div>
             )}
@@ -136,7 +137,7 @@ const DashboardPage = () => {
               <div key={diseno.id} className="py-3 flex items-center justify-between">
                 <div>
                   <div className="font-medium">{diseno.nombre}</div>
-                  <div className="text-sm text-muted-foreground">Estado: {diseno.estado} | Precio: ${Number(diseno.precio ?? 0).toFixed(2)}</div>
+                  <div className="text-sm text-muted-foreground">Estado: {diseno.estado} | Precio: {formatCurrencyPEN(Number(diseno.precio ?? 0))}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" aria-label="editar" onClick={() => handleEditarDiseno(diseno.id)}>

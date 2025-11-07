@@ -3,6 +3,7 @@ import { useCart } from '../context/CartContext';
 import ventaService from '../services/ventaService';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
+import { formatCurrencyPEN } from '../utils/currency';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 
 const CarritoPage = () => {
@@ -59,7 +60,7 @@ const CarritoPage = () => {
               <li key={item.id} className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-sm font-medium text-slate-900">{item.nombre}</p>
-                  <p className="text-sm text-slate-600">${item.precio.toFixed(2)}</p>
+                  <p className="text-sm text-slate-600">{formatCurrencyPEN(item.precio)}</p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => removeItem(item.id)}>
                   Quitar
@@ -72,7 +73,7 @@ const CarritoPage = () => {
         <div className="my-2 h-px bg-slate-200" />
 
         <div className="text-right text-lg font-semibold">
-          Total: ${total.toFixed(2)}
+          Total: {formatCurrencyPEN(total)}
         </div>
 
         <Button

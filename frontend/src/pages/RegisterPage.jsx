@@ -58,7 +58,7 @@ const RegisterPage = () => {
             <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             <label className="text-sm font-medium text-slate-700">Rol</label>
             <select
-              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400"
+              className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400"
               value={rol}
               onChange={(e) => setRol(e.target.value)}
             >

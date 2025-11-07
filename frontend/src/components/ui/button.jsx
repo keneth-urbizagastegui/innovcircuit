@@ -2,10 +2,10 @@ import React from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 
-const base = 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:pointer-events-none disabled:opacity-50'
+const base = 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:pointer-events-none disabled:opacity-50'
 
 const variants = {
-  default: 'bg-sky-500 text-white hover:bg-sky-600',
+  default: 'bg-slate-900 text-white hover:bg-slate-800',
   outline: 'border border-slate-200 bg-white text-slate-900 hover:bg-slate-50',
   ghost: 'hover:bg-slate-100',
   secondary: 'bg-slate-900 text-white hover:bg-slate-800',
