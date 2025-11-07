@@ -62,6 +62,17 @@ const AdminDashboardPage = () => {
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
       <Typography variant="h4" gutterBottom>Panel de Administración</Typography>
+      <Box sx={{ mb: 2 }}>
+        <Button variant="outlined" onClick={() => {
+          adminService.getReporteVentas()
+            .then(res => {
+              alert(JSON.stringify(res.data, null, 2));
+            })
+            .catch(() => alert('Error al generar reporte de ventas'));
+        }}>
+          Generar Reporte de Ventas
+        </Button>
+      </Box>
       {/* Estadísticas globales */}
       {statsError && <Alert severity="error" sx={{ mb: 2 }}>{statsError}</Alert>}
       <Grid container spacing={2} sx={{ mb: 3 }}>

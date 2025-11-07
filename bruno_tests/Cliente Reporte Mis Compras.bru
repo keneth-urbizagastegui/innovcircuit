@@ -1,0 +1,19 @@
+meta {
+  name: Cliente Reporte Mis Compras
+  type: http
+  seq: 23
+}
+
+get {
+  url: http://localhost:8080/api/v1/usuario/reporte/mis-compras
+  auth: bearer
+}
+
+auth:bearer {
+  token: REEMPLAZAR_CON_TOKEN_CLIENTE
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

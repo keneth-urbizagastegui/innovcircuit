@@ -1,0 +1,19 @@
+meta {
+  name: Admin Reporte Ventas
+  type: http
+  seq: 22
+}
+
+get {
+  url: http://localhost:8080/api/v1/admin/reporte/ventas
+  auth: bearer
+}
+
+auth:bearer {
+  token: REEMPLAZAR_CON_TOKEN_ADMIN
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

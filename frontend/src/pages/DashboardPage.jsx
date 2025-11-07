@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import usuarioService from '../services/usuarioService';
-import { Typography, Box, Paper, List, ListItem, ListItemText, Divider, CircularProgress, Alert, IconButton, Grid } from '@mui/material';
+import { Typography, Box, Paper, List, ListItem, ListItemText, Divider, CircularProgress, Alert, IconButton, Grid, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import disenoService from '../services/disenoService';
@@ -71,6 +71,15 @@ const DashboardPage = () => {
         <Box sx={{ mt: 3 }}>
           <Typography variant="h5">Historial de Compras</Typography>
           <Divider sx={{ my: 2 }} />
+          <Box sx={{ mb: 2 }}>
+            <Button variant="outlined" onClick={() => {
+              usuarioService.getReporteMisCompras()
+                .then(res => alert(JSON.stringify(res.data, null, 2)))
+                .catch(() => alert('Error al generar reporte de compras'));
+            }}>
+              Generar Reporte de Mis Compras
+            </Button>
+          </Box>
           <List>
             {compras.length === 0 ? <Typography>No has realizado compras.</Typography> : null}
             {compras.map(compra => (

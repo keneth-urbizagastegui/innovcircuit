@@ -10,6 +10,7 @@ import DisenoDetallePage from './pages/DisenoDetallePage';
 import CarritoPage from './pages/CarritoPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUsuariosPage from './pages/AdminUsuariosPage';
+import AdminConfigPage from './pages/AdminConfigPage';
 import DashboardPage from './pages/DashboardPage';
 import PerfilPage from './pages/PerfilPage';
 
@@ -41,6 +42,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["ADMINISTRADOR"]} />}> 
           <Route path="admin" element={<AdminDashboardPage />} />
           <Route path="admin/usuarios" element={<AdminUsuariosPage />} />
+          <Route path="admin/configuracion" element={<AdminConfigPage />} />
         </Route>
       </Route>
     </Routes>

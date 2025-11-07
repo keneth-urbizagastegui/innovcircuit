@@ -70,6 +70,12 @@ const Layout = () => {
                   Gestionar Usuarios
                 </Button>
               )}
+              {/* Configuración (solo Admin) */}
+              {auth.user?.rol === 'ADMINISTRADOR' && (
+                <Button color="inherit" component={Link} to="/admin/configuracion" sx={{ mr: 2 }}>
+                  Configuración
+                </Button>
+              )}
               <Button color="inherit" onClick={handleLogout}>
                 Logout
               </Button>

@@ -17,6 +17,10 @@ const usuarioService = {
   actualizarMiPerfil: (data) => {
     // data = { nombre?: string, avatarUrl?: string }
     return apiClient.put('/usuario/mi-perfil', data);
+  },
+  // Reporte detallado de mis compras (Cliente)
+  getReporteMisCompras: () => {
+    return apiClient.get('/usuario/reporte/mis-compras');
   }
 };
 

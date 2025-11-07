@@ -18,6 +18,17 @@ const adminService = {
   // Nuevo: estadísticas globales del admin
   getEstadisticasAdmin: () => {
     return apiClient.get('/admin/estadisticas');
+  },
+  // Configuraciones (Admin)
+  getConfiguraciones: () => {
+    return apiClient.get('/admin/configuracion');
+  },
+  actualizarConfiguracion: (clave, valor) => {
+    return apiClient.put(`/admin/configuracion/${encodeURIComponent(clave)}`, { valor });
+  },
+  // Reporte de ventas (Admin)
+  getReporteVentas: () => {
+    return apiClient.get('/admin/reporte/ventas');
   }
 };
 

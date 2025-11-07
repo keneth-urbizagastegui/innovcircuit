@@ -100,6 +100,42 @@ Notas:
 - Requiere rol ADMINISTRADOR.
 - ID_USUARIO debe ser un ID válido existente.
 
+### 7. Configuración (ADMINISTRADOR)
+
+Listar configuraciones:
+```bash
+curl -X GET http://localhost:8080/api/v1/admin/configuracion \
+  -H "Authorization: Bearer TOKEN_DE_ADMIN"
+```
+
+Actualizar/crear una configuración (por clave):
+```bash
+curl -X PUT http://localhost:8080/api/v1/admin/configuracion/TASA_COMISION \
+  -H "Authorization: Bearer TOKEN_DE_ADMIN" \
+  -H "Content-Type: application/json" \
+  -d '{"valor":"0.25"}'
+```
+
+Notas:
+- La clave `TASA_COMISION` controla la tasa de comisión de la plataforma (por ejemplo, `0.20` para 20%).
+- Las compras realizadas después del cambio utilizarán la nueva tasa.
+
+### 8. Reportes (ADMINISTRADOR y CLIENTE)
+
+Reporte de Ventas (Admin):
+```bash
+curl -X GET http://localhost:8080/api/v1/admin/reporte/ventas \
+  -H "Authorization: Bearer TOKEN_DE_ADMIN"
+```
+Respuesta: `ReporteVentasDTO` con totales y lista de ventas detalladas.
+
+Reporte de Mis Compras (Cliente):
+```bash
+curl -X GET http://localhost:8080/api/v1/usuario/reporte/mis-compras \
+  -H "Authorization: Bearer TOKEN_DE_CLIENTE"
+```
+Respuesta: `List<VentaResponseDTO>` con detalle por compra (líneas, comisiones y montos proveedor).
+
 ### 7. Gestión de Diseños (PROVEEDOR)
 
 Editar un diseño propio:
