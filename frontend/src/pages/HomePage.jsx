@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 // import { useAuth } from '../context/AuthContext'; // Ya no lo necesitamos aquí
 import disenoService from '../services/disenoService';
 import DisenoCard from '../components/DisenoCard';
-import { Grid, Typography, CircularProgress, Box, Alert, TextField, IconButton } from '@mui/material';
+import { Grid, Typography, CircularProgress, Box, Alert, TextField, IconButton, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 // import { Link } from 'react-router-dom'; // Ya no se usa
+import iaService from '../services/iaService';
 
 const HomePage = () => {
   // const auth = useAuth(); // Ya no es necesario para esta lógica
@@ -38,6 +39,22 @@ const HomePage = () => {
       })
       .catch(() => {
         setError('Error al buscar diseños.');
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const handleIaSearch = () => {
+    setLoading(true);
+    setError('');
+    const prompt = (keyword || '').trim();
+    iaService
+      .buscarAsistido({ prompt })
+      .then((response) => {
+        const data = Array.isArray(response?.data) ? response.data : [];
+        setDisenos(data);
+      })
+      .catch(() => {
+        setError('Error en la búsqueda asistida por IA.');
       })
       .finally(() => setLoading(false));
   };
@@ -84,6 +101,9 @@ const HomePage = () => {
         <IconButton color="primary" onClick={handleSearch} aria-label="Buscar">
           <SearchIcon />
         </IconButton>
+        <Button variant="outlined" color="secondary" onClick={handleIaSearch}>
+          Búsqueda IA
+        </Button>
       </Box>
       {content}
     </Box>

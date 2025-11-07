@@ -3,12 +3,13 @@ import { useParams } from 'react-router-dom';
 import disenoService from '../services/disenoService';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Typography, Box, CircularProgress, Alert, Button, Paper, Grid, Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, TextField } from '@mui/material';
+import { Typography, Box, CircularProgress, Alert, Button, Paper, Grid, Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, TextField, Modal } from '@mui/material';
 import Rating from '@mui/material/Rating';
 import resenaService from '../services/resenaService';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DownloadIcon from '@mui/icons-material/Download';
 import { resolveImageUrl, resolveAvatarUrl, buildUiAvatar, FALLBACK_IMAGE, FALLBACK_AVATAR, onErrorSetSrc } from '../utils/imageUtils';
+import iaService from '../services/iaService';
 
 const DisenoDetallePage = () => {
   const { id } = useParams();
@@ -28,6 +29,13 @@ const DisenoDetallePage = () => {
   const [calificacion, setCalificacion] = useState(0);
   const [comentario, setComentario] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // IA Chatbot modal state
+  const [iaOpen, setIaOpen] = useState(false);
+  const [iaMessages, setIaMessages] = useState([]); // { sender: 'user'|'ai', text }
+  const [iaQuestion, setIaQuestion] = useState('');
+  const [iaSending, setIaSending] = useState(false);
+  const [iaError, setIaError] = useState('');
 
   const cargarDiseno = () => {
     setLoading(true);
@@ -111,6 +119,35 @@ const DisenoDetallePage = () => {
     if (diseno) cart.addItem(diseno);
   };
 
+  const handleOpenIa = () => {
+    setIaOpen(true);
+    setIaError('');
+  };
+
+  const handleCloseIa = () => {
+    setIaOpen(false);
+  };
+
+  const handleIaSend = async () => {
+    const pregunta = iaQuestion.trim();
+    if (!pregunta) return;
+    setIaSending(true);
+    setIaError('');
+    // Añade mensaje del usuario
+    setIaMessages((prev) => [...prev, { sender: 'user', text: pregunta }]);
+    try {
+      const response = await iaService.chatbotDiseno(id, { pregunta });
+      const texto = response?.data?.respuesta || 'Sin respuesta.';
+      setIaMessages((prev) => [...prev, { sender: 'ai', text: texto }]);
+      setIaQuestion('');
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Error al consultar el asistente de diseño.';
+      setIaError(msg);
+    } finally {
+      setIaSending(false);
+    }
+  };
+
   if (loading) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
   }
@@ -126,6 +163,7 @@ const DisenoDetallePage = () => {
   const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 64, { rounded: true });
 
   return (
+    <>
     <Paper elevation={3} sx={{ p: 4 }}>
       <Grid container spacing={4}>
         {/* Columna Izquierda (Imagen) */}
@@ -168,6 +206,13 @@ const DisenoDetallePage = () => {
           {user?.rol === 'CLIENTE' && (
             <Button variant="contained" size="large" onClick={handleAddToCart} fullWidth>
               Añadir al Carrito
+            </Button>
+          )}
+
+          {/* Botón Asistente de Diseño (IA) - requiere autenticación */}
+          {user && (
+            <Button variant="outlined" color="secondary" sx={{ mt: 2 }} onClick={handleOpenIa} fullWidth>
+              Asistente de Diseño (IA)
             </Button>
           )}
         </Grid>
@@ -268,6 +313,35 @@ const DisenoDetallePage = () => {
         )}
       </Grid>
     </Paper>
+    {/* Modal: Asistente de Diseño (IA) */}
+    <Modal open={iaOpen} onClose={handleCloseIa} aria-labelledby="ia-chatbot-modal">
+      <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, maxWidth: '90%', bgcolor: 'background.paper', boxShadow: 24, p: 3, borderRadius: 2 }}>
+        <Typography id="ia-chatbot-modal" variant="h6" gutterBottom>
+          Asistente de Diseño (IA)
+        </Typography>
+        {iaError && <Alert severity="error" sx={{ mb: 2 }}>{iaError}</Alert>}
+        <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 1.5, height: 300, overflowY: 'auto', mb: 2, bgcolor: 'background.default' }}>
+          {iaMessages.length === 0 ? (
+            <Typography variant="body2" color="text.secondary">Inicia la conversación con una pregunta técnica sobre este diseño.</Typography>
+          ) : (
+            iaMessages.map((m, idx) => (
+              <Box key={idx} sx={{ display: 'flex', justifyContent: m.sender === 'user' ? 'flex-end' : 'flex-start', mb: 1 }}>
+                <Box sx={{ maxWidth: '80%', p: 1.5, borderRadius: 2, bgcolor: m.sender === 'user' ? 'primary.light' : 'action.hover' }}>
+                  <Typography variant="body2">{m.text}</Typography>
+                </Box>
+              </Box>
+            ))
+          )}
+        </Box>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <TextField fullWidth placeholder="Escribe tu pregunta..." value={iaQuestion} onChange={(e) => setIaQuestion(e.target.value)} disabled={iaSending} />
+          <Button variant="contained" onClick={handleIaSend} disabled={iaSending || !iaQuestion.trim()}>
+            {iaSending ? 'Enviando...' : 'Enviar'}
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
+    </>
   );
 };
 
