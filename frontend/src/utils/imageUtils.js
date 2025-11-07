@@ -2,9 +2,38 @@
 
 export const BACKEND_BASE_URL = import.meta.env?.VITE_BACKEND_URL || 'http://localhost:8080';
 
-export const FALLBACK_IMAGE = 'https://placehold.co/600x400?text=Imagen+no+disponible';
-export const FALLBACK_CARD_IMAGE = 'https://placehold.co/300x200?text=Sin+Imagen';
-export const FALLBACK_AVATAR = 'https://placehold.co/150x150?text=User';
+// Generadores de placeholders locales (SVG en data URI) para evitar depender de servicios externos
+function svgDataUri(svg) {
+  const encoded = encodeURIComponent(svg)
+    .replace(/'/g, '%27')
+    .replace(/\(/g, '%28')
+    .replace(/\)/g, '%29');
+  return `data:image/svg+xml;utf8,${encoded}`;
+}
+
+function makeImagePlaceholder(width = 600, height = 400, text = 'Imagen no disponible') {
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+    <rect width="100%" height="100%" fill="#f3f4f6"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#374151" font-family="sans-serif" font-size="${Math.max(14, Math.floor(Math.min(width, height) / 16))}">${text}</text>
+  </svg>`;
+  return svgDataUri(svg);
+}
+
+function makeAvatarPlaceholder(size = 150, text = 'U') {
+  const radius = Math.floor(size / 2);
+  const fontSize = Math.max(12, Math.floor(size / 2.5));
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
+    <circle cx="${radius}" cy="${radius}" r="${radius}" fill="#e5e7eb" />
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#111827" font-family="sans-serif" font-size="${fontSize}" font-weight="bold">${text}</text>
+  </svg>`;
+  return svgDataUri(svg);
+}
+
+export const FALLBACK_IMAGE = makeImagePlaceholder(600, 400, 'Imagen no disponible');
+export const FALLBACK_CARD_IMAGE = makeImagePlaceholder(300, 200, 'Sin Imagen');
+export const FALLBACK_AVATAR = makeAvatarPlaceholder(150, 'U');
 
 // Normaliza URLs que vienen relativas desde el backend (p.ej., "/uploads/...")
 export function resolveImageUrl(url) {
