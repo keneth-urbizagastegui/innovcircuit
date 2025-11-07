@@ -2,10 +2,13 @@ package com.utec.innovcircuit.innovcircuitbackend.service;
 
 import com.utec.innovcircuit.innovcircuitbackend.dto.CompraRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.VentaResponseDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.LineaVentaDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.ReporteVentasDTO;
 import com.utec.innovcircuit.innovcircuitbackend.model.*;
 import com.utec.innovcircuit.innovcircuitbackend.repository.DisenoRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.UsuarioRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.VentaRepository;
+import com.utec.innovcircuit.innovcircuitbackend.repository.ConfiguracionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +20,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class VentaServiceImpl implements IVentaService {
-    private static final double TASA_COMISION = 0.20; // 20%
     @Autowired
     private VentaRepository ventaRepository;
 
@@ -26,6 +28,9 @@ public class VentaServiceImpl implements IVentaService {
 
     @Autowired
     private DisenoRepository disenoRepository;
+
+    @Autowired
+    private ConfiguracionRepository configuracionRepository;
 
     // (Simulación del Servicio de Pago Externo)
     // private ServicioPagoExterno servicioPago;
@@ -68,13 +73,24 @@ public class VentaServiceImpl implements IVentaService {
         venta.setCliente(cliente);
         venta.setMontoTotal(montoTotal);
 
+        // Obtener tasa de comisión de BD
+        double tasaComision = configuracionRepository.findByClave("TASA_COMISION")
+                .map(c -> {
+                    try {
+                        return Double.parseDouble(c.getValor());
+                    } catch (NumberFormatException ex) {
+                        return 0.20; // fallback seguro
+                    }
+                })
+                .orElse(0.20);
+
         // 6. Crear las Lineas de Venta con cálculo de comisiones
         for (Diseno diseno : disenos) {
             LineaVenta linea = new LineaVenta();
             linea.setDiseno(diseno);
             // Si es gratuito, el precio efectivo para comisión es 0
             double precio = diseno.isGratuito() ? 0.0 : diseno.getPrecio();
-            double comision = precio * TASA_COMISION;
+            double comision = precio * tasaComision;
             double montoProv = precio - comision;
             linea.setPrecioAlComprar(precio);
             linea.setComisionPlataforma(comision);
@@ -147,6 +163,23 @@ public class VentaServiceImpl implements IVentaService {
         dto.setDisenosComprados(venta.getLineasVenta().stream()
                 .map(linea -> linea.getDiseno().getNombre())
                 .collect(Collectors.toList()));
+
+        // Totales
+        dto.setComisionTotal(venta.getComisionTotal());
+        dto.setMontoProveedorTotal(venta.getMontoProveedorTotal());
+
+        // Detalle de líneas
+        List<LineaVentaDTO> lineasDto = venta.getLineasVenta().stream().map(lv -> {
+            LineaVentaDTO l = new LineaVentaDTO();
+            l.setId(lv.getId());
+            l.setDisenoId(lv.getDiseno() != null ? lv.getDiseno().getId() : null);
+            l.setDisenoNombre(lv.getDiseno() != null ? lv.getDiseno().getNombre() : null);
+            l.setPrecioAlComprar(lv.getPrecioAlComprar());
+            l.setComisionPlataforma(lv.getComisionPlataforma());
+            l.setMontoProveedor(lv.getMontoProveedor());
+            return l;
+        }).collect(Collectors.toList());
+        dto.setLineas(lineasDto);
         return dto;
     }
 
@@ -160,5 +193,27 @@ public class VentaServiceImpl implements IVentaService {
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ReporteVentasDTO getReporteVentas() {
+        List<Venta> ventas = ventaRepository.findAll();
+        ReporteVentasDTO reporte = new ReporteVentasDTO();
+
+        double totalVentasGlobal = ventas.stream()
+                .mapToDouble(v -> v.getMontoTotal() != null ? v.getMontoTotal() : 0.0)
+                .sum();
+        double totalComisiones = ventas.stream()
+                .mapToDouble(v -> v.getComisionTotal() != null ? v.getComisionTotal() : 0.0)
+                .sum();
+        double totalMontoProveedor = ventas.stream()
+                .mapToDouble(v -> v.getMontoProveedorTotal() != null ? v.getMontoProveedorTotal() : 0.0)
+                .sum();
+
+        reporte.setTotalVentasGlobal(totalVentasGlobal);
+        reporte.setTotalComisiones(totalComisiones);
+        reporte.setTotalMontoProveedor(totalMontoProveedor);
+        reporte.setVentas(ventas.stream().map(this::convertToDTO).collect(Collectors.toList()));
+        return reporte;
     }
 }

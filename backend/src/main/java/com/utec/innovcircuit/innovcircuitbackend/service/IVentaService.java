@@ -4,6 +4,7 @@ import com.utec.innovcircuit.innovcircuitbackend.dto.CompraRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.VentaResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasAdminDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.ReporteVentasDTO;
 import java.util.List;
 
 public interface IVentaService {
@@ -17,4 +18,7 @@ public interface IVentaService {
 
     // Estadísticas para admin
     EstadisticasAdminDTO getEstadisticasAdmin();
+
+    // Reporte detallado de ventas para admin
+    ReporteVentasDTO getReporteVentas();
 }

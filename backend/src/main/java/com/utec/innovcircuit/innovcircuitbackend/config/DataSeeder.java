@@ -8,9 +8,11 @@ import com.utec.innovcircuit.innovcircuitbackend.model.Categoria;
 import com.utec.innovcircuit.innovcircuitbackend.model.Cliente;
 import com.utec.innovcircuit.innovcircuitbackend.model.Diseno;
 import com.utec.innovcircuit.innovcircuitbackend.model.Proveedor;
+import com.utec.innovcircuit.innovcircuitbackend.model.Configuracion;
 import com.utec.innovcircuit.innovcircuitbackend.repository.CategoriaRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.DisenoRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.UsuarioRepository;
+import com.utec.innovcircuit.innovcircuitbackend.repository.ConfiguracionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
@@ -33,6 +35,8 @@ public class DataSeeder implements CommandLineRunner {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ResourceLoader resourceLoader; // Para leer archivos del classpath
+    @Autowired
+    private ConfiguracionRepository configuracionRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -44,6 +48,9 @@ public class DataSeeder implements CommandLineRunner {
         if (disenoRepository.count() == 0) {
             seedDisenosFromJSON();
         }
+
+        // 3. Sembrar configuración de TASA_COMISION si no existe
+        seedTasaComision();
     }
 
     private void seedUsuarios() {
@@ -113,5 +120,14 @@ public class DataSeeder implements CommandLineRunner {
                 disenoRepository.save(diseno);
             }
         }
+    }
+
+    private void seedTasaComision() {
+        configuracionRepository.findByClave("TASA_COMISION").orElseGet(() -> {
+            Configuracion conf = new Configuracion();
+            conf.setClave("TASA_COMISION");
+            conf.setValor("0.20");
+            return configuracionRepository.save(conf);
+        });
     }
 }

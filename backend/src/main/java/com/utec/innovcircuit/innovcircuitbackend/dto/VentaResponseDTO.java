@@ -10,5 +10,11 @@ public class VentaResponseDTO {
     private LocalDateTime fecha;
     private Double montoTotal;
     private String nombreCliente;
-    private List<String> disenosComprados; // Lista simple de nombres
+    // Lista simple de nombres (mantener compatibilidad con clientes existentes)
+    private List<String> disenosComprados;
+
+    // Campos detallados para reportes completos
+    private Double comisionTotal;
+    private Double montoProveedorTotal;
+    private List<LineaVentaDTO> lineas;
 }

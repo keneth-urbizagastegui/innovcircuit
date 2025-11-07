@@ -37,6 +37,13 @@ public class UsuarioController {
         return ResponseEntity.ok(ventaService.getComprasPorCliente(principal.getName()));
     }
 
+    // Reporte completo de compras (detalle de líneas, totales y comisiones)
+    @GetMapping("/reporte/mis-compras")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<List<VentaResponseDTO>> getReporteMisCompras(Principal principal) {
+        return ResponseEntity.ok(ventaService.getComprasPorCliente(principal.getName()));
+    }
+
     // Endpoint para que el PROVEEDOR vea sus diseños (todos los estados)
     @GetMapping("/mis-disenos")
     @PreAuthorize("hasRole('PROVEEDOR')")
