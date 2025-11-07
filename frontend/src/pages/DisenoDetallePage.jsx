@@ -160,7 +160,7 @@ const DisenoDetallePage = () => {
 
   const proveedor = diseno.proveedor || { nombre: 'N/A', avatarUrl: '' };
   const mainImageSrc = resolveImageUrl(diseno.imagenUrl) || FALLBACK_IMAGE;
-  const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 64, { rounded: true });
+  const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 40, { rounded: true });
 
   return (
     <>
@@ -170,9 +170,10 @@ const DisenoDetallePage = () => {
         <Grid item xs={12} md={7}>
           <Box
             component="img"
-            sx={{ width: '100%', objectFit: 'cover', borderRadius: 2 }}
+            sx={{ width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: 2, backgroundColor: 'background.default' }}
             alt={diseno.nombre}
             src={mainImageSrc}
+            loading="lazy"
             onError={onErrorSetSrc(FALLBACK_IMAGE)}
           />
         </Grid>
@@ -183,7 +184,7 @@ const DisenoDetallePage = () => {
 
           {/* Info del Proveedor */}
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Avatar src={avatarSrc} onError={onErrorSetSrc(FALLBACK_AVATAR)} sx={{ mr: 1 }} />
+            <Avatar src={avatarSrc} onError={onErrorSetSrc(FALLBACK_AVATAR)} sx={{ width: 40, height: 40, mr: 1, border: '1px solid', borderColor: 'divider' }} />
             <Typography variant="h6">{proveedor.nombre}</Typography>
           </Box>
 

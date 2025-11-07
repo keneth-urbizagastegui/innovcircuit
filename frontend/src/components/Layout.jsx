@@ -4,7 +4,6 @@ import { AppBar, Toolbar, Typography, Container, Box, Button, CssBaseline, Badge
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import SearchBar from './SearchBar';
 
 const Layout = () => {
   const auth = useAuth();
@@ -31,21 +30,7 @@ const Layout = () => {
           >
             InnovCircuit
           </Typography>
-          {/* Barra de búsqueda rápida */}
-          <Box sx={{ flexGrow: 1, maxWidth: 600, display: { xs: 'none', md: 'block' } }}>
-            <SearchBar
-              placeholder="Buscar diseños (Arduino, Sensor, Radio...)"
-              onSearch={(q) => {
-                const params = new URLSearchParams(location.search);
-                if (q) {
-                  params.set('q', q);
-                } else {
-                  params.delete('q');
-                }
-                navigate({ pathname: '/', search: params.toString() });
-              }}
-            />
-          </Box>
+          {/* Barra de búsqueda eliminada por requerimiento */}
           {/* Lógica de Autenticación */}
           {auth.isAuthenticated() ? (
             <>

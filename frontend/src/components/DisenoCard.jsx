@@ -8,27 +8,29 @@ import { resolveImageUrl, resolveAvatarUrl, FALLBACK_CARD_IMAGE, FALLBACK_AVATAR
 const DisenoCard = ({ diseno }) => {
   // Fallback por si la API aún no envía el objeto proveedor
   const proveedor = diseno.proveedor || { nombre: 'N/A', avatarUrl: '' };
-  const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 48, { rounded: true });
+  const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 32, { rounded: true });
   const imageSrc = resolveImageUrl(diseno.imagenUrl) || FALLBACK_CARD_IMAGE;
   return (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 3 }}>
       {/* Proveedor Info */}
-      <Box sx={{ display: 'flex', alignItems: 'center', p: 1.5 }}>
-        <Avatar src={avatarSrc} onError={onErrorSetSrc(FALLBACK_AVATAR)} sx={{ width: 24, height: 24, mr: 1 }} />
-        <Typography variant="body2">{proveedor.nombre}</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', p: 1.25 }}>
+        <Avatar src={avatarSrc} onError={onErrorSetSrc(FALLBACK_AVATAR)} sx={{ width: 28, height: 28, mr: 1, border: '1px solid', borderColor: 'divider' }} />
+        <Typography variant="body2" color="text.secondary">{proveedor.nombre}</Typography>
       </Box>
       {/* Link en la Imagen */}
       <Box component={Link} to={`/diseno/${diseno.id}`} sx={{ textDecoration: 'none' }}>
         <CardMedia
           component="img"
-          height="160"
+          height="220"
           image={imageSrc}
           onError={onErrorSetSrc(FALLBACK_CARD_IMAGE)}
+          loading="lazy"
+          sx={{ objectFit: 'cover', backgroundColor: 'background.default' }}
           alt={diseno.nombre}
         />
         {/* Titulo */}
         <CardContent sx={{ flexGrow: 1, py: 1 }}>
-          <Typography gutterBottom variant="h6" component="h2" sx={{ fontSize: '1rem', color: 'text.primary' }}>
+          <Typography gutterBottom variant="h6" component="h2" sx={{ fontSize: '1rem', color: 'text.primary', lineHeight: 1.3 }}>
             {diseno.nombre}
           </Typography>
         </CardContent>

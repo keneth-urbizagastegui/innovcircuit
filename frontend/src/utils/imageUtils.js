@@ -39,9 +39,11 @@ export function buildUiAvatar(name = 'Usuario', size = 64, opts = {}) {
   const params = new URLSearchParams({
     name: name || 'Usuario',
     size: String(size),
-    background: opts.background || 'random',
+    background: opts.background || 'e5e7eb', // gris claro minimalista
+    color: opts.color || '111827', // texto gris oscuro
     rounded: (opts.rounded ?? true) ? 'true' : 'false',
-    bold: (opts.bold ?? false) ? 'true' : 'false'
+    bold: (opts.bold ?? false) ? 'true' : 'false',
+    format: opts.format || 'svg',
   });
   return `https://ui-avatars.com/api/?${params.toString()}`;
 }
@@ -50,5 +52,5 @@ export function buildUiAvatar(name = 'Usuario', size = 64, opts = {}) {
 export function resolveAvatarUrl(avatarUrl, name, size = 64, opts = {}) {
   const resolved = resolveImageUrl(avatarUrl);
   if (resolved) return resolved;
-  return buildUiAvatar(name, size, opts);
+  return buildUiAvatar(name, size, { rounded: true, background: 'e5e7eb', color: '111827', format: 'svg', ...opts });
 }
