@@ -243,7 +243,7 @@ const DisenoDetallePage = () => {
   const isGratis = Boolean(diseno.gratuito) || Number(diseno.precio || 0) === 0;
 
   return (
-    <>
+      <div className="mx-auto max-w-7xl px-4 py-6">
     <Card className="p-4 md:p-6">
       <CardContent className="p-0">
         <div className="grid gap-6 md:grid-cols-2">
@@ -531,7 +531,7 @@ const DisenoDetallePage = () => {
         </div>
       </DialogFooter>
     </Dialog>
-    </>
+    </div>
   );
 };
 

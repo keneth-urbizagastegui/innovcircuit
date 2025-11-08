@@ -97,7 +97,8 @@ const EditarDisenoPage = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-[600px] mx-auto p-6 bg-white rounded-xl border border-border shadow-sm space-y-4">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <form onSubmit={handleSubmit} className="max-w-[600px] mx-auto p-6 bg-white rounded-xl border border-border shadow-sm space-y-4">
       <h1 className="text-2xl font-semibold">Editar Diseño</h1>
 
       {error && (
@@ -158,7 +159,8 @@ const EditarDisenoPage = () => {
           Guardar Cambios
         </Button>
       </div>
-    </form>
+      </form>
+    </div>
   )
 }
 

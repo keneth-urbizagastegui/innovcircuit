@@ -35,7 +35,8 @@ const CarritoPage = () => {
   };
 
   return (
-    <Card className="p-4">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <Card className="p-4">
       <CardHeader className="pb-2">
         <CardTitle>Carrito de Compras</CardTitle>
       </CardHeader>
@@ -84,7 +85,8 @@ const CarritoPage = () => {
           {loading ? 'Procesando...' : 'Proceder al Pago'}
         </Button>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

@@ -1,6 +1,7 @@
 # === Java / Spring Boot ===
 # Ignora la carpeta de compilación de Maven
 /backend/target/
+/target/
 
 # Ignora los archivos de log y compilados
 *.log
@@ -22,6 +23,7 @@
 
 # === Archivos de Usuario (Uploads) ===
 /backend/uploads/
+/uploads/
 
 # === Scripts de Prueba Temporales ===
 /tmp_schematic/

@@ -39,8 +39,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="flex min-h-[70vh] items-center justify-center p-4">
+        <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Iniciar Sesión</CardTitle>
         </CardHeader>
@@ -87,7 +88,8 @@ const LoginPage = () => {
             <Button type="submit" className="w-full">Entrar</Button>
           </CardFooter>
         </form>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };

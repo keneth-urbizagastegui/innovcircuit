@@ -22,7 +22,7 @@ const TransaccionesPage = () => {
 
   if (loading)
     return (
-      <div className="p-4">
+      <div className="mx-auto max-w-7xl px-4 py-6">
         <Card>
           <CardHeader>
             <CardTitle>Historial de Transacciones</CardTitle>
@@ -36,7 +36,7 @@ const TransaccionesPage = () => {
     );
 
   return (
-    <div className="p-4">
+    <div className="mx-auto max-w-7xl px-4 py-6">
       <Card>
         <CardHeader>
           <CardTitle>Historial de Transacciones</CardTitle>

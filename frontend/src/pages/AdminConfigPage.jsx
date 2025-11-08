@@ -61,7 +61,8 @@ const AdminConfigPage = () => {
   );
 
   return (
-    <Card className="p-4">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <Card className="p-4">
       <CardHeader className="pb-2">
         <CardTitle>Configuración (Admin)</CardTitle>
       </CardHeader>
@@ -97,7 +98,8 @@ const AdminConfigPage = () => {
           </div>
         </CardContent>
       )}
-    </Card>
+      </Card>
+    </div>
   );
 };
 

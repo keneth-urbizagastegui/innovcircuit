@@ -86,7 +86,8 @@ const AdminDashboardPage = () => {
   }
 
   return (
-    <div className="p-6 bg-white rounded-xl border border-border shadow-sm">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="p-6 bg-white rounded-xl border border-border shadow-sm">
       <h1 className="text-2xl font-semibold text-foreground mb-4">Panel de Administración</h1>
       <div className="mb-2">
         <Button variant="outline" onClick={() => {
@@ -181,6 +182,7 @@ const AdminDashboardPage = () => {
           <Button onClick={() => setReporteOpen(false)}>Cerrar</Button>
         </DialogFooter>
       </Dialog>
+      </div>
     </div>
   );
 };

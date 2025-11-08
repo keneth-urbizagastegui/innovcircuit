@@ -116,7 +116,8 @@ const ReportesPage = () => {
   };
 
   return (
-    <Card>
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <CardTitle>Reportes de Proveedor</CardTitle>
         <Button
@@ -136,7 +137,8 @@ const ReportesPage = () => {
           <Line options={chartOptions} data={chartData} />
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

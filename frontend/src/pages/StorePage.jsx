@@ -57,7 +57,8 @@ const StorePage = () => {
   const bannerSrc = resolveImageUrl(proveedor.bannerUrl) || FALLBACK_IMAGE;
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="space-y-6">
       <div className="relative">
         <img
           src={bannerSrc}
@@ -103,6 +104,7 @@ const StorePage = () => {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

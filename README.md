@@ -14,6 +14,43 @@ Plataforma de venta de diseños electrónicos con un frontend en React (Vite) y 
 - Frontend es una SPA (Single Page Application) que consume la API.
 - La pila completa se orquesta con `docker-compose.yml`.
 
+## 🗂️ Estructura del Proyecto
+
+```
+innovcircuit/
+├── backend/
+│   ├── Dockerfile
+│   ├── pom.xml
+│   └── src/main/  (Spring Boot: controllers, services, repositories, config)
+├── frontend/
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── nginx.conf
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   ├── vite.config.js
+│   └── src/
+│       ├── App.jsx
+│       ├── components/
+│       │   ├── Footer.jsx
+│       │   ├── Layout.jsx
+│       │   ├── DisenoCard.jsx
+│       │   ├── DesignCard.jsx
+│       │   └── ui/ (avatar, badge, button, card, dialog, input, select, textarea)
+│       ├── context/ (AuthContext, CartContext, etc.)
+│       ├── pages/ (HomePage, LoginPage, DashboardPage, StorePage, etc.)
+│       ├── services/ (cliente/usuario/categoria/diseno/... APIs)
+│       ├── theme/ (tokens y utilidades de tema si aplica)
+│       ├── utils/ (helpers: cn, currency, imageUtils, etc.)
+│       ├── index.css
+│       └── main.jsx
+├── bruno_tests/ (colecciones de pruebas de API)
+├── scripts/ (PowerShell para pruebas y utilidades)
+├── docker-compose.yml
+└── README.md
+```
+
 ## Entorno de Desarrollo
 - Backend (Spring Boot): http://localhost:8080
 - Frontend (React/Nginx): http://localhost:5173
@@ -173,16 +210,150 @@ Notas:
 
 ## Frontend – Tema global Tindie y Tailwind v4
 
-Se aplicó un tema visual global inspirado en Tindie a todo el frontend usando Tailwind v4.
+Se utiliza Tailwind v4 y una paleta oscura (lima/verde) aplicada actualmente solo al Encabezado y al Footer. El resto de componentes se mantienen con los estilos por defecto del tema para evitar cambios globales no deseados.
 
-- Migración a Tailwind v4: `src/index.css` ahora usa `@import "tailwindcss";` y el `postcss.config.js` está configurado con `tailwindcss` y `autoprefixer`.
-- Tokens de tema en `tailwind.config.js`: `primary` (verde) y `secondary` (naranja) más `background`, `foreground`, `border` y `muted-foreground`.
-- Componentes UI actualizados: `Layout`, `Card`, `Input` y `Badge` usan los tokens del tema de forma consistente.
-- Validación: El servidor Vite (`npm run dev`) corre sin errores y las páginas Home y Login muestran el tema correctamente.
+- Tailwind v4: `src/index.css` usa `@import "tailwindcss";` con `postcss.config.js` (tailwindcss + autoprefixer).
+- Paleta Innov en `:root` (CSS variables HSL) para colores base; se evita `@apply` en estilos globales para compatibilidad.
+- Encabezado y Footer: colores oscuros (`#1A202C`/`#2D3748`) con acentos lima/verde (`#C7F782`/`#48BB78`).
+- Componentes base revertidos: `button`, `card`, `badge` usan los tokens originales (`primary`, `secondary`, `background`, etc.).
+- Proxy Vite: `vite.config.js` enruta `/api` y `/uploads` al backend `http://localhost:8080`.
+- Nota HMR: el aviso `net::ERR_ABORTED /src/index.css` puede aparecer durante recargas; es benigno.
 
 Referencias prácticas:
 - Desarrollo: `cd frontend && npm install && npm run dev` → `http://localhost:5173`
 - Build: `npm run build` y preview con `npm run preview`
+
+## 🔧 Guía de Inicio Rápido
+
+Requisitos:
+- Node.js 18+ y npm
+- Java 17+ (JDK)
+- Docker (opcional para despliegue completo)
+
+Desarrollo local:
+1) Backend
+   - `cd backend`
+   - Ejecuta: `mvn spring-boot:run`
+   - Alternativa: `mvn clean package` y luego `java -jar target/innovcircuit-backend-0.0.1-SNAPSHOT.jar`
+2) Frontend
+   - `cd frontend`
+   - `npm install`
+   - `npm run dev` → abre `http://localhost:5173/`
+
+Endpoints útiles:
+- API base: `http://localhost:8080/api/v1`
+- `vite.config.js` define proxy para `/api` y `/uploads`.
+
+## 🧪 Pruebas y Scripts
+
+- Bruno (API): Colecciones en `bruno_tests/` para login, categorías, reportes y compras. Útil para validar roles (ADMIN/PROVEEDOR/CLIENTE).
+- Scripts PowerShell (`scripts/`):
+  - `test_login_via_vite.ps1`, `test_list_disenos.ps1`, `test_upload_diseno_local.ps1`, etc.
+  - Ejecutar desde Windows PowerShell dentro del proyecto raíz.
+
+## 🔗 Rutas y Endpoints (Resumen)
+
+- Autenticación
+  - `POST /api/v1/auth/login` (público): inicia sesión y devuelve JWT.
+
+- Categorías
+  - `GET /api/v1/categorias` (autenticado): lista de categorías.
+  - `POST /api/v1/categorias` (ADMIN): crea una nueva categoría.
+
+- Usuarios (ADMIN)
+  - `GET /api/v1/admin/usuarios` (ADMIN): lista usuarios (clientes y proveedores).
+  - `PUT /api/v1/admin/usuarios/{id}/estado` (ADMIN): actualiza estado `ACTIVO`/`BLOQUEADO`.
+  - `DELETE /api/v1/admin/usuarios/{id}` (ADMIN): elimina un usuario.
+
+- Configuración (ADMIN)
+  - `GET /api/v1/admin/configuracion` (ADMIN): lista configuraciones.
+  - `PUT /api/v1/admin/configuracion/{clave}` (ADMIN): crea/actualiza configuración, p.ej. `TASA_COMISION`.
+
+- Reportes
+  - `GET /api/v1/admin/reporte/ventas` (ADMIN): totales y ventas detalladas.
+  - `GET /api/v1/usuario/reporte/mis-compras` (CLIENTE): detalle de compras del usuario.
+
+- Diseños (Proveedor)
+  - `PUT /api/v1/disenos/{id}` (PROVEEDOR): edita un diseño propio.
+  - `DELETE /api/v1/disenos/{id}` (PROVEEDOR): elimina un diseño propio.
+
+- Diseños (Público/Autenticado)
+  - `GET /api/v1/disenos` (autenticado vía proxy Vite): lista de diseños aprobados.
+  - `GET /api/v1/disenos/{id}` (público): detalle de un diseño específico.
+
+- Ventas/Compras (Cliente)
+  - `POST /api/v1/ventas/comprar` (CLIENTE): compra de uno o varios diseños.
+    - Body: `{ "disenoIds": [ID, ...] }`
+    - Nota: la API rechaza compras de diseños en estado `PENDIENTE`.
+
+Notas:
+- Este resumen no es exhaustivo; para más ejemplos consulta `bruno_tests/`.
+- Todas las rutas protegidas requieren `Authorization: Bearer <TOKEN>`.
+
+## 🧭 Arquitectura (Diagrama Texto)
+
+```
+           ┌───────────────────────────┐
+           │        Frontend (SPA)     │
+           │  React + Vite + Tailwind  │
+           └─────────────┬─────────────┘
+                         │ HTTP (Proxy /api, /uploads)
+                 ┌───────▼────────┐
+                 │   Nginx (Dev)  │
+                 └───────┬────────┘
+                         │
+                 ┌───────▼──────────────┐
+                 │   Backend (API)      │
+                 │ Spring Boot + JWT    │
+                 └───────┬──────────────┘
+                         │ JDBC
+         ┌───────────────▼──────────────┐
+         │       PostgreSQL (DB)        │
+         └───────────────┬──────────────┘
+                         │
+                ┌────────▼────────┐
+                │    pgAdmin      │
+                └─────────────────┘
+
+Flujos clave:
+- Login → `POST /api/v1/auth/login` → JWT.
+- SPA consume API → headers `Authorization: Bearer <JWT>`.
+- Roles (ADMIN/PROVEEDOR/CLIENTE) controlan acceso a endpoints.
+```
+
+## 📦 Ejemplos cURL – Diseños y Compras
+
+### Listar Diseños (aprobados)
+```bash
+curl -X GET http://localhost:8080/api/v1/disenos \
+  -H "Authorization: Bearer TU_TOKEN_AQUI"
+```
+
+### Obtener Diseño por ID (público)
+```bash
+curl -X GET http://localhost:8080/api/v1/disenos/ID_DISENO
+```
+
+### Comprar Diseños (éxito)
+```bash
+curl -X POST http://localhost:8080/api/v1/ventas/comprar \
+  -H "Authorization: Bearer TOKEN_DE_CLIENTE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "disenoIds": [2]
+  }'
+```
+
+### Comprar Diseño en estado PENDIENTE (fallo esperado)
+```bash
+curl -X POST http://localhost:8080/api/v1/ventas/comprar \
+  -H "Authorization: Bearer TOKEN_DE_CLIENTE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "disenoIds": [1]
+  }'
+```
+Resultado esperado: error por validación de estado (el diseño no está aprobado).
 
 ## Despliegue Completo (Docker Compose)
 

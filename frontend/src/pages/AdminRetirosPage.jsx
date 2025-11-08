@@ -44,7 +44,8 @@ const AdminRetirosPage = () => {
   }
 
   return (
-    <Card>
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <Card>
       <CardHeader>
         <CardTitle>Gestionar Solicitudes de Retiro (Pendientes)</CardTitle>
       </CardHeader>
@@ -77,7 +78,7 @@ const AdminRetirosPage = () => {
                 <tr key={r.id} className="border-t">
                   <td className="px-3 py-2">{r.id}</td>
                   <td className="px-3 py-2">{new Date(r.fechaSolicitud).toLocaleDateString()}</td>
-                  <td className="px-3 py-2 max-w-[200px] truncate">{r.metodoPago}</td>
+                  <td className="px-3 py-2 max-w-lg break-words">{r.metodoPago}</td>
                   <td className="px-3 py-2 text-right font-semibold">{formatCurrencyPEN(r.monto)}</td>
                   <td className="px-3 py-2 text-right space-x-2">
                     <Button variant="success" size="sm" onClick={() => handleProcesar(r.id, 'APROBADO')}>
@@ -93,7 +94,8 @@ const AdminRetirosPage = () => {
           </table>
         </div>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

@@ -35,7 +35,8 @@ const PerfilPage = () => {
   };
 
   return (
-    <Card className="p-3">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <Card className="p-3">
       <CardHeader className="pb-2">
         <CardTitle>Mi Perfil</CardTitle>
       </CardHeader>
@@ -92,7 +93,8 @@ const PerfilPage = () => {
           </Button>
         </form>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

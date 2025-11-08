@@ -1,34 +1,72 @@
-/* Importar los estilos de Tailwind v4 (entrada única) */
+/* Import único de Tailwind v4 */
 @import "tailwindcss";
 
-/* Tus variables y estilos base personalizados van aquí */
 @layer base {
   :root {
-    --background: #ffffff;
-    --foreground: #0f172a;
+    /* Fondo blanco, Texto gris oscuro (Tu paleta) */
+    --background: 0 0% 100%; /* Blanco */
+    --foreground: 0 0% 30.2%; /* Tu innov-dark-gray: #4D4D4D */
+
+    /* Tarjetas blancas, Texto gris oscuro */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 30.2%;
+
+    /* Popovers blancos, Texto gris oscuro */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 30.2%;
+
+    /* Color Primario (Botones) - Tu innov-aqua: #54C4BB */
+    --primary: 174 51.6% 55.3%;
+    --primary-foreground: 0 0% 30.2%; /* Tu innov-dark-gray para contraste */
+
+    /* Color Secundario (Botones) - Tu innov-red: #FA7776 */
+    --secondary: 0.5 91.8% 72.5%;
+    --secondary-foreground: 0 0% 100%; /* Texto blanco para contraste */
+
+    /* Muted (Fondos grises) - Tu innov-light-gray: #EBEBEB */
+    --muted: 0 0% 92.2%;
+    --muted-foreground: 0 0% 30.2%; /* Tu innov-dark-gray */
+
+    /* Acento - Tu innov-lime: #C7F782 */
+    --accent: 81.4 89.5% 73.5%;
+    --accent-foreground: 0 0% 30.2%; /* Tu innov-dark-gray */
+
+    /* Destructivo (Rojo) - Tu innov-red: #FA7776 */
+    --destructive: 0.5 91.8% 72.5%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Bordes e Inputs - Tu innov-light-gray: #EBEBEB */
+    --border: 0 0% 92.2%;
+    --input: 0 0% 92.2%;
+    --ring: 174 51.6% 55.3%; /* Tu innov-aqua */
+    --radius: 0.5rem;
   }
 
-  html, body, #root {
-    height: 100%;
-  }
-
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
+  .dark {
+    /* Modo oscuro - invertir colores para alto contraste */
+    --background: 222.2 47.4% 11.2%; /* Fondo: Gris oscuro */
+    --foreground: 210 40% 98%; /* Texto: Blanco */
+    --card: 222.2 47.4% 11.2%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 47.4% 11.2%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%; /* Primario: Blanco */
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
 
-/* Variables y reset ligeros para una base consistente */
-:root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-}
-
-html, body, #root {
-  height: 100%;
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
+@layer base {
+  * { border-color: hsl(var(--border)); }
+  body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); font-feature-settings: "rlig" 1, "calt" 1; }
 }

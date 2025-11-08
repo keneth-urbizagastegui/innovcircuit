@@ -176,33 +176,33 @@ const HomePage = () => {
       <>
         {/* ----- INICIO NUEVA SECCIÓN: DESTACADOS ----- */}
         {destacados.length > 0 && (
-          <section className="mb-8">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold">Destacados</h2>
-              <p className="text-sm text-slate-600">Diseños seleccionados por nuestros curadores</p>
-            </div>
-            <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {destacados.slice(0,8).map((diseno) => (
-                <div key={`feat-${diseno.id}`}>
-                  <DisenoCard diseno={diseno} />
-                </div>
-              ))}
+          <section className="mx-auto max-w-6xl px-4 py-8">
+            <h2 className="mb-6 text-center text-3xl font-bold text-foreground">Destacados</h2>
+            <p className="mb-8 text-center text-muted-foreground">Diseños seleccionados por nuestros curadores</p>
+            <div className="rounded-xl border bg-card p-6 shadow-lg">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {destacados.slice(0,8).map((diseno) => (
+                  <div key={`feat-${diseno.id}`}>
+                    <DisenoCard diseno={diseno} />
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         )}
         {/* ----- FIN NUEVA SECCIÓN ----- */}
         {/* Sección: Explora nuestros productos más nuevos */}
-        <section className="mb-8">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold">Explora nuestros productos más nuevos</h2>
-            <p className="text-sm text-slate-600">Encuentra cosas interesantes</p>
-          </div>
-          <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {newest.slice(0,8).map((diseno) => (
-              <div key={`new-${diseno.id}`}>
-                <DisenoCard diseno={diseno} />
-              </div>
-            ))}
+        <section className="mx-auto max-w-6xl px-4 py-8">
+          <h2 className="mb-6 text-center text-3xl font-bold text-foreground">Explora nuestros productos más nuevos</h2>
+          <p className="mb-8 text-center text-muted-foreground">Encuentra cosas interesantes</p>
+          <div className="rounded-xl border bg-card p-6 shadow-lg">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {newest.slice(0,8).map((diseno) => (
+                <div key={`new-${diseno.id}`}>
+                  <DisenoCard diseno={diseno} />
+                </div>
+              ))}
+            </div>
           </div>
           <div className="mt-6 flex justify-center">
             <Button variant="outline" onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}>
@@ -236,32 +236,33 @@ const HomePage = () => {
 
         {/* Sección: Productos Populares */}
         {popularList.length > 0 && (
-          <section className="mb-8">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold">Productos populares</h2>
-              <p className="text-sm text-slate-600">Tendencias en InnovCircuit</p>
-            </div>
-            <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {popularList.slice(0,8).map((diseno) => (
-                <div key={`pop-${diseno.id}`}>
-                  <DisenoCard diseno={diseno} />
-                </div>
-              ))}
+          <section className="mx-auto max-w-6xl px-4 py-8">
+            <h2 className="mb-6 text-center text-3xl font-bold text-foreground">Los más populares de InnovCircuit</h2>
+            <p className="mb-8 text-center text-muted-foreground">Lo que la comunidad está amando</p>
+            <div className="rounded-xl border bg-card p-6 shadow-lg">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {popularList.slice(0,8).map((diseno) => (
+                  <div key={`pop-${diseno.id}`}>
+                    <DisenoCard diseno={diseno} />
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         )}
 
         {/* Catálogo completo */}
-        <section id="catalogo">
-          <div className="text-center mb-4">
-            <h2 className="text-xl font-semibold">Todos los productos</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {ordered.map((diseno) => (
-              <div key={`all-${diseno.id}`}>
-                <DisenoCard diseno={diseno} />
-              </div>
-            ))}
+        <section id="catalogo" className="mx-auto max-w-6xl px-4 py-8">
+          <h2 className="mb-6 text-center text-3xl font-bold text-foreground">Todos nuestros productos</h2>
+          <p className="mb-8 text-center text-muted-foreground">Explora el catálogo completo de InnovCircuit</p>
+          <div className="rounded-xl border bg-card p-6 shadow-lg">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {ordered.map((diseno) => (
+                <div key={`all-${diseno.id}`}>
+                  <DisenoCard diseno={diseno} />
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </>
@@ -269,26 +270,27 @@ const HomePage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      {/* Hero con buscador al estilo Tindie */}
-      <div className="mb-6 rounded-lg border bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white p-6">
+<div className="mx-auto max-w-7xl px-4 py-6">
+      {/* Hero con nuevos colores oscuros */}
+      <div className="mb-8 rounded-xl border border-[#2D3748] bg-gradient-to-br from-[#1A202C] to-[#2D3748] p-8 text-white shadow-xl">
         <div className="mb-2 text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight">Compra cosas increíbles directamente a los makers.</h1>
-          <p className="text-sm text-slate-600">Construye algo extraordinario.</p>
+          <h1 className="mb-4 text-center text-4xl font-bold tracking-tight md:text-5xl text-[#C7F782]">Compra cosas increíbles directamente a los makers.</h1>
+          <p className="mb-8 text-center text-lg text-[#CBD5E0]">Construye algo extraordinario.</p>
         </div>
-        <div className="mx-auto flex max-w-2xl gap-2">
+        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="mx-auto flex max-w-2xl gap-2">
           <Input
+            type="text"
+            placeholder="Buscar por nombre o palabra clave..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Buscar por nombre o palabra clave"
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            className="flex-grow rounded-md border-[#2D3748] bg-[#2D3748] text-white placeholder-[#CBD5E0] focus:border-[#48BB78] focus:ring-[#48BB78]"
           />
-          <Button onClick={handleSearch}>Buscar</Button>
-        </div>
-        <div className="mx-auto mt-4 flex max-w-2xl justify-center gap-3">
-          <Button variant="secondary" onClick={() => navigate('/subir-diseno')}>Comienza a vender</Button>
-          <Button variant="outline" onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}>Explorar productos</Button>
-          <Button variant="secondary" onClick={() => setIaSearchOpen(true)}>Buscar con IA</Button>
+          <Button type="submit" variant="default" className="bg-[#48BB78] text-white hover:bg-[#48BB78]/90">Buscar</Button>
+        </form>
+        <div className="mx-auto mt-6 flex max-w-2xl justify-center gap-3">
+          <Button variant="secondary" className="bg-[#ECC94B] text-[#1A202C] hover:bg-[#ECC94B]/90" onClick={() => navigate('/subir-diseno')}>Comienza a vender</Button>
+          <Button variant="outline" className="border-[#48BB78] text-[#48BB78] hover:bg-[#48BB78]/10 hover:text-[#48BB78]" onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}>Explorar productos</Button>
+          <Button variant="ghost" className="text-white hover:bg-[#2D3748] hover:text-[#C7F782]" onClick={() => setIaSearchOpen(true)}>Búsqueda Asistida (IA)</Button>
         </div>
         {categorias.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center gap-2">

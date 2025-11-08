@@ -115,7 +115,8 @@ const DashboardPage = () => {
   );
 
   return (
-    <div className="p-6 bg-white rounded-xl border border-border shadow-sm">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="p-6 bg-white rounded-xl border border-border shadow-sm">
       <h1 className="text-2xl font-semibold text-foreground mb-2">Mi Panel</h1>
       <p className="text-muted-foreground">Hola, {user?.sub}</p>
 
@@ -276,6 +277,7 @@ const DashboardPage = () => {
           </Button>
         </DialogFooter>
       </Dialog>
+      </div>
     </div>
   );
 };

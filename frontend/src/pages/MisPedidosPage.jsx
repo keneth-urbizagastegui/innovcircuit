@@ -26,7 +26,8 @@ const MisPedidosPage = () => {
   );
 
   return (
-    <Card className="bg-white border border-border shadow-sm">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <Card className="bg-white border border-border shadow-sm">
       <CardHeader>
         <CardTitle>Mis Pedidos de Impresión</CardTitle>
       </CardHeader>
@@ -65,7 +66,8 @@ const MisPedidosPage = () => {
           </ul>
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 
