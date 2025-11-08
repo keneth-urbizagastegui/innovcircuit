@@ -36,7 +36,7 @@ public class IAServiceImpl {
         contexto.append("[Contexto del Diseño]\n");
         contexto.append("Nombre: ").append(diseno.getNombre()).append("\n");
         contexto.append("Descripción: ").append(diseno.getDescripcion()).append("\n");
-        contexto.append("Precio: ").append(diseno.getPrecio()).append(" | Gratuito: ").append(diseno.isGratuito()).append("\n");
+        contexto.append("Precio: ").append(diseno.getPrecio()).append(" | Gratuito: ").append(Boolean.TRUE.equals(diseno.getGratuito())).append("\n");
         contexto.append("Categoría: ").append(diseno.getCategoria() != null ? diseno.getCategoria().getNombre() : "N/A").append("\n\n");
         contexto.append("[Reseñas]\n");
         for (Resena r : resenas) {
@@ -96,7 +96,7 @@ public class IAServiceImpl {
         dto.setNombre(diseno.getNombre());
         dto.setDescripcion(diseno.getDescripcion());
         dto.setPrecio(diseno.getPrecio());
-        dto.setGratuito(diseno.isGratuito());
+        dto.setGratuito(Boolean.TRUE.equals(diseno.getGratuito()));
         dto.setEstado(diseno.getEstado());
         dto.setImagenUrl(diseno.getImagenUrl());
         dto.setEsquematicoUrl(diseno.getEsquematicoUrl());

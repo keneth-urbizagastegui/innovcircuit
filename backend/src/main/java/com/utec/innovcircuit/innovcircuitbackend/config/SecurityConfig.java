@@ -42,6 +42,9 @@ public class SecurityConfig {
                 // evitamos patrones redundantes que pueden causar errores de coincidencia en Spring Security 6
                 .requestMatchers(HttpMethod.GET, "/api/v1/categorias").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/proveedores/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/preguntas/diseno/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/disenos/destacados").permitAll()
 
                 // Panel de Administración: proteger todo bajo /api/v1/admin/**
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMINISTRADOR")

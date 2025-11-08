@@ -6,6 +6,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } fr
 
 const AdminDashboardPage = () => {
   const [pendientes, setPendientes] = useState([]);
+  const [aprobados, setAprobados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState(null);
@@ -42,9 +43,20 @@ const AdminDashboardPage = () => {
       });
   };
 
+  const cargarAprobados = () => {
+    adminService.getDisenosAprobados()
+      .then(response => {
+        setAprobados(response.data);
+      })
+      .catch(() => {
+        setError('Error al cargar diseños aprobados.');
+      });
+  };
+
   useEffect(() => {
     cargarPendientes();
     cargarEstadisticas();
+    cargarAprobados();
   }, []);
 
   const handleAprobar = (id) => {
@@ -57,6 +69,12 @@ const AdminDashboardPage = () => {
     adminService.rechazarDiseno(id)
       .then(() => cargarPendientes())
       .catch(() => setError('No se pudo rechazar el diseño.'));
+  };
+
+  const handleToggleFeatured = (id) => {
+    adminService.toggleFeatured(id)
+      .then(() => cargarAprobados())
+      .catch(() => setError('No se pudo actualizar el estado de destacado.'));
   };
 
   if (loading) {
@@ -123,6 +141,31 @@ const AdminDashboardPage = () => {
           ))
         )}
       </div>
+      {/* ----- INICIO NUEVA SECCIÓN: APROBADOS ----- */}
+      <h2 className="text-xl font-semibold mb-2 mt-6">Gestionar Diseños Aprobados (Curación)</h2>
+      <div className="divide-y">
+        {aprobados.length === 0 ? (
+          <p className="text-muted-foreground">No hay diseños aprobados.</p>
+        ) : (
+          aprobados.map(diseno => (
+            <div key={diseno.id} className="py-3 flex items-center justify-between">
+              <div>
+                <div className="font-medium">{diseno.nombre}</div>
+                <div className="text-sm text-muted-foreground">Por: {diseno.proveedor?.nombre || 'N/A'}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={diseno.featured ? 'destructive' : 'default'}
+                  onClick={() => handleToggleFeatured(diseno.id)}
+                >
+                  {diseno.featured ? 'Quitar Destacado' : 'Destacar'}
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+      {/* ----- FIN NUEVA SECCIÓN ----- */}
       {/* Modal para mostrar JSON del reporte */}
       <Dialog open={reporteOpen} onClose={() => setReporteOpen(false)} className="w-[90%] sm:w-[600px] p-4">
         <DialogHeader>

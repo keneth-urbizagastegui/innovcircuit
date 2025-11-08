@@ -5,11 +5,15 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Avatar } from '../components/ui/avatar';
+import { Textarea } from '../components/ui/textarea';
 
 const PerfilPage = () => {
   const { user } = useAuth();
   const [nombre, setNombre] = useState(user?.nombre || '');
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || '');
+  const [descripcionTienda, setDescripcionTienda] = useState(user?.descripcionTienda || '');
+  const [bannerUrl, setBannerUrl] = useState(user?.bannerUrl || '');
+  const [sitioWebUrl, setSitioWebUrl] = useState(user?.sitioWebUrl || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -20,7 +24,7 @@ const PerfilPage = () => {
     setError('');
     setSuccess('');
     try {
-      await usuarioService.actualizarMiPerfil({ nombre, avatarUrl });
+      await usuarioService.actualizarMiPerfil({ nombre, avatarUrl, descripcionTienda, bannerUrl, sitioWebUrl });
       setSuccess('Perfil actualizado correctamente.');
     } catch (err) {
       const msg = err?.response?.data?.message || 'Error al actualizar el perfil.';
@@ -57,6 +61,32 @@ const PerfilPage = () => {
           <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
           <label className="text-sm font-medium text-slate-700">URL del Avatar</label>
           <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} />
+          {/* --- INICIO CAMPOS PROVEEDOR --- */}
+          {user?.rol === 'PROVEEDOR' && (
+            <>
+              <div className="my-2 border-t border-gray-200" />
+              <label className="text-sm font-medium text-slate-700">Descripción de tu Tienda</label>
+              <Textarea
+                rows={4}
+                value={descripcionTienda}
+                onChange={(e) => setDescripcionTienda(e.target.value)}
+                placeholder="Describe tu tienda, quién eres y qué haces..."
+              />
+              <label className="text-sm font-medium text-slate-700">URL del Banner de tu Tienda</label>
+              <Input
+                value={bannerUrl}
+                onChange={(e) => setBannerUrl(e.target.value)}
+                placeholder="https://ejemplo.com/mi-banner.png"
+              />
+              <label className="text-sm font-medium text-slate-700">Sitio Web (Opcional)</label>
+              <Input
+                value={sitioWebUrl}
+                onChange={(e) => setSitioWebUrl(e.target.value)}
+                placeholder="https://mi-sitio-personal.com"
+              />
+            </>
+          )}
+          {/* --- FIN CAMPOS PROVEEDOR --- */}
           <Button type="submit" disabled={loading}>
             {loading ? 'Guardando...' : 'Guardar Cambios'}
           </Button>

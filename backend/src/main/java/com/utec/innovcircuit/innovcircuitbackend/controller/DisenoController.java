@@ -110,4 +110,10 @@ public class DisenoController {
         disenoService.eliminarDiseno(id, emailProveedor);
         return ResponseEntity.noContent().build();
     }
+
+    // Endpoint PÚBLICO: obtener diseños destacados
+    @GetMapping("/destacados")
+    public ResponseEntity<List<DisenoResponseDTO>> getDisenosDestacados() {
+        return ResponseEntity.ok(disenoService.listarDisenosDestacados());
+    }
 }

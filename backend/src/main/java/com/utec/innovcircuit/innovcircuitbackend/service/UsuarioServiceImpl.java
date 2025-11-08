@@ -3,6 +3,7 @@ package com.utec.innovcircuit.innovcircuitbackend.service;
 import com.utec.innovcircuit.innovcircuitbackend.dto.UsuarioLoginDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.LoginResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.UsuarioRegistroDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.PerfilRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.model.Cliente;
 import com.utec.innovcircuit.innovcircuitbackend.model.Proveedor;
 import com.utec.innovcircuit.innovcircuitbackend.model.Administrador;
@@ -26,7 +27,8 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public Usuario registrarUsuario(UsuarioRegistroDTO registroDTO) {
         // 1. Validar que el email no exista
-        if (usuarioRepository.findByEmail(registroDTO.getEmail()).isPresent()) {
+        String emailNormalizado = registroDTO.getEmail() == null ? null : registroDTO.getEmail().trim().toLowerCase();
+        if (usuarioRepository.findByEmail(emailNormalizado).isPresent()) {
             throw new RuntimeException("Error: El email ya está en uso.");
         }
 
@@ -42,7 +44,8 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
         // 3. Setear datos y HASHEAR el password
         usuario.setNombre(registroDTO.getNombre());
-        usuario.setEmail(registroDTO.getEmail());
+        // Normalizar y guardar el email en minúsculas para evitar problemas de coincidencia
+        usuario.setEmail(emailNormalizado);
         usuario.setPassword(passwordEncoder.encode(registroDTO.getPassword()));
 
         // 4. Guardar en la BD
@@ -51,8 +54,10 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public LoginResponseDTO login(UsuarioLoginDTO loginDTO) {
-        // 1. Buscar al usuario por email
-        Usuario usuario = usuarioRepository.findByEmail(loginDTO.getEmail())
+        // 1. Normalizar email (trim + minúsculas) y buscar al usuario
+        String emailNormalizado = loginDTO.getEmail() == null ? null : loginDTO.getEmail().trim().toLowerCase();
+        System.out.println("[AUTH] Intento de login para email: " + emailNormalizado);
+        Usuario usuario = usuarioRepository.findByEmail(emailNormalizado)
                 .orElseThrow(() -> new RuntimeException("Credenciales inválidas"));
 
         // 2. Comparar la contraseña del DTO con la hasheada en la BD
@@ -75,15 +80,32 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     @Override
-    public Usuario actualizarPerfil(String email, String nombre, String avatarUrl) {
+    public Usuario actualizarPerfil(String email, PerfilRequestDTO dto) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        if (nombre != null) {
-            usuario.setNombre(nombre);
+
+        // Campos comunes
+        if (dto.getNombre() != null) {
+            usuario.setNombre(dto.getNombre());
         }
-        if (avatarUrl != null) {
-            usuario.setAvatarUrl(avatarUrl);
+        if (dto.getAvatarUrl() != null) {
+            usuario.setAvatarUrl(dto.getAvatarUrl());
         }
+
+        // Campos específicos del Proveedor
+        if (usuario instanceof Proveedor proveedor) {
+            if (dto.getDescripcionTienda() != null) {
+                proveedor.setDescripcionTienda(dto.getDescripcionTienda());
+            }
+            if (dto.getBannerUrl() != null) {
+                proveedor.setBannerUrl(dto.getBannerUrl());
+            }
+            if (dto.getSitioWebUrl() != null) {
+                proveedor.setSitioWebUrl(dto.getSitioWebUrl());
+            }
+            return usuarioRepository.save(proveedor);
+        }
+
         return usuarioRepository.save(usuario);
     }
 }

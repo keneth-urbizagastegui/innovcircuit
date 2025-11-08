@@ -55,6 +55,8 @@ public class DisenoServiceImpl implements IDisenoService {
         diseno.setPrecio(requestDTO.getPrecio());
         diseno.setGratuito(requestDTO.isGratuito());
         diseno.setEstado("PENDIENTE");
+        // Inicializar explícitamente el campo 'featured' a false para nuevos diseños
+        diseno.setFeatured(false);
         diseno.setCategoria(categoria);
         diseno.setProveedor(proveedor);
 
@@ -87,10 +89,15 @@ public class DisenoServiceImpl implements IDisenoService {
 
         diseno.setEstado("APROBADO");
         Diseno saved = disenoRepository.save(diseno);
+        // --- INICIO SIMULACIÓN DE NOTIFICACIÓN ---
+        System.out.println("[NOTIFICACIÓN] Diseño APROBADO: " + saved.getNombre());
+        System.out.println("  -> NOTIFICAR A PROVEEDOR: " + saved.getProveedor().getEmail());
+        // --- FIN SIMULACIÓN ---
         return mapToResponseDTO(saved);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DisenoResponseDTO> listarDisenosAprobados(String keyword) {
         List<Diseno> disenos;
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -104,6 +111,7 @@ public class DisenoServiceImpl implements IDisenoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DisenoResponseDTO getDisenoById(Long disenoId) {
         Diseno diseno = disenoRepository.findById(disenoId)
                 .orElseThrow(() -> new NoSuchElementException("Diseño no encontrado"));
@@ -139,7 +147,7 @@ public class DisenoServiceImpl implements IDisenoService {
         dto.setNombre(diseno.getNombre());
         dto.setDescripcion(diseno.getDescripcion());
         dto.setPrecio(diseno.getPrecio());
-        dto.setGratuito(diseno.isGratuito());
+        dto.setGratuito(Boolean.TRUE.equals(diseno.getGratuito()));
         dto.setEstado(diseno.getEstado());
         dto.setImagenUrl(diseno.getImagenUrl());
         dto.setEsquematicoUrl(diseno.getEsquematicoUrl());
@@ -148,6 +156,7 @@ public class DisenoServiceImpl implements IDisenoService {
         // Nuevas estadísticas
         dto.setLikesCount(diseno.getLikesCount());
         dto.setDescargasCount(diseno.getDescargasCount());
+        dto.setFeatured(Boolean.TRUE.equals(diseno.getFeatured()));
 
         // Proveedor anidado
         if (diseno.getProveedor() != null) {
@@ -155,14 +164,44 @@ public class DisenoServiceImpl implements IDisenoService {
             provDTO.setId(diseno.getProveedor().getId());
             provDTO.setNombre(diseno.getProveedor().getNombre());
             provDTO.setAvatarUrl(diseno.getProveedor().getAvatarUrl());
+            // --- INICIO DE CORRECCIÓN ---
+            // Añadir los campos faltantes que introdujimos
+            provDTO.setDescripcionTienda(diseno.getProveedor().getDescripcionTienda());
+            provDTO.setBannerUrl(diseno.getProveedor().getBannerUrl());
+            provDTO.setSitioWebUrl(diseno.getProveedor().getSitioWebUrl());
+            // --- FIN DE CORRECCIÓN ---
             dto.setProveedor(provDTO);
         }
 
         return dto;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<DisenoResponseDTO> listarDisenosDestacados() {
+        return disenoRepository.findByEstadoAndFeatured("APROBADO", true)
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public DisenoResponseDTO toggleFeatured(Long disenoId) {
+        Diseno diseno = disenoRepository.findById(disenoId)
+                .orElseThrow(() -> new NoSuchElementException("Diseño no encontrado"));
+        // Solo se pueden destacar diseños APROBADOS
+        if (!"APROBADO".equals(diseno.getEstado())) {
+            throw new IllegalStateException("Solo se pueden destacar diseños que han sido APROBADOS.");
+        }
+        diseno.setFeatured(!Boolean.TRUE.equals(diseno.getFeatured()));
+        Diseno saved = disenoRepository.save(diseno);
+        return mapToResponseDTO(saved);
+    }
+
     // --- Nuevas funcionalidades de Administración ---
     @Override
+    @Transactional(readOnly = true)
     public List<DisenoResponseDTO> listarDisenosPorEstado(String estado) {
         return disenoRepository.findByEstado(estado)
                 .stream()
@@ -178,6 +217,10 @@ public class DisenoServiceImpl implements IDisenoService {
 
         diseno.setEstado("RECHAZADO");
         Diseno saved = disenoRepository.save(diseno);
+        // --- INICIO SIMULACIÓN DE NOTIFICACIÓN ---
+        System.out.println("[NOTIFICACIÓN] Diseño RECHAZADO: " + saved.getNombre());
+        System.out.println("  -> NOTIFICAR A PROVEEDOR: " + saved.getProveedor().getEmail());
+        // --- FIN SIMULACIÓN ---
         return mapToResponseDTO(saved);
     }
 

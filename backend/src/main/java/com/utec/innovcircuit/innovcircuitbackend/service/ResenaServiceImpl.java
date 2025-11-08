@@ -43,6 +43,11 @@ public class ResenaServiceImpl implements IResenaService {
         resena.setDiseno(diseno);
         try {
             Resena resenaGuardada = resenaRepository.save(resena);
+            // --- INICIO SIMULACIÓN DE NOTIFICACIÓN ---
+            String emailProveedor = resenaGuardada.getDiseno().getProveedor().getEmail();
+            System.out.println("[NOTIFICACIÓN] Nueva reseña creada para el diseño: " + resenaGuardada.getDiseno().getNombre());
+            System.out.println("  -> NOTIFICAR A PROVEEDOR: " + emailProveedor);
+            // --- FIN SIMULACIÓN ---
             return convertToDTO(resenaGuardada);
         } catch (Exception e) {
             throw new IllegalStateException("Ya has dejado una reseña para este diseño.");
@@ -75,6 +80,11 @@ public class ResenaServiceImpl implements IResenaService {
         resena.setRespuestaProveedor(respuesta);
         resena.setFechaRespuesta(LocalDateTime.now());
         Resena guardada = resenaRepository.save(resena);
+        // --- INICIO SIMULACIÓN DE NOTIFICACIÓN ---
+        String emailCliente = guardada.getCliente().getEmail();
+        System.out.println("[NOTIFICACIÓN] El proveedor respondió a una reseña del diseño: " + guardada.getDiseno().getNombre());
+        System.out.println("  -> NOTIFICAR A CLIENTE: " + emailCliente);
+        // --- FIN SIMULACIÓN ---
         return convertToDTO(guardada);
     }
 

@@ -6,10 +6,13 @@ import DisenoCard from '../components/DisenoCard';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
+import iaService from '../services/iaService';
+import IaSearchModal from '../components/IaSearchModal';
 
 const HomePage = () => {
   // const auth = useAuth(); // Ya no es necesario para esta lógica
   const [disenos, setDisenos] = useState([]);
+  const [destacados, setDestacados] = useState([]);
   const [loading, setLoading] = useState(true); // Empezar cargando
   const [error, setError] = useState('');
   const [keyword, setKeyword] = useState('');
@@ -18,12 +21,17 @@ const HomePage = () => {
   const [grupoSeleccionado, setGrupoSeleccionado] = useState('');
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterMsg, setNewsletterMsg] = useState('');
+  const [iaSearchOpen, setIaSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     // Cargar diseños al montar el componente, para todos.
     setLoading(true);
+    // Cargar Destacados
+    disenoService.listarDestacados()
+      .then(res => setDestacados(res.data || []))
+      .catch(() => setDestacados([])); // No mostrar error si falla
     disenoService
       .listarDisenosAprobados()
       .then((response) => {
@@ -111,9 +119,7 @@ const HomePage = () => {
     if (q) handleSearchWith(q);
   }, [location.search]);
 
-  const handleIaSearch = () => {
-    // opción IA deshabilitada temporalmente para simplificar el catálogo
-  };
+  // La búsqueda asistida por IA se maneja en IaSearchModal
 
   // Sincronización con query removida al eliminar barra de búsqueda
 
@@ -168,6 +174,23 @@ const HomePage = () => {
     const popularList = filtrados.filter(d => Number(d?.descargasCount || 0) >= 25);
     content = (
       <>
+        {/* ----- INICIO NUEVA SECCIÓN: DESTACADOS ----- */}
+        {destacados.length > 0 && (
+          <section className="mb-8">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold">Destacados</h2>
+              <p className="text-sm text-slate-600">Diseños seleccionados por nuestros curadores</p>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {destacados.slice(0,8).map((diseno) => (
+                <div key={`feat-${diseno.id}`}>
+                  <DisenoCard diseno={diseno} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+        {/* ----- FIN NUEVA SECCIÓN ----- */}
         {/* Sección: Explora nuestros productos más nuevos */}
         <section className="mb-8">
           <div className="text-center">
@@ -248,7 +271,7 @@ const HomePage = () => {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       {/* Hero con buscador al estilo Tindie */}
-      <div className="mb-6 rounded-lg border bg-gradient-to-r from-sky-50 to-teal-50 p-6">
+      <div className="mb-6 rounded-lg border bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 text-white p-6">
         <div className="mb-2 text-center">
           <h1 className="text-3xl font-extrabold tracking-tight">Compra cosas increíbles directamente a los makers.</h1>
           <p className="text-sm text-slate-600">Construye algo extraordinario.</p>
@@ -263,8 +286,9 @@ const HomePage = () => {
           <Button onClick={handleSearch}>Buscar</Button>
         </div>
         <div className="mx-auto mt-4 flex max-w-2xl justify-center gap-3">
-          <Button variant="default" onClick={() => navigate('/subir-diseno')}>Comienza a vender</Button>
+          <Button variant="secondary" onClick={() => navigate('/subir-diseno')}>Comienza a vender</Button>
           <Button variant="outline" onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}>Explorar productos</Button>
+          <Button variant="secondary" onClick={() => setIaSearchOpen(true)}>Buscar con IA</Button>
         </div>
         {categorias.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -290,6 +314,7 @@ const HomePage = () => {
       </div>
 
       {content}
+      <IaSearchModal open={iaSearchOpen} onClose={() => setIaSearchOpen(false)} />
     </div>
   );
 };

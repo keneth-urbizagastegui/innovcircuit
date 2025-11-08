@@ -1,6 +1,7 @@
 package com.utec.innovcircuit.innovcircuitbackend.dto;
 
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 public class LineaVentaDTO {
@@ -10,4 +11,5 @@ public class LineaVentaDTO {
     private Double precioAlComprar;
     private Double comisionPlataforma;
     private Double montoProveedor;
+    private LocalDateTime fechaVenta;
 }

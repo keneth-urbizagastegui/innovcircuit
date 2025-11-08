@@ -6,6 +6,14 @@ const adminService = {
     return apiClient.get('/admin/disenos/pendientes');
   },
 
+  // Nuevos: Gestión de diseños aprobados (Admin)
+  getDisenosAprobados: () => {
+    return apiClient.get('/admin/disenos/aprobados');
+  },
+  toggleFeatured: (id) => {
+    return apiClient.post(`/admin/disenos/${id}/toggle-featured`);
+  },
+
   // Llama al endpoint de DisenoController (que ya es solo para Admin)
   aprobarDiseno: (id) => {
     return apiClient.post(`/disenos/${id}/aprobar`);
@@ -29,6 +37,22 @@ const adminService = {
   // Reporte de ventas (Admin)
   getReporteVentas: () => {
     return apiClient.get('/admin/reporte/ventas');
+  },
+  // Gestión de Pedidos de Impresión (Admin)
+  getPedidos: (estado) => {
+    const params = estado ? { estado } : {};
+    return apiClient.get('/admin/pedidos', { params });
+  },
+  actualizarEstadoPedido: (id, estado) => {
+    return apiClient.post(`/admin/pedidos/${id}/actualizar-estado`, { estado });
+  },
+  // Gestión de Retiros (Admin)
+  getRetiros: (estado) => {
+    const params = estado ? { estado } : {};
+    return apiClient.get('/admin/retiros', { params });
+  },
+  procesarRetiro: (id, estado) => {
+    return apiClient.post(`/admin/retiros/${id}/procesar`, { estado });
   }
 };
 

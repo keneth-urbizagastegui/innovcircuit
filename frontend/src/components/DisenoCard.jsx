@@ -52,7 +52,9 @@ const DisenoCard = ({ diseno }) => {
           <Avatar className="mr-2" src={avatarSrc} alt={proveedor.nombre}>
             {proveedor?.nombre?.[0] ?? 'P'}
           </Avatar>
-          <div className="text-sm text-slate-700">{proveedor.nombre}</div>
+          <Link to={`/store/${proveedor.id}`} className="text-sm text-slate-700 hover:underline">
+            {proveedor.nombre}
+          </Link>
         </div>
         <div className="flex items-center gap-3 text-slate-600">
           <div className="flex items-center gap-1">

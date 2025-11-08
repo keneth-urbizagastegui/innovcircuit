@@ -18,6 +18,10 @@ const disenoService = {
   // Gestión de diseños (Proveedor)
   editarDiseno: (id, data) => apiClient.put(`/disenos/${id}`, data),
   eliminarDiseno: (id) => apiClient.delete(`/disenos/${id}`),
+  // Nuevo: Listar diseños destacados (público)
+  listarDestacados: () => {
+    return apiClient.get('/disenos/destacados');
+  },
 };
 
 export default disenoService;

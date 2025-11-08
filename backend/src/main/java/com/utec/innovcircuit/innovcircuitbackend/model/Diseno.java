@@ -18,7 +18,7 @@ public class Diseno {
 
     private Double precio;
 
-    private boolean gratuito;
+    private Boolean gratuito = false;
 
     @Column(nullable = false)
     private String estado = "PENDIENTE"; // PENDIENTE, APROBADO, RECHAZADO
@@ -34,6 +34,9 @@ public class Diseno {
 
     @Column
     private int descargasCount = 0;
+
+    @Column
+    private Boolean featured = false;
 
     // Relación: Muchos diseños pertenecen a Una Categoría
     @ManyToOne

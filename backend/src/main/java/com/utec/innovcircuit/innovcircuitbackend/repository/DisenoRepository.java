@@ -16,4 +16,7 @@ public interface DisenoRepository extends JpaRepository<Diseno, Long> {
 
     // Buscar todos los diseños de un proveedor (por su ID)
     List<Diseno> findByProveedorId(Long proveedorId);
+
+    // Buscar diseños APROBADOS que también estén marcados como DESTACADOS
+    List<Diseno> findByEstadoAndFeatured(String estado, boolean featured);
 }

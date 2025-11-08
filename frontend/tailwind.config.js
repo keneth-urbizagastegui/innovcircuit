@@ -9,14 +9,26 @@ export default {
       colors: {
         border: 'hsl(0 0% 90%)',
         background: '#ffffff',
-        foreground: '#0f172a',
+        foreground: '#0f172a', // slate-900
         primary: {
-          DEFAULT: '#0ea5e9',
+          DEFAULT: '#0d9488', // teal-600 (El verde/azul de Tindie)
+          foreground: '#ffffff',
+        },
+        secondary: {
+          DEFAULT: '#f97316', // orange-500 (Para "Comenzar a Vender")
+          foreground: '#ffffff',
+        },
+        destructive: {
+          DEFAULT: '#dc2626', // red-600
+          foreground: '#ffffff',
+        },
+        success: {
+          DEFAULT: '#059669', // emerald-600
           foreground: '#ffffff',
         },
         muted: {
-          DEFAULT: '#f1f5f9',
-          foreground: '#64748b',
+          DEFAULT: '#f1f5f9', // slate-100
+          foreground: '#64748b', // slate-500
         },
       },
       borderRadius: {

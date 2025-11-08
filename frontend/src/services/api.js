@@ -3,9 +3,7 @@ import axios from 'axios';
 // Instancia centralizada de Axios para la API de InnovCircuit
 const apiClient = axios.create({
   baseURL: '/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // No default Content-Type; let Axios set per request
 });
 
 // *** INICIO DEL INTERCEPTOR ***

@@ -5,6 +5,7 @@ import com.utec.innovcircuit.innovcircuitbackend.dto.VentaResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasAdminDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.ReporteVentasDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.LineaVentaDTO;
 import java.util.List;
 
 public interface IVentaService {
@@ -21,4 +22,7 @@ public interface IVentaService {
 
     // Reporte detallado de ventas para admin
     ReporteVentasDTO getReporteVentas();
+
+    // Historial de transacciones para el proveedor
+    List<LineaVentaDTO> getTransaccionesPorProveedor(String emailProveedor);
 }

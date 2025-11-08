@@ -5,12 +5,12 @@ import { cn } from '../../utils/cn'
 const base = 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:pointer-events-none disabled:opacity-50'
 
 const variants = {
-  default: 'bg-slate-900 text-white hover:bg-slate-800',
+  default: 'bg-primary text-primary-foreground hover:bg-primary/90',
   outline: 'border border-slate-200 bg-white text-slate-900 hover:bg-slate-50',
   ghost: 'hover:bg-slate-100',
-  secondary: 'bg-slate-900 text-white hover:bg-slate-800',
-  destructive: 'bg-red-600 text-white hover:bg-red-700',
-  success: 'bg-emerald-600 text-white hover:bg-emerald-700',
+  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90',
+  destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+  success: 'bg-success text-success-foreground hover:bg-success/90',
 }
 
 const sizes = {

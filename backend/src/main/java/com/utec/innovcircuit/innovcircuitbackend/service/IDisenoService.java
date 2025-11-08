@@ -33,4 +33,8 @@ public interface IDisenoService {
     // Gestión de Diseños (Proveedor)
     DisenoResponseDTO editarDiseno(Long disenoId, DisenoRequestDTO requestDTO, String emailProveedor);
     void eliminarDiseno(Long disenoId, String emailProveedor);
+
+    // Featured
+    List<DisenoResponseDTO> listarDisenosDestacados();
+    DisenoResponseDTO toggleFeatured(Long disenoId);
 }

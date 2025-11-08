@@ -9,6 +9,8 @@ import com.utec.innovcircuit.innovcircuitbackend.repository.DisenoRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.UsuarioRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.VentaRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.ConfiguracionRepository;
+import com.utec.innovcircuit.innovcircuitbackend.repository.LineaVentaRepository;
+import com.utec.innovcircuit.innovcircuitbackend.repository.RetiroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,12 @@ public class VentaServiceImpl implements IVentaService {
 
     @Autowired
     private ConfiguracionRepository configuracionRepository;
+
+    @Autowired
+    private LineaVentaRepository lineaVentaRepository;
+
+    @Autowired
+    private RetiroRepository retiroRepository;
 
     // (Simulación del Servicio de Pago Externo)
     // private ServicioPagoExterno servicioPago;
@@ -60,7 +68,7 @@ public class VentaServiceImpl implements IVentaService {
 
         // 3. Calcular Total (ignorando gratuitos)
         double montoTotal = disenos.stream()
-                .filter(d -> !d.isGratuito()) // Ignorar gratuitos
+                .filter(d -> !Boolean.TRUE.equals(d.getGratuito())) // Ignorar gratuitos
                 .mapToDouble(Diseno::getPrecio)
                 .sum();
 
@@ -89,7 +97,7 @@ public class VentaServiceImpl implements IVentaService {
             LineaVenta linea = new LineaVenta();
             linea.setDiseno(diseno);
             // Si es gratuito, el precio efectivo para comisión es 0
-            double precio = diseno.isGratuito() ? 0.0 : diseno.getPrecio();
+            double precio = Boolean.TRUE.equals(diseno.getGratuito()) ? 0.0 : diseno.getPrecio();
             double comision = precio * tasaComision;
             double montoProv = precio - comision;
             linea.setPrecioAlComprar(precio);
@@ -112,6 +120,18 @@ public class VentaServiceImpl implements IVentaService {
         // 7. Guardar Venta (Cascade.ALL guardará las líneas también)
         Venta ventaGuardada = ventaRepository.save(venta);
 
+        // --- INICIO SIMULACIÓN DE NOTIFICACIÓN ---
+        System.out.println("[NOTIFICACIÓN] Venta ID " + ventaGuardada.getId() + " registrada.");
+        // Agrupar líneas por proveedor para enviar una sola notificación por proveedor
+        ventaGuardada.getLineasVenta().stream()
+                .collect(Collectors.groupingBy(lv -> lv.getDiseno().getProveedor()))
+                .forEach((proveedor, lineas) -> {
+                    System.out.println("  -> NOTIFICAR A PROVEEDOR: " + proveedor.getEmail());
+                    System.out.println("     Monto ganado (neto): " + lineas.stream().mapToDouble(LineaVenta::getMontoProveedor).sum());
+                    System.out.println("     Diseños vendidos: " + lineas.stream().map(l -> l.getDiseno().getNombre()).collect(Collectors.toList()));
+                });
+        // --- FIN SIMULACIÓN ---
+
         // 8. Convertir a DTO y devolver
         return convertToDTO(ventaGuardada);
     }
@@ -121,22 +141,30 @@ public class VentaServiceImpl implements IVentaService {
         Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
                 .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
 
+        // 1. Calcular Ganancia Neta Total y Total Vendido
+        double gananciaNetaTotal = 0.0;
         double totalVendido = 0.0;
-        double gananciaNeta = 0.0;
-
         for (Venta v : ventaRepository.findAll()) {
             for (LineaVenta lv : v.getLineasVenta()) {
                 if (lv.getDiseno() != null && lv.getDiseno().getProveedor() != null
                         && lv.getDiseno().getProveedor().getId().equals(proveedor.getId())) {
                     totalVendido += (lv.getPrecioAlComprar() != null ? lv.getPrecioAlComprar() : 0.0);
-                    gananciaNeta += (lv.getMontoProveedor() != null ? lv.getMontoProveedor() : 0.0);
+                    gananciaNetaTotal += (lv.getMontoProveedor() != null ? lv.getMontoProveedor() : 0.0);
                 }
             }
         }
 
+        // 2. Calcular Total Retirado (Pendiente + Aprobado)
+        double totalRetirado = retiroRepository.sumMontoByProveedorIdAndEstadoNotRechazado(proveedor.getId());
+
+        // 3. Calcular Saldo Disponible
+        double saldoDisponible = gananciaNetaTotal - totalRetirado;
+
         com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO dto = new com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO();
         dto.setTotalVendido(totalVendido);
-        dto.setGananciaNeta(gananciaNeta);
+        dto.setGananciaNeta(gananciaNetaTotal); // Ganancia histórica
+        dto.setTotalRetirado(totalRetirado);   // Total retirado o pendiente
+        dto.setSaldoDisponible(saldoDisponible); // Saldo actual
         return dto;
     }
 
@@ -154,6 +182,20 @@ public class VentaServiceImpl implements IVentaService {
         return dto;
     }
 
+    private LineaVentaDTO convertLineaToDTO(LineaVenta lv) {
+        LineaVentaDTO l = new LineaVentaDTO();
+        l.setId(lv.getId());
+        l.setDisenoId(lv.getDiseno() != null ? lv.getDiseno().getId() : null);
+        l.setDisenoNombre(lv.getDiseno() != null ? lv.getDiseno().getNombre() : null);
+        l.setPrecioAlComprar(lv.getPrecioAlComprar());
+        l.setComisionPlataforma(lv.getComisionPlataforma());
+        l.setMontoProveedor(lv.getMontoProveedor());
+        if (lv.getVenta() != null) {
+            l.setFechaVenta(lv.getVenta().getFecha());
+        }
+        return l;
+    }
+
     private VentaResponseDTO convertToDTO(Venta venta) {
         VentaResponseDTO dto = new VentaResponseDTO();
         dto.setId(venta.getId());
@@ -169,16 +211,9 @@ public class VentaServiceImpl implements IVentaService {
         dto.setMontoProveedorTotal(venta.getMontoProveedorTotal());
 
         // Detalle de líneas
-        List<LineaVentaDTO> lineasDto = venta.getLineasVenta().stream().map(lv -> {
-            LineaVentaDTO l = new LineaVentaDTO();
-            l.setId(lv.getId());
-            l.setDisenoId(lv.getDiseno() != null ? lv.getDiseno().getId() : null);
-            l.setDisenoNombre(lv.getDiseno() != null ? lv.getDiseno().getNombre() : null);
-            l.setPrecioAlComprar(lv.getPrecioAlComprar());
-            l.setComisionPlataforma(lv.getComisionPlataforma());
-            l.setMontoProveedor(lv.getMontoProveedor());
-            return l;
-        }).collect(Collectors.toList());
+        List<LineaVentaDTO> lineasDto = venta.getLineasVenta().stream()
+                .map(this::convertLineaToDTO)
+                .collect(Collectors.toList());
         dto.setLineas(lineasDto);
         return dto;
     }
@@ -215,5 +250,16 @@ public class VentaServiceImpl implements IVentaService {
         reporte.setTotalMontoProveedor(totalMontoProveedor);
         reporte.setVentas(ventas.stream().map(this::convertToDTO).collect(Collectors.toList()));
         return reporte;
+    }
+
+    @Override
+    public List<LineaVentaDTO> getTransaccionesPorProveedor(String emailProveedor) {
+        Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
+                .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
+
+        return lineaVentaRepository.findByDisenoProveedorId(proveedor.getId())
+                .stream()
+                .map(this::convertLineaToDTO)
+                .collect(Collectors.toList());
     }
 }

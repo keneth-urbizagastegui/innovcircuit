@@ -18,6 +18,8 @@ public class DisenoResponseDTO {
     private int likesCount;
     private int descargasCount;
 
+    private boolean featured;
+
     // Proveedor anidado
     private ProveedorDTO proveedor;
 }

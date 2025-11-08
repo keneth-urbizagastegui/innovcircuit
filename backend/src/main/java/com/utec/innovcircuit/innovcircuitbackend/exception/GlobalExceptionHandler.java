@@ -6,6 +6,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.IllegalStateException;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
     // Manejador para errores de Validación (@Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -48,6 +50,14 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
         // Otros errores
+        log.error("Unhandled runtime exception", ex);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    // Catch-all para excepciones no capturadas previamente
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception ex) {
+        log.error("Unhandled exception", ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

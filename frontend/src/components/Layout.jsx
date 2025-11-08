@@ -58,9 +58,9 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-40 w-full border-b bg-white">
+      <header className="sticky top-0 z-40 w-full border-b bg-slate-900 text-white">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-          <Link to="/" className="text-slate-900 font-extrabold tracking-wide">
+          <Link to="/" className="text-white font-extrabold tracking-wide">
             InnovCircuit
           </Link>
           {/* Buscador central como en Tindie */}
@@ -76,17 +76,17 @@ const Layout = () => {
             {auth.isAuthenticated() ? (
               <>
                 {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
-                  <Button as={Link} to="/dashboard" variant="ghost">Mi Panel</Button>
+                  <Button as={Link} to="/dashboard" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Mi Panel</Button>
                 )}
                 {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
-                  <Button as={Link} to="/perfil" variant="ghost">Mi Perfil</Button>
+                  <Button as={Link} to="/perfil" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Mi Perfil</Button>
                 )}
                 {auth.user?.rol === 'PROVEEDOR' && (
-                  <Button as={Link} to="/subir-diseno" variant="ghost">Subir Diseño</Button>
+                  <Button as={Link} to="/subir-diseno" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Subir Diseño</Button>
                 )}
                 {auth.user?.rol === 'CLIENTE' && (
-                  <Link to="/carrito" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-slate-100">
-                    <ShoppingCart className="h-5 w-5 text-slate-700" />
+                  <Link to="/carrito" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-slate-700">
+                    <ShoppingCart className="h-5 w-5 text-white" />
                     {items?.length > 0 && (
                       <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
                         {items.length}
@@ -95,19 +95,25 @@ const Layout = () => {
                   </Link>
                 )}
                 {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin" variant="ghost">Panel de Admin</Button>
+                  <Button as={Link} to="/admin" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Panel de Admin</Button>
                 )}
                 {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/usuarios" variant="ghost">Gestionar Usuarios</Button>
+                  <Button as={Link} to="/admin/usuarios" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Gestionar Usuarios</Button>
                 )}
                 {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/configuracion" variant="ghost">Configuración</Button>
+                  <Button as={Link} to="/admin/configuracion" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Configuración</Button>
                 )}
-                <Button onClick={handleLogout} variant="outline">Salir</Button>
+                {auth.user?.rol === 'ADMINISTRADOR' && (
+                  <Button as={Link} to="/admin/retiros" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Gestionar Retiros</Button>
+                )}
+                {auth.user?.rol === 'ADMINISTRADOR' && (
+                  <Button as={Link} to="/admin/pedidos" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Gestionar Pedidos</Button>
+                )}
+                <Button onClick={handleLogout} variant="outline" className="border-slate-500 text-white hover:bg-slate-700 hover:text-white">Salir</Button>
               </>
             ) : (
               <>
-                <Button as={Link} to="/login" variant="ghost">Iniciar sesión</Button>
+                <Button as={Link} to="/login" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Iniciar sesión</Button>
                 <Button as={Link} to="/register" variant="default">Registrarse</Button>
               </>
             )}

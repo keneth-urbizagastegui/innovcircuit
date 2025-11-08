@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import disenoService from '../services/disenoService';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -14,6 +14,8 @@ import resenaService from '../services/resenaService';
 import { resolveImageUrl, resolveAvatarUrl, buildUiAvatar, FALLBACK_IMAGE, FALLBACK_AVATAR, onErrorSetSrc } from '../utils/imageUtils';
 import { formatCurrencyPEN } from '../utils/currency';
 import iaService from '../services/iaService';
+import preguntaService from '../services/preguntaService';
+import { Textarea } from '../components/ui/textarea';
 
 // Simple componente para mostrar calificación con estrellas
 const StarRating = ({ value }) => {
@@ -42,6 +44,17 @@ const DisenoDetallePage = () => {
   const [comentario, setComentario] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // Q&A
+  const [preguntas, setPreguntas] = useState([]);
+  const [preguntasLoading, setPreguntasLoading] = useState(true);
+  const [preguntasError, setPreguntasError] = useState('');
+  // Formulario nueva pregunta (solo AUTENTICADO)
+  const [nuevaPregunta, setNuevaPregunta] = useState('');
+  const [submittingPregunta, setSubmittingPregunta] = useState(false);
+  // Responder preguntas (PROVEEDOR)
+  const [respuestaPreguntaInputs, setRespuestaPreguntaInputs] = useState({});
+  const [respondingPregunta, setRespondingPregunta] = useState({});
+
   // IA Chatbot modal state
   const [iaOpen, setIaOpen] = useState(false);
   const [iaMessages, setIaMessages] = useState([]); // { sender: 'user'|'ai', text }
@@ -60,6 +73,7 @@ const DisenoDetallePage = () => {
   useEffect(() => {
     cargarDiseno();
     cargarResenas();
+    cargarPreguntas();
   }, [id]);
 
   const handleLike = () => {
@@ -91,6 +105,17 @@ const DisenoDetallePage = () => {
       })
       .catch(() => setResenasError('Error al cargar las reseñas.'))
       .finally(() => setResenasLoading(false));
+  };
+
+  const cargarPreguntas = () => {
+    setPreguntasLoading(true);
+    setPreguntasError('');
+    preguntaService.getPreguntasPorDiseno(id)
+      .then(response => {
+        setPreguntas(Array.isArray(response.data) ? response.data : []);
+      })
+      .catch(() => setPreguntasError('Error al cargar las preguntas.'))
+      .finally(() => setPreguntasLoading(false));
   };
 
   const handleResponderResena = async (resenaId) => {
@@ -125,6 +150,39 @@ const DisenoDetallePage = () => {
         setError(msg);
       })
       .finally(() => setSubmitting(false));
+  };
+
+  const handleCrearPregunta = (e) => {
+    e.preventDefault();
+    if (!nuevaPregunta.trim()) return;
+    setSubmittingPregunta(true);
+    setPreguntasError('');
+    const payload = { disenoId: Number(id), textoPregunta: nuevaPregunta };
+    preguntaService.crearPregunta(payload)
+      .then(() => {
+        setNuevaPregunta('');
+        cargarPreguntas(); // Recargar lista
+      })
+      .catch((err) => {
+        const msg = err?.response?.data?.message || 'Error al enviar la pregunta.';
+        setPreguntasError(msg);
+      })
+      .finally(() => setSubmittingPregunta(false));
+  };
+
+  const handleResponderPregunta = async (preguntaId) => {
+    const texto = (respuestaPreguntaInputs[preguntaId] || '').trim();
+    if (!texto) return;
+    setRespondingPregunta(prev => ({ ...prev, [preguntaId]: true }));
+    try {
+      await preguntaService.responderPregunta(preguntaId, { textoRespuesta: texto });
+      setRespuestaPreguntaInputs(prev => ({ ...prev, [preguntaId]: '' }));
+      cargarPreguntas(); // Recargar lista
+    } catch (err) {
+      console.error('Error al responder pregunta', err);
+    } finally {
+      setRespondingPregunta(prev => ({ ...prev, [preguntaId]: false }));
+    }
   };
 
   const handleAddToCart = () => {
@@ -208,12 +266,12 @@ const DisenoDetallePage = () => {
             </div>
 
             {/* Info del Proveedor */}
-            <div className="flex items-center mb-3">
+            <Link to={`/store/${proveedor.id}`} className="flex items-center mb-3 group">
               <Avatar className="mr-2 border" src={avatarSrc} alt={proveedor.nombre}>
                 {(proveedor.nombre || 'N/A').slice(0, 2).toUpperCase()}
               </Avatar>
-              <div className="text-lg font-semibold">{proveedor.nombre}</div>
-            </div>
+              <div className="text-lg font-semibold group-hover:underline">{proveedor.nombre}</div>
+            </Link>
 
             {/* Estadísticas */}
             <div className="flex gap-4 mb-4">
@@ -363,6 +421,76 @@ const DisenoDetallePage = () => {
             </form>
           </div>
         )}
+        {/* ----- INICIO SECCIÓN Q&A ----- */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold">Preguntas y Respuestas</h2>
+          <div className="my-2 h-px bg-gray-200" />
+          {preguntasLoading ? (
+            <div className="flex justify-center mt-2"><Loader2 className="h-5 w-5 animate-spin" /></div>
+          ) : preguntasError ? (
+            <div className="rounded-md border border-red-300 bg-red-50 text-red-700 p-3">{preguntasError}</div>
+          ) : (
+            <ul className="space-y-4">
+              {preguntas.length === 0 && (
+                <div className="text-sm text-gray-600">Aún no hay preguntas para este diseño.</div>
+              )}
+              {preguntas.map((p) => (
+                <li key={p.id} className="">
+                  <div className="flex items-start gap-3">
+                    <Avatar src={buildUiAvatar(p?.nombreUsuarioPregunta || p?.clienteNombre || 'U', 32, { rounded: true })} alt={p?.nombreUsuarioPregunta || p?.clienteNombre || 'Usuario'}>
+                      {(p?.nombreUsuarioPregunta || p?.clienteNombre || 'US').slice(0,2).toUpperCase()}
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{p?.nombreUsuarioPregunta || p?.clienteNombre || 'Usuario'}</div>
+                      <div className="text-sm text-gray-700">{p?.textoPregunta || ''}</div>
+                      {/* Respuesta del proveedor */}
+                      {p?.textoRespuesta ? (
+                        <div className="mt-2 ml-4 p-2 border-l-4 border-slate-300 bg-gray-50 rounded">
+                          <div className="text-sm font-semibold">Respuesta de {p?.nombreProveedorRespuesta || p?.proveedorNombre || 'Proveedor'}:</div>
+                          <div className="text-sm">{p.textoRespuesta}</div>
+                        </div>
+                      ) : (
+                        /* Formulario de respuesta para el proveedor dueño */
+                        user?.id === diseno?.proveedor?.id && (
+                          <div className="mt-2 ml-4 flex gap-2">
+                            <Input
+                              placeholder="Escribe tu respuesta..."
+                              value={respuestaPreguntaInputs[p.id] || ''}
+                              onChange={(e) => setRespuestaPreguntaInputs(prev => ({ ...prev, [p.id]: e.target.value }))}
+                            />
+                            <Button onClick={() => handleResponderPregunta(p.id)} disabled={respondingPregunta[p.id]}>
+                              {respondingPregunta[p.id] ? '...' : 'Responder'}
+                            </Button>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        {/* Formulario de Nueva Pregunta - Solo AUTENTICADOS */}
+        {user && (
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold">Haz una Pregunta</h3>
+            <div className="my-2 h-px bg-gray-200" />
+            <form onSubmit={handleCrearPregunta} className="flex flex-col gap-3">
+              <Textarea
+                rows={3}
+                value={nuevaPregunta}
+                onChange={(e) => setNuevaPregunta(e.target.value)}
+                placeholder="Escribe tu pregunta técnica sobre el diseño..."
+              />
+              <Button type="submit" disabled={submittingPregunta || !nuevaPregunta.trim()} className="self-start">
+                {submittingPregunta ? 'Enviando...' : 'Enviar Pregunta'}
+              </Button>
+            </form>
+          </div>
+        )}
+        {/* ----- FIN SECCIÓN Q&A ----- */}
+
       </CardContent>
     </Card>
     {/* Dialog: Asistente de Diseño (IA) */}
