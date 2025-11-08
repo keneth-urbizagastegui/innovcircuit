@@ -57,10 +57,10 @@ const Layout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-40 w-full border-b bg-slate-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-primary text-primary-foreground">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-          <Link to="/" className="text-white font-extrabold tracking-wide">
+          <Link to="/" className="text-primary-foreground font-extrabold tracking-wide">
             InnovCircuit
           </Link>
           {/* Buscador central como en Tindie */}
@@ -76,17 +76,17 @@ const Layout = () => {
             {auth.isAuthenticated() ? (
               <>
                 {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
-                  <Button as={Link} to="/dashboard" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Mi Panel</Button>
+                  <Button as={Link} to="/dashboard" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Mi Panel</Button>
                 )}
                 {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
-                  <Button as={Link} to="/perfil" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Mi Perfil</Button>
+                  <Button as={Link} to="/perfil" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Mi Perfil</Button>
                 )}
                 {auth.user?.rol === 'PROVEEDOR' && (
-                  <Button as={Link} to="/subir-diseno" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Subir Diseño</Button>
+                  <Button as={Link} to="/subir-diseno" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Subir Diseño</Button>
                 )}
                 {auth.user?.rol === 'CLIENTE' && (
-                  <Link to="/carrito" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-slate-700">
-                    <ShoppingCart className="h-5 w-5 text-white" />
+                  <Link to="/carrito" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-primary/90">
+                    <ShoppingCart className="h-5 w-5 text-primary-foreground" />
                     {items?.length > 0 && (
                       <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
                         {items.length}
@@ -95,41 +95,41 @@ const Layout = () => {
                   </Link>
                 )}
                 {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Panel de Admin</Button>
+                  <Button as={Link} to="/admin" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Panel de Admin</Button>
                 )}
                 {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/usuarios" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Gestionar Usuarios</Button>
+                  <Button as={Link} to="/admin/usuarios" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Gestionar Usuarios</Button>
                 )}
                 {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/configuracion" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Configuración</Button>
+                  <Button as={Link} to="/admin/configuracion" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Configuración</Button>
                 )}
                 {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/retiros" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Gestionar Retiros</Button>
+                  <Button as={Link} to="/admin/retiros" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Gestionar Retiros</Button>
                 )}
                 {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/pedidos" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Gestionar Pedidos</Button>
+                  <Button as={Link} to="/admin/pedidos" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Gestionar Pedidos</Button>
                 )}
-                <Button onClick={handleLogout} variant="outline" className="border-slate-500 text-white hover:bg-slate-700 hover:text-white">Salir</Button>
+                <Button onClick={handleLogout} variant="outline" className="border-transparent text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Salir</Button>
               </>
             ) : (
               <>
-                <Button as={Link} to="/login" variant="ghost" className="text-white hover:bg-slate-700 hover:text-white">Iniciar sesión</Button>
+                <Button as={Link} to="/login" variant="ghost" className="text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">Iniciar sesión</Button>
                 <Button as={Link} to="/register" variant="default">Registrarse</Button>
               </>
             )}
           </div>
         </div>
         {/* Menú superior tipo Tindie (grupos) */}
-        <div className="border-t bg-white">
-          <nav className="mx-auto max-w-6xl overflow-x-auto px-4 py-2 text-sm text-slate-700">
+        <div className="border-t border-border bg-background">
+          <nav className="mx-auto max-w-6xl overflow-x-auto px-4 py-2 text-sm text-foreground">
             <div className="flex items-center gap-4">
               {groups.map((g) => (
                 <Link
                   key={g.slug}
                   to={g.slug ? `/?group=${encodeURIComponent(g.slug)}` : '/'}
                   className={cn(
-                    'whitespace-nowrap hover:text-slate-900',
-                    activeGroup === g.slug ? 'text-slate-900 font-semibold' : 'text-slate-700'
+                    'whitespace-nowrap hover:text-foreground',
+                    activeGroup === g.slug ? 'text-foreground font-semibold' : 'text-foreground'
                   )}
                 >
                   {g.label}
@@ -140,12 +140,12 @@ const Layout = () => {
         </div>
 
         {/* Subnavegación de categorías */}
-        <div className="border-t bg-white">
-          <nav className="mx-auto max-w-6xl overflow-x-auto px-4 py-2 text-sm text-slate-700">
+        <div className="border-t border-border bg-background">
+          <nav className="mx-auto max-w-6xl overflow-x-auto px-4 py-2 text-sm text-foreground">
             <div className="flex items-center gap-3">
-              <Link to="/" className="hover:text-slate-900">Todas</Link>
+              <Link to="/" className="hover:text-foreground">Todas</Link>
               {categorias.map((cat) => (
-                <Link key={cat.id} to={`/?cat=${encodeURIComponent(cat.nombre)}`} className="hover:text-slate-900">
+                <Link key={cat.id} to={`/?cat=${encodeURIComponent(cat.nombre)}`} className="hover:text-foreground">
                   {cat.nombre}
                 </Link>
               ))}

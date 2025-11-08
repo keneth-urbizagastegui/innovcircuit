@@ -2,9 +2,9 @@ import React from 'react'
 import { cn } from '../../utils/cn'
 
 const variants = {
-  default: 'bg-slate-900 text-white',
-  secondary: 'bg-slate-100 text-slate-900',
-  outline: 'border border-slate-200 text-slate-900',
+  default: 'bg-primary text-primary-foreground',
+  secondary: 'bg-secondary text-secondary-foreground',
+  outline: 'border border-border text-foreground',
 }
 
 export function Badge({ className, variant = 'secondary', ...props }) {

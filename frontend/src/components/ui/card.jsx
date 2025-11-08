@@ -3,12 +3,12 @@ import { cn } from '../../utils/cn'
 
 export function Card({ className, ...props }) {
   return (
-    <div className={cn('rounded-lg border border-slate-200 bg-white text-slate-900 shadow-sm', className)} {...props} />
+    <div className={cn('rounded-lg border border-border bg-background text-foreground shadow-sm', className)} {...props} />
   )
 }
 
 export function CardHeader({ className, ...props }) {
-  return <div className={cn('p-6 border-b border-slate-100', className)} {...props} />
+  return <div className={cn('p-6 border-b border-border', className)} {...props} />
 }
 
 export function CardTitle({ className, ...props }) {
@@ -16,7 +16,7 @@ export function CardTitle({ className, ...props }) {
 }
 
 export function CardDescription({ className, ...props }) {
-  return <p className={cn('text-sm text-slate-500', className)} {...props} />
+  return <p className={cn('text-sm text-muted-foreground', className)} {...props} />
 }
 
 export function CardContent({ className, ...props }) {

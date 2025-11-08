@@ -1,6 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Importar los estilos de Tailwind v4 (entrada única) */
+@import "tailwindcss";
+
+/* Tus variables y estilos base personalizados van aquí */
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #0f172a;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}
 
 /* Variables y reset ligeros para una base consistente */
 :root {

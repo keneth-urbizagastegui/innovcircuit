@@ -171,6 +171,19 @@ Notas:
 - Requiere rol PROVEEDOR y propiedad del diseño. Si el diseño no pertenece al proveedor autenticado, la API devuelve 403 Forbidden.
 - ID_DISENO debe referirse a un diseño existente del proveedor.
 
+## Frontend – Tema global Tindie y Tailwind v4
+
+Se aplicó un tema visual global inspirado en Tindie a todo el frontend usando Tailwind v4.
+
+- Migración a Tailwind v4: `src/index.css` ahora usa `@import "tailwindcss";` y el `postcss.config.js` está configurado con `tailwindcss` y `autoprefixer`.
+- Tokens de tema en `tailwind.config.js`: `primary` (verde) y `secondary` (naranja) más `background`, `foreground`, `border` y `muted-foreground`.
+- Componentes UI actualizados: `Layout`, `Card`, `Input` y `Badge` usan los tokens del tema de forma consistente.
+- Validación: El servidor Vite (`npm run dev`) corre sin errores y las páginas Home y Login muestran el tema correctamente.
+
+Referencias prácticas:
+- Desarrollo: `cd frontend && npm install && npm run dev` → `http://localhost:5173`
+- Build: `npm run build` y preview con `npm run preview`
+
 ## Despliegue Completo (Docker Compose)
 
 1. Asegúrate de que el backend tenga un JAR construido:

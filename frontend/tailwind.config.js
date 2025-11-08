@@ -11,11 +11,11 @@ export default {
         background: '#ffffff',
         foreground: '#0f172a', // slate-900
         primary: {
-          DEFAULT: '#0d9488', // teal-600 (El verde/azul de Tindie)
+          DEFAULT: '#0d9488', // teal-600 (Tindie Green)
           foreground: '#ffffff',
         },
         secondary: {
-          DEFAULT: '#f97316', // orange-500 (Para "Comenzar a Vender")
+          DEFAULT: '#f97316', // orange-500 (Tindie Orange)
           foreground: '#ffffff',
         },
         destructive: {

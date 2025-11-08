@@ -1,16 +1,71 @@
-# React + Vite
+# Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend del proyecto InnovCircuit con React 19, Vite y Tailwind CSS v4, utilizando componentes UI basados en shadcn.
 
-Currently, two official plugins are available:
+## Desarrollo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Servidor de desarrollo: `npm run dev` → `http://localhost:5173`
+- Build de producción: `npm run build`
+- Previsualizar build: `npm run preview`
 
-## React Compiler
+## Tailwind CSS v4 (Migración y Uso)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Esta base está migrada a Tailwind v4. Cambios clave:
 
-## Expanding the ESLint configuration
+1) `src/index.css` debe importar una sola vez Tailwind v4:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```css
+@import "tailwindcss";
+```
+
+2) `postcss.config.js` utiliza el preset oficial v4 (ya configurado):
+
+```js
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+```
+
+3) No se usan los imports parciales antiguos como `@tailwind base/components/utilities` ni `@import "tailwindcss/base"`.
+
+4) Tokens del tema (definidos en `tailwind.config.js`):
+- Colores: `primary` (Tindie Green `#22c55e`), `secondary` (Tindie Orange `#f97316`), además de `muted`, `border`, `background`, `foreground`.
+- Bordes: `radius` extendido (`lg`, `md`, `sm`).
+
+## Componentes UI temáticos
+
+Se aplicó un tema global estilo Tindie a los componentes base:
+
+- `components/Layout.jsx`: fondo/foreground global, header primario, bordes y navegación.
+- `components/ui/card.jsx`: fondo/foreground, borde, títulos y descripciones con `muted-foreground`.
+- `components/ui/input.jsx`: borde, fondo y focus ring primario accesible.
+- `components/ui/badge.jsx`: variantes `primary` y `secondary` más `outline`, usando tokens del tema.
+
+Ejemplos de uso rápido:
+
+```jsx
+// Botón principal
+<button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md">Comprar</button>
+
+// Card
+<div className="bg-background text-foreground border rounded-lg shadow-sm">...</div>
+
+// Input
+<input className="border bg-background text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" />
+
+// Badge
+<span className="bg-secondary text-secondary-foreground border">Nuevo</span>
+```
+
+## Rutas y páginas
+
+El enrutado está definido en `src/App.jsx` con rutas protegidas por rol. Páginas destacadas:
+- `HomePage.jsx` y `LoginPage.jsx` usan utilidades de Tailwind y los componentes UI.
+
+## Notas
+
+- El servidor Vite se ha validado sin errores de PostCSS/Tailwind.
+- Ante cambios de UI, verifica en el navegador y revisa la consola del terminal por errores.
