@@ -140,3 +140,25 @@
     "categoria": "Fuentes de Poder"
   }
 ]
+[
+  { "nombre": "Estación Meteorológica WiFi con ESP32", "descripcion": "Mide temperatura, humedad y presión...", "precio": 14.99, "imagenUrl": "/uploads/seed/design-1.png", "categoria": "Microcontroladores" },
+  { "nombre": "Robot Seguidor de Línea con Arduino UNO", "descripcion": "Carrito autónomo que sigue trayectorias...", "precio": 19.49, "imagenUrl": "/uploads/seed/design-2.png", "categoria": "Microcontroladores" },
+  { "nombre": "Control de Tira LED Neopixel con ESP8266", "descripcion": "Controla efectos RGB y animaciones...", "precio": 12.99, "imagenUrl": "/uploads/seed/design-3.png", "categoria": "Microcontroladores" },
+  { "nombre": "Gamepad Bluetooth con Arduino Nano 33 BLE", "descripcion": "Controlador inalámbrico con sensores...", "precio": 21.99, "imagenUrl": "/uploads/seed/design-4.png", "categoria": "Microcontroladores" },
+  { "nombre": "Servidor Web de Control de GPIO con ESP32", "descripcion": "Activa y monitorea salidas/entradas...", "precio": 16.49, "imagenUrl": "/uploads/seed/design-5.png", "categoria": "Microcontroladores" },
+  { "nombre": "Monitor de Calidad del Aire MQ135 con Arduino", "descripcion": "Lee gases y contaminantes con el sensor MQ135...", "precio": 13.49, "imagenUrl": "/uploads/seed/design-6.png", "categoria": "Sensores" },
+  { "nombre": "Detector de Movimiento PIR con ESP32", "descripcion": "Sistema de alerta con sensor PIR...", "precio": 11.99, "imagenUrl": "/uploads/seed/design-7.png", "categoria": "Sensores" },
+  { "nombre": "Medidor de Nivel de Agua con HC-SR04", "descripcion": "Usa ultrasonido para medir el nivel en tanques...", "precio": 10.99, "imagenUrl": "/uploads/seed/design-8.png", "categoria": "Sensores" },
+  { "nombre": "Sensor de Pulso con Arduino (BPM)", "descripcion": "Monitorea ritmo cardíaco con Pulse Sensor...", "precio": 12.49, "imagenUrl": "/uploads/seed/design-9.png", "categoria": "Sensores" },
+  { "nombre": "Datalogger de Temperatura y Humedad con DHT22", "descripcion": "Registra datos ambientales en tarjeta SD...", "precio": 15.99, "imagenUrl": "/uploads/seed/design-10.png", "categoria": "Sensores" },
+  { "nombre": "Amplificador de Audio TDA2030", "descripcion": "Esquemático de amplificador clase AB de ~14–18W...", "precio": 9.99, "imagenUrl": "/uploads/seed/design-11.png", "categoria": "Audio" },
+  { "nombre": "Amplificador Mini LM386", "descripcion": "Amplificador compacto de baja potencia...", "precio": 8.99, "imagenUrl": "/uploads/seed/design-12.png", "categoria": "Audio" },
+  { "nombre": "Vúmetro LED con Micrófono Electret", "descripcion": "Visualiza niveles de audio con una barra de LEDs...", "precio": 11.49, "imagenUrl": "/uploads/seed/design-13.png", "categoria": "Audio" },
+  { "nombre": "Radio FM con TEA5767 y Arduino", "descripcion": "Sintoniza emisoras FM con el módulo TEA5767...", "precio": 12.99, "imagenUrl": "/uploads/seed/design-14.png", "categoria": "Audio" },
+  { "nombre": "Pedal de Distorsión de Guitarra DIY", "descripcion": "Efecto de distorsión analógico...", "precio": 18.99, "imagenUrl": "/uploads/seed/design-15.png", "categoria": "Audio" },
+  { "nombre": "Fuente Ajustable LM317 (1.25–12V)", "descripcion": "Fuente regulable con LM317...", "precio": 17.99, "imagenUrl": "/uploads/seed/design-16.png", "categoria": "Fuentes de Poder" },
+  { "nombre": "Buck XL4015 5A con Indicador de Corriente", "descripcion": "Convertidor reductor eficiente...", "precio": 13.99, "imagenUrl": "/uploads/seed/design-17.png", "categoria": "Fuentes de Poder" },
+  { "nombre": "Cargador Li‑ion TP4056 con Protección", "descripcion": "Módulo para cargar celdas 18650...", "precio": 9.49, "imagenUrl": "/uploads/seed/design-18.png", "categoria": "Fuentes de Poder" },
+  { "nombre": "Boost MT3608 5V→12V", "descripcion": "Convertidor elevador compacto...", "precio": 10.49, "imagenUrl": "/uploads/seed/design-19.png", "categoria": "Fuentes de Poder" },
+  { "nombre": "Banco de Trabajo con Fuente ATX", "descripcion": "Convierte una fuente ATX reciclada...", "precio": 22.99, "imagenUrl": "/uploads/seed/design-20.png", "categoria": "Fuentes de Poder" }
+]
