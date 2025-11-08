@@ -24,6 +24,15 @@ public class FileStorageService {
         }
     }
 
+    // Inicializa (o reasegura) la creación del directorio de uploads
+    public void init() {
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new RuntimeException("No se pudo inicializar el directorio de almacenamiento de archivos.", ex);
+        }
+    }
+
     public String storeFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return null;

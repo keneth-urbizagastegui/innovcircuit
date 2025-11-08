@@ -13,14 +13,21 @@ import com.utec.innovcircuit.innovcircuitbackend.repository.CategoriaRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.DisenoRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.UsuarioRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.ConfiguracionRepository;
+import com.utec.innovcircuit.innovcircuitbackend.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Component
@@ -37,9 +44,15 @@ public class DataSeeder implements CommandLineRunner {
     private ResourceLoader resourceLoader; // Para leer archivos del classpath
     @Autowired
     private ConfiguracionRepository configuracionRepository;
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @Override
     public void run(String... args) throws Exception {
+        // Inicializar almacenamiento y copiar archivos seed (imágenes y esquema placeholder)
+        fileStorageService.init();
+        copySeedFiles();
+
         // 1. Sembrar Usuarios primero (necesitamos al proveedor)
         if (usuarioRepository.count() == 0) {
             seedUsuarios();
@@ -51,6 +64,43 @@ public class DataSeeder implements CommandLineRunner {
 
         // 3. Sembrar configuración de TASA_COMISION si no existe
         seedTasaComision();
+    }
+
+    // Copia imágenes PNG desde resources/seed-images y el esquema ZIP desde resources/seed-files
+    private void copySeedFiles() {
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        try {
+            // 1. Crear el directorio de destino
+            Path seedDir = Paths.get("uploads/seed");
+            if (!Files.exists(seedDir)) {
+                Files.createDirectories(seedDir);
+            }
+
+            // 2. Copiar todas las imágenes
+            Resource[] resources = resolver.getResources("classpath:seed-images/*.png");
+            for (Resource resource : resources) {
+                Path targetFile = seedDir.resolve(resource.getFilename());
+                if (!Files.exists(targetFile)) {
+                    try (InputStream is = resource.getInputStream()) {
+                        Files.copy(is, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            }
+            System.out.println(resources.length + " imágenes de prueba copiadas a " + seedDir.toAbsolutePath());
+
+            // 3. Copiar el esquemático placeholder
+            Path targetSchematic = seedDir.resolve("schematic-placeholder.zip");
+            if (!Files.exists(targetSchematic)) {
+                try (InputStream is = getClass().getResourceAsStream("/seed-files/schematic-placeholder.zip")) {
+                    if (is != null) {
+                        Files.copy(is, targetSchematic, StandardCopyOption.REPLACE_EXISTING);
+                        System.out.println("Esquemático placeholder copiado.");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error al copiar archivos de prueba (seed): " + e.getMessage());
+        }
     }
 
     private void seedUsuarios() {
