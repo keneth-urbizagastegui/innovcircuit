@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 import { useNavigate } from 'react-router-dom';
@@ -22,18 +23,24 @@ const LoginPage = () => {
       const response = await authService.login({ email, password });
       // response.data contiene { token, tipo }
       auth.login(response.data.token);
+      toast.success('Inicio de sesión exitoso');
       navigate('/');
     } catch (err) {
       // Mostrar mensajes más claros según el tipo de error
       if (err?.response) {
         if (err.response.status === 401) {
           setError('Credenciales inválidas. Inténtalo de nuevo.');
+          toast.error('Credenciales inválidas');
         } else {
           const backendMsg = typeof err.response.data === 'string' ? err.response.data : '';
-          setError(backendMsg || `Error del servidor (${err.response.status}). Inténtalo más tarde.`);
+          const msg = backendMsg || `Error del servidor (${err.response.status}). Inténtalo más tarde.`;
+          setError(msg);
+          toast.error(msg);
         }
       } else {
-        setError('No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose.');
+        const msg = 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose.';
+        setError(msg);
+        toast.error(msg);
       }
     }
   };

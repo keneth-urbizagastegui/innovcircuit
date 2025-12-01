@@ -33,6 +33,10 @@ const usuarioService = {
   // Nuevo: obtener historial de retiros (Proveedor)
   getMisRetiros: () => {
     return apiClient.get('/usuario/mis-retiros');
+  },
+  // Reclamos (Cliente)
+  crearReclamo: ({ lineaId, motivo }) => {
+    return apiClient.post('/reclamos', { lineaVentaId: lineaId, motivo });
   }
 };
 

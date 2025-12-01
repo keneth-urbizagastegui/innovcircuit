@@ -8,6 +8,7 @@ const AdminPedidosPage = () => {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [sendingId, setSendingId] = useState(null);
 
   const cargarPedidos = () => {
     setLoading(true);
@@ -33,6 +34,16 @@ const AdminPedidosPage = () => {
         cargarPedidos();
       })
       .catch(() => setError(`Error al actualizar el pedido ${id}.`));
+  };
+
+  const handleEnviarAFabrica = (id) => {
+    setError('');
+    setSendingId(id);
+    adminService
+      .enviarAFabrica(id)
+      .then(() => cargarPedidos())
+      .catch(() => setError(`Error al enviar el pedido ${id} a fábrica.`))
+      .finally(() => setSendingId(null));
   };
 
   if (loading) {
@@ -63,7 +74,7 @@ const AdminPedidosPage = () => {
           </div>
         )}
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hide-scrollbar">
             <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-muted">
@@ -72,6 +83,7 @@ const AdminPedidosPage = () => {
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Cliente</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Diseño</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Dirección</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tracking Fábrica</th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">Acciones</th>
                 </tr>
               </thead>
@@ -92,13 +104,15 @@ const AdminPedidosPage = () => {
                     <td className="px-3 py-2">{p.clienteNombre}</td>
                     <td className="px-3 py-2">{p.disenoNombre}</td>
                     <td className="px-3 py-2 max-w-lg break-words">{p.direccionEnvio}</td>
+                    <td className="px-3 py-2">{p.codigoSeguimientoFabrica || '-'}</td>
                     <td className="px-3 py-2 text-right space-x-2">
                       <Button
                         variant="secondary"
                         size="sm"
-                        onClick={() => handleActualizarEstado(p.id, 'EN_PROCESO')}
+                        disabled={sendingId === p.id}
+                        onClick={() => handleEnviarAFabrica(p.id)}
                       >
-                        Confirmar Producción
+                        {sendingId === p.id ? 'Enviando a fábrica...' : 'Confirmar Producción'}
                       </Button>
                       <Button
                         variant="success"

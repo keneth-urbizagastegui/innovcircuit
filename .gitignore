@@ -15,6 +15,11 @@
 # Ignora la carpeta de compilación de Vite
 /frontend/dist/
 
+# === Environment files ===
+/.env
+/frontend/.env
+*.env
+
 # === IDE / OS ===
 .idea/
 .vscode/

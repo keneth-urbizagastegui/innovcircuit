@@ -43,6 +43,7 @@ const DisenoDetallePage = () => {
   const [calificacion, setCalificacion] = useState(0);
   const [comentario, setComentario] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   // Q&A
   const [preguntas, setPreguntas] = useState([]);
@@ -85,16 +86,36 @@ const DisenoDetallePage = () => {
   const handleDownload = () => {
     disenoService.descargar(id)
       .then(response => {
-        const url = response?.data?.url;
-        if (url) {
-          window.open(url, '_blank');
-        } else {
-          setError('Este diseño no tiene archivo para descargar.');
+        const blob = new Blob([response.data]);
+        const url = window.URL.createObjectURL(blob);
+        let filename = 'diseno.bin';
+        const cd = response.headers && response.headers['content-disposition'];
+        if (cd) {
+          const match = cd.match(/filename="?([^";]+)"?/i);
+          if (match && match[1]) filename = match[1];
         }
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
         cargarDiseno();
       })
-      .catch(() => setError('Error al registrar la descarga.'));
+      .catch(err => {
+        if (err?.response?.status === 403) {
+          setError('Debes comprar este diseño para descargarlo');
+        } else {
+          setError('Error al descargar el archivo.');
+        }
+      });
   };
+
+  const imagenes = (() => {
+    const arr = Array.isArray(diseno?.imagenesUrls) && diseno.imagenesUrls.length ? diseno.imagenesUrls : (diseno?.imagenUrl ? [diseno.imagenUrl] : []);
+    return arr.map(resolveImageUrl);
+  })();
 
   const cargarResenas = () => {
     setResenasLoading(true);
@@ -247,15 +268,44 @@ const DisenoDetallePage = () => {
     <Card className="p-4 md:p-6">
       <CardContent className="p-0">
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Columna Izquierda (Imagen) */}
+          {/* Columna Izquierda (Galería) */}
           <div>
-            <img
-              className="w-full aspect-[4/3] object-cover rounded-md bg-gray-100"
-              alt={diseno.nombre}
-              src={mainImageSrc}
-              loading="lazy"
-              onError={onErrorSetSrc(FALLBACK_IMAGE)}
-            />
+            {imagenes.length > 0 ? (
+              <div>
+                <div className="relative">
+                  <img
+                    className="w-full aspect-[4/3] object-cover rounded-md bg-gray-100"
+                    alt={diseno.nombre}
+                    src={imagenes[activeIdx] || FALLBACK_IMAGE}
+                    loading="lazy"
+                    onError={onErrorSetSrc(FALLBACK_IMAGE)}
+                  />
+                  {imagenes.length > 1 && (
+                    <div className="absolute inset-0 flex items-center justify-between px-1">
+                      <Button variant="ghost" onClick={() => setActiveIdx((activeIdx - 1 + imagenes.length) % imagenes.length)}>‹</Button>
+                      <Button variant="ghost" onClick={() => setActiveIdx((activeIdx + 1) % imagenes.length)}>›</Button>
+                    </div>
+                  )}
+                </div>
+                {imagenes.length > 1 && (
+                  <div className="mt-3 flex gap-2 overflow-x-auto hide-scrollbar">
+                    {imagenes.map((src, i) => (
+                      <button key={`thumb-${i}`} onClick={() => setActiveIdx(i)} className={`h-16 w-24 flex-shrink-0 rounded-md border ${i === activeIdx ? 'border-primary' : 'border-border'}`}>
+                        <img src={src} onError={onErrorSetSrc(FALLBACK_IMAGE)} alt={`Imagen ${i+1}`} className="h-full w-full object-cover rounded-md" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <img
+                className="w-full aspect-[4/3] object-cover rounded-md bg-gray-100"
+                alt={diseno.nombre}
+                src={mainImageSrc}
+                loading="lazy"
+                onError={onErrorSetSrc(FALLBACK_IMAGE)}
+              />
+            )}
           </div>
 
           {/* Columna Derecha (Info) */}
@@ -502,7 +552,7 @@ const DisenoDetallePage = () => {
         {iaError && (
           <div className="rounded-md border border-red-300 bg-red-50 text-red-700 p-3 mb-2">{iaError}</div>
         )}
-        <div className="border rounded p-3 h-[300px] overflow-y-auto mb-3 bg-gray-50">
+        <div className="border rounded p-3 h-[300px] overflow-y-auto hide-scrollbar mb-3 bg-gray-50">
           {iaMessages.length === 0 ? (
             <div className="text-sm text-gray-600">Inicia la conversación con una pregunta técnica sobre este diseño.</div>
           ) : (

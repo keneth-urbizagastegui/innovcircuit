@@ -5,9 +5,11 @@ import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.model.Categoria;
 import com.utec.innovcircuit.innovcircuitbackend.model.Diseno;
 import com.utec.innovcircuit.innovcircuitbackend.model.Proveedor;
+import com.utec.innovcircuit.innovcircuitbackend.model.DisenoImagen;
 import com.utec.innovcircuit.innovcircuitbackend.repository.CategoriaRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.DisenoRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.UsuarioRepository;
+import com.utec.innovcircuit.innovcircuitbackend.service.strategy.IBusquedaStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,12 +36,16 @@ public class DisenoServiceImpl implements IDisenoService {
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Autowired
+    private java.util.Map<String, IBusquedaStrategy> estrategias;
+
     // Eliminadas variantes sobrecargadas: usamos un solo método con archivos opcionales
 
     @Override
     public DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor,
                                          MultipartFile imagenFile,
-                                         MultipartFile esquematicoFile) {
+                                         MultipartFile esquematicoFile,
+                                         List<MultipartFile> imagenesFiles) {
         // 1. Buscar categoría
         Categoria categoria = categoriaRepository.findById(requestDTO.getCategoriaId())
                 .orElseThrow(() -> new NoSuchElementException("Categoría no encontrada"));
@@ -79,6 +85,26 @@ public class DisenoServiceImpl implements IDisenoService {
 
         // 5. Guardar y devolver DTO
         Diseno saved = disenoRepository.save(diseno);
+
+        if (imagenesFiles != null) {
+            int idx = 0;
+            for (MultipartFile f : imagenesFiles) {
+                if (f != null && !f.isEmpty()) {
+                    String url = fileStorageService.storeFile(f);
+                    DisenoImagen di = new DisenoImagen();
+                    di.setDiseno(saved);
+                    di.setUrl(url);
+                    di.setOrden(idx);
+                    di.setThumbnail(idx == 0);
+                    saved.getImagenes().add(di);
+                    idx++;
+                }
+            }
+            if (imagenUrl == null && idx > 0) {
+                saved.setImagenUrl(saved.getImagenes().get(0).getUrl());
+            }
+            saved = disenoRepository.save(saved);
+        }
         return mapToResponseDTO(saved);
     }
 
@@ -108,6 +134,15 @@ public class DisenoServiceImpl implements IDisenoService {
         return disenos.stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DisenoResponseDTO> buscarDisenos(String query, Long categoriaId, Double minPrecio, Double maxPrecio) {
+        boolean avanzada = (categoriaId != null) || (minPrecio != null) || (maxPrecio != null);
+        IBusquedaStrategy strategy = avanzada ? estrategias.get("busquedaAvanzada") : estrategias.get("busquedaSimple");
+        List<Diseno> disenos = strategy.buscar(query, categoriaId, minPrecio, maxPrecio);
+        return disenos.stream().map(this::mapToResponseDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -171,6 +206,14 @@ public class DisenoServiceImpl implements IDisenoService {
             provDTO.setSitioWebUrl(diseno.getProveedor().getSitioWebUrl());
             // --- FIN DE CORRECCIÓN ---
             dto.setProveedor(provDTO);
+        }
+
+        if (diseno.getImagenes() != null && !diseno.getImagenes().isEmpty()) {
+            List<String> urls = diseno.getImagenes().stream()
+                    .sorted((a, b) -> Integer.compare(a.getOrden() != null ? a.getOrden() : 0, b.getOrden() != null ? b.getOrden() : 0))
+                    .map(DisenoImagen::getUrl)
+                    .collect(java.util.stream.Collectors.toList());
+            dto.setImagenesUrls(urls);
         }
 
         return dto;
@@ -295,5 +338,18 @@ public class DisenoServiceImpl implements IDisenoService {
 
         // 5. Eliminar entidad
         disenoRepository.delete(diseno);
+    }
+
+    @Override
+    @Transactional
+    public int aprobarTodosPendientes() {
+        List<Diseno> pendientes = disenoRepository.findByEstado("PENDIENTE");
+        int count = 0;
+        for (Diseno d : pendientes) {
+            d.setEstado("APROBADO");
+            disenoRepository.save(d);
+            count++;
+        }
+        return count;
     }
 }

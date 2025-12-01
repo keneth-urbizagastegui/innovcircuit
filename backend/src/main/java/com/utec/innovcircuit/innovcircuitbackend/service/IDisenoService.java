@@ -9,13 +9,17 @@ public interface IDisenoService {
     // Para Proveedor: subir diseño con archivos opcionales (imagen y esquemático)
     DisenoResponseDTO subirDiseno(DisenoRequestDTO requestDTO, String emailProveedor,
                                   org.springframework.web.multipart.MultipartFile imagenFile,
-                                  org.springframework.web.multipart.MultipartFile esquematicoFile);
+                                  org.springframework.web.multipart.MultipartFile esquematicoFile,
+                                  java.util.List<org.springframework.web.multipart.MultipartFile> imagenesFiles);
 
     // Para Administrador
     DisenoResponseDTO aprobarDiseno(Long disenoId);
 
     // Para Todos (Autenticados) - con búsqueda opcional por nombre
     List<DisenoResponseDTO> listarDisenosAprobados(String keyword);
+
+    // Nueva búsqueda con Strategy
+    java.util.List<DisenoResponseDTO> buscarDisenos(String query, Long categoriaId, Double minPrecio, Double maxPrecio);
 
     DisenoResponseDTO getDisenoById(Long disenoId);
 
@@ -37,4 +41,7 @@ public interface IDisenoService {
     // Featured
     List<DisenoResponseDTO> listarDisenosDestacados();
     DisenoResponseDTO toggleFeatured(Long disenoId);
+
+    // Bulk approve
+    int aprobarTodosPendientes();
 }

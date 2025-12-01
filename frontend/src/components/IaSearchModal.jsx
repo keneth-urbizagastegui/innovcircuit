@@ -54,7 +54,7 @@ const IaSearchModal = ({ open, onClose }) => {
           {error}
         </div>
       )}
-      <div className="max-h-[50vh] overflow-y-auto p-1">
+      <div className="max-h-[50vh] overflow-y-auto hide-scrollbar p-1">
         {results.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {results.map((diseno) => (

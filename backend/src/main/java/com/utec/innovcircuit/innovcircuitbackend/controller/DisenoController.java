@@ -3,15 +3,26 @@ package com.utec.innovcircuit.innovcircuitbackend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoRequestDTO;
 import com.utec.innovcircuit.innovcircuitbackend.dto.DisenoResponseDTO;
+import com.utec.innovcircuit.innovcircuitbackend.dto.ResenaResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.service.IDisenoService;
 import com.utec.innovcircuit.innovcircuitbackend.service.IResenaService;
-import com.utec.innovcircuit.innovcircuitbackend.dto.ResenaResponseDTO;
+import com.utec.innovcircuit.innovcircuitbackend.service.FileStorageService;
+import com.utec.innovcircuit.innovcircuitbackend.model.Cliente;
+import com.utec.innovcircuit.innovcircuitbackend.model.Diseno;
+import com.utec.innovcircuit.innovcircuitbackend.model.Proveedor;
+import com.utec.innovcircuit.innovcircuitbackend.repository.DisenoRepository;
+import com.utec.innovcircuit.innovcircuitbackend.repository.UsuarioRepository;
+import com.utec.innovcircuit.innovcircuitbackend.repository.VentaRepository;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
@@ -26,11 +37,23 @@ public class DisenoController {
     private IDisenoService disenoService;
     @Autowired
     private IResenaService resenaService;
+    @Autowired
+    private FileStorageService fileStorageService;
+    @Autowired
+    private VentaRepository ventaRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private DisenoRepository disenoRepository;
 
     // RF-6, RF-9: Para todos los usuarios logueados, con búsqueda opcional por nombre (q)
     @GetMapping
-    public ResponseEntity<List<DisenoResponseDTO>> listarDisenos(@RequestParam(name = "q", required = false) String q) {
-        return ResponseEntity.ok(disenoService.listarDisenosAprobados(q));
+    public ResponseEntity<List<DisenoResponseDTO>> listarDisenos(
+            @RequestParam(name = "q", required = false) String q,
+            @RequestParam(name = "categoriaId", required = false) Long categoriaId,
+            @RequestParam(name = "minPrecio", required = false) Double minPrecio,
+            @RequestParam(name = "maxPrecio", required = false) Double maxPrecio) {
+        return ResponseEntity.ok(disenoService.buscarDisenos(q, categoriaId, minPrecio, maxPrecio));
     }
 
     @GetMapping("/{id}")
@@ -45,6 +68,7 @@ public class DisenoController {
             @RequestParam("disenoDTO") String disenoRequestDTOString,
             @RequestPart(value = "imagenFile", required = false) MultipartFile imagenFile,
             @RequestPart(value = "esquematicoFile", required = false) MultipartFile esquematicoFile,
+            @RequestPart(value = "imagenesFiles", required = false) java.util.List<MultipartFile> imagenesFiles,
             Principal principal) {
         try {
             // Convertir el String DTO de vuelta a un objeto Java
@@ -54,7 +78,7 @@ public class DisenoController {
             // 'Principal' nos da el usuario (email) desde el token JWT
             String emailProveedor = principal.getName();
 
-            DisenoResponseDTO response = disenoService.subirDiseno(requestDTO, emailProveedor, imagenFile, esquematicoFile);
+            DisenoResponseDTO response = disenoService.subirDiseno(requestDTO, emailProveedor, imagenFile, esquematicoFile, imagenesFiles);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             throw new RuntimeException("Error al procesar la subida: " + e.getMessage());
@@ -77,13 +101,36 @@ public class DisenoController {
     }
 
     // Endpoint para DESCARGAR
-    @PostMapping("/{id}/download")
+    @GetMapping("/{id}/archivo")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Map<String, String>> registrarDescarga(@PathVariable Long id) {
-        String url = disenoService.registrarDescarga(id);
-        String safeUrl = (url != null) ? url : ""; // evitar NPE con Map.of
-        Map<String, String> response = Map.of("url", safeUrl);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Resource> descargarArchivo(@PathVariable Long id, Principal principal) {
+        Diseno diseno = disenoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Diseño no encontrado"));
+
+        String email = principal.getName();
+        boolean esDueno = diseno.getProveedor() != null && email.equals(diseno.getProveedor().getEmail());
+
+        boolean haComprado = false;
+        Cliente cliente = usuarioRepository.findByEmail(email, Cliente.class).orElse(null);
+        if (cliente != null) {
+            haComprado = ventaRepository.countByClienteIdAndDisenoId(cliente.getId(), diseno.getId()) > 0;
+        }
+
+        if (!esDueno && !haComprado) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para descargar este archivo");
+        }
+
+        String fileUrl = diseno.getEsquematicoUrl() != null ? diseno.getEsquematicoUrl() : diseno.getImagenUrl();
+        if (fileUrl == null || fileUrl.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Este diseño no tiene archivo disponible");
+        }
+
+        Resource resource = fileStorageService.loadFileAsResource(fileUrl);
+        String filename = resource.getFilename();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     // Endpoint PÚBLICO: obtener reseñas de un diseño (ubicado aquí para alinearse con rutas públicas de /disenos/**)

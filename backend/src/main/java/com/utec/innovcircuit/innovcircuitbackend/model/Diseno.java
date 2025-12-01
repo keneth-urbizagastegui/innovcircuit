@@ -2,6 +2,8 @@ package com.utec.innovcircuit.innovcircuitbackend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "disenos")
@@ -48,5 +50,6 @@ public class Diseno {
     @JoinColumn(name = "proveedor_id", nullable = false)
     private Proveedor proveedor;
 
-    // (Relaciones con Resena y LineaVenta las añadiremos después)
+    @OneToMany(mappedBy = "diseno", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DisenoImagen> imagenes = new ArrayList<>();
 }

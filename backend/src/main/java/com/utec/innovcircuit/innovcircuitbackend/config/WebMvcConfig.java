@@ -8,8 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Expone el directorio local ./uploads/ bajo la ruta /uploads/**
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:./uploads/");
+        // Seguridad: deshabilitado el acceso público a ./uploads/
+        // registry.addResourceHandler("/uploads/**")
+        //         .addResourceLocations("file:./uploads/");
     }
 }

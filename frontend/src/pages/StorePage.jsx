@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import proveedorService from '../services/proveedorService';
 import disenoService from '../services/disenoService';
+import categoriaService from '../services/categoriaService';
 import { Avatar } from '../components/ui/avatar';
 import { Loader2, ExternalLink } from 'lucide-react';
 import { buildUiAvatar, resolveImageUrl, FALLBACK_IMAGE, onErrorSetSrc } from '../utils/imageUtils';
 import DisenoCard from '../components/DisenoCard';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import { Select } from '../components/ui/select';
 
 const StorePage = () => {
   const { id } = useParams();
@@ -13,6 +17,12 @@ const StorePage = () => {
   const [disenos, setDisenos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [q, setQ] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [categorias, setCategorias] = useState([]);
+  const [categoriaId, setCategoriaId] = useState('');
+  const [minPrecio, setMinPrecio] = useState('');
+  const [maxPrecio, setMaxPrecio] = useState('');
 
   useEffect(() => {
     if (!id) return;
@@ -23,7 +33,7 @@ const StorePage = () => {
       try {
         const provRes = await proveedorService.getProveedorById(id);
         setProveedor(provRes.data);
-        const disenosRes = await disenoService.listarDisenosAprobados('');
+        const disenosRes = await disenoService.getAll({});
         const misDisenos = (disenosRes.data || []).filter((d) => d.proveedor?.id == id);
         setDisenos(misDisenos);
       } catch (_) {
@@ -34,6 +44,28 @@ const StorePage = () => {
     };
     loadData();
   }, [id]);
+
+  useEffect(() => {
+    categoriaService
+      .listarCategorias()
+      .then((res) => setCategorias(res.data || []))
+      .catch(() => setCategorias([]));
+  }, []);
+
+  const handleSearch = async (e) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const resp = await disenoService.getAll({ q, categoriaId: categoriaId || undefined, minPrecio, maxPrecio });
+      const misDisenos = (resp.data || []).filter((d) => d.proveedor?.id == id);
+      setDisenos(misDisenos);
+    } catch (_) {
+      setError('No se pudo realizar la búsqueda.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -94,6 +126,44 @@ const StorePage = () => {
         </div>
         <div className="md:col-span-2">
           <h2 className="text-xl font-semibold mb-2">Diseños de {proveedor.nombre}</h2>
+          <form onSubmit={handleSearch} className="mb-3 flex flex-wrap items-center gap-2">
+            <Input
+              placeholder="Buscar en esta tienda..."
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="flex-1"
+            />
+            <Button type="submit">Buscar</Button>
+            <Button type="button" variant="outline" onClick={() => setShowFilters((v) => !v)}>
+              Filtros Avanzados
+            </Button>
+          </form>
+          {showFilters && (
+            <div className="mb-4 rounded-lg border border-border p-3 bg-white">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-sm font-medium">Categoría</label>
+                  <Select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}>
+                    <option value="">Todas</option>
+                    {categorias.map((c) => (
+                      <option key={c.id} value={c.id}>{c.nombre}</option>
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Precio Mínimo</label>
+                  <Input type="number" value={minPrecio} onChange={(e) => setMinPrecio(e.target.value)} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Precio Máximo</label>
+                  <Input type="number" value={maxPrecio} onChange={(e) => setMaxPrecio(e.target.value)} />
+                </div>
+              </div>
+              <div className="mt-3">
+                <Button onClick={handleSearch}>Aplicar filtros</Button>
+              </div>
+            </div>
+          )}
           {disenos.length === 0 ? (
             <p className="text-gray-600">Este proveedor no tiene diseños aprobados.</p>
           ) : (

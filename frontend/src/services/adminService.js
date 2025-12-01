@@ -23,6 +23,9 @@ const adminService = {
   rechazarDiseno: (id) => {
     return apiClient.post(`/admin/disenos/${id}/rechazar`);
   },
+  aprobarTodosPendientes: () => {
+    return apiClient.post('/admin/disenos/aprobar-todos');
+  },
   // Nuevo: estadísticas globales del admin
   getEstadisticasAdmin: () => {
     return apiClient.get('/admin/estadisticas');
@@ -53,6 +56,15 @@ const adminService = {
   },
   procesarRetiro: (id, estado) => {
     return apiClient.post(`/admin/retiros/${id}/procesar`, { estado });
+  },
+  enviarAFabrica: (id) => {
+    return apiClient.post(`/admin/pedidos/${id}/enviar-fabrica`);
+  },
+  getReclamos: () => {
+    return apiClient.get('/admin/reclamos');
+  },
+  resolverReclamo: (id, aceptarReembolso) => {
+    return apiClient.post(`/admin/reclamos/${id}/resolver`, { aceptarReembolso });
   }
 };
 

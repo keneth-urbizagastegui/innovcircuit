@@ -138,7 +138,69 @@ const HomePage = () => {
       </div>
     );
   } else if (disenos.length === 0) {
-    content = <p className="text-slate-700">No hay diseños aprobados para mostrar.</p>;
+    const fallbackDisenos = [
+      {
+        id: 1001,
+        nombre: 'Fuente Conmutada 12V/5A',
+        nombreCategoria: 'Fuentes de Poder',
+        proveedor: { id: 1, nombre: 'Proveedor Demo', avatarUrl: '' },
+        imagenUrl: '',
+        precio: 29.99,
+        gratuito: false,
+        descargasCount: 57,
+        likesCount: 23,
+      },
+      {
+        id: 1002,
+        nombre: 'Sensor de Temperatura Digital',
+        nombreCategoria: 'Sensores',
+        proveedor: { id: 2, nombre: 'ElectroLab', avatarUrl: '' },
+        imagenUrl: '',
+        precio: 0,
+        gratuito: true,
+        descargasCount: 105,
+        likesCount: 40,
+      },
+      {
+        id: 1003,
+        nombre: 'Módulo ESP32 WiFi BLE',
+        nombreCategoria: 'IoT',
+        proveedor: { id: 3, nombre: 'IoT Makers', avatarUrl: '' },
+        imagenUrl: '',
+        precio: 19.9,
+        gratuito: false,
+        descargasCount: 80,
+        likesCount: 35,
+      },
+      {
+        id: 1004,
+        nombre: 'Controlador de Motor Paso a Paso',
+        nombreCategoria: 'Robots y Drones',
+        proveedor: { id: 4, nombre: 'RoboticsLab', avatarUrl: '' },
+        imagenUrl: '',
+        precio: 14.5,
+        gratuito: false,
+        descargasCount: 42,
+        likesCount: 18,
+      },
+    ];
+    content = (
+      <section id="catalogo" className="mx-auto max-w-6xl px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-slate-800 mb-4">Catálogo de Ejemplos</h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">Aún no hay diseños aprobados; mostrando ejemplos de lo que podrás encontrar</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {fallbackDisenos.map((diseno) => (
+              <div key={`sample-${diseno.id}`} className="transform transition-all duration-300 hover:scale-105">
+                <DisenoCard diseno={diseno} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   } else {
     // Filtro por categoría seleccionada
     const base = categoriaSeleccionada
@@ -150,13 +212,8 @@ const HomePage = () => {
     const groupFilters = {
       '': () => true,
       'diy-electronics': (d) => /arduino|esp|sensor|diy|electr[ií]c|electronic/i.test(hay(d)),
-      '3d-printing-cnc': (d) => /3d|impr[eé]si[oó]n|printing|cnc/i.test(hay(d)),
-      'camera-equipment': (d) => /c[aá]mara|camera|lente|lens/i.test(hay(d)),
       'iot-smart-home': (d) => /iot|smart|hogar|home/i.test(hay(d)),
-      'robots-drones': (d) => /robot|drone/i.test(hay(d)),
       'sound': (d) => /audio|sonido|sound/i.test(hay(d)),
-      'supplies': (d) => /suministros|supplies|componentes|parts/i.test(hay(d)),
-      'flea-market': (d) => /usado|used|oferta|clearance|flea/i.test(hay(d)),
     };
     const gf = groupFilters[grupoSeleccionado] || (() => true);
     const filtrados = base.filter(gf);
@@ -176,13 +233,15 @@ const HomePage = () => {
       <>
         {/* ----- INICIO NUEVA SECCIÓN: DESTACADOS ----- */}
         {destacados.length > 0 && (
-          <section className="mx-auto max-w-6xl px-4 py-8">
-            <h2 className="mb-6 text-center text-3xl font-bold text-foreground">Destacados</h2>
-            <p className="mb-8 text-center text-muted-foreground">Diseños seleccionados por nuestros curadores</p>
-            <div className="rounded-xl border bg-card p-6 shadow-lg">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <section className="mx-auto max-w-6xl px-4 py-16">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent mb-4">Destacados</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Diseños seleccionados por nuestros curadores</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {destacados.slice(0,8).map((diseno) => (
-                  <div key={`feat-${diseno.id}`}>
+                  <div key={`feat-${diseno.id}`} className="transform transition-all duration-300 hover:scale-105">
                     <DisenoCard diseno={diseno} />
                   </div>
                 ))}
@@ -192,57 +251,71 @@ const HomePage = () => {
         )}
         {/* ----- FIN NUEVA SECCIÓN ----- */}
         {/* Sección: Explora nuestros productos más nuevos */}
-        <section className="mx-auto max-w-6xl px-4 py-8">
-          <h2 className="mb-6 text-center text-3xl font-bold text-foreground">Explora nuestros productos más nuevos</h2>
-          <p className="mb-8 text-center text-muted-foreground">Encuentra cosas interesantes</p>
-          <div className="rounded-xl border bg-card p-6 shadow-lg">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <section className="mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-slate-800 mb-4">Novedades</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Los productos más recientes de nuestra comunidad</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {newest.slice(0,8).map((diseno) => (
-                <div key={`new-${diseno.id}`}>
+                <div key={`new-${diseno.id}`} className="transform transition-all duration-300 hover:scale-105">
                   <DisenoCard diseno={diseno} />
                 </div>
               ))}
             </div>
           </div>
-          <div className="mt-6 flex justify-center">
-            <Button variant="outline" onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}>
-              Más productos
+          <div className="mt-8 flex justify-center">
+            <Button 
+              variant="outline" 
+              className="rounded-xl px-8 py-3 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all"
+              onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Ver más productos
             </Button>
           </div>
         </section>
 
         {/* Newsletter CTA */}
-        <section className="mb-8 rounded-lg border bg-slate-50 p-4">
-          <div className="text-center mb-3">
-            <h3 className="font-semibold">Recibe novedades de hardware en tu correo</h3>
-            <p className="text-sm text-slate-600">Suscríbete para descubrir nuevos diseños</p>
+        <section className="mx-auto max-w-4xl mb-16">
+          <div className="rounded-2xl bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 p-8 text-center">
+            <h3 className="text-2xl font-bold text-slate-800 mb-3">¿Quieres recibir novedades?</h3>
+            <p className="text-slate-600 mb-6 max-w-md mx-auto">Suscríbete y te enviaremos los mejores diseños y ofertas exclusivas</p>
+            <div className="mx-auto flex max-w-md gap-3">
+              <Input
+                placeholder="Ingresa tu email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                className="rounded-xl border-slate-300 bg-white"
+              />
+              <Button 
+                className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 rounded-xl px-6 shadow-lg hover:shadow-xl transition-all"
+                onClick={() => {
+                  if (!newsletterEmail.trim()) { setNewsletterMsg('Ingresa un email válido'); return; }
+                  setNewsletterMsg('¡Listo! Te enviaremos novedades pronto.');
+                  setNewsletterEmail('');
+                }}
+              >
+                Suscribirme
+              </Button>
+            </div>
+            {newsletterMsg && (
+              <div className="mt-4 text-center text-sm text-slate-700 font-medium">{newsletterMsg}</div>
+            )}
           </div>
-          <div className="mx-auto flex max-w-md gap-2">
-            <Input
-              placeholder="Ingresa tu email"
-              value={newsletterEmail}
-              onChange={(e) => setNewsletterEmail(e.target.value)}
-            />
-            <Button onClick={() => {
-              if (!newsletterEmail.trim()) { setNewsletterMsg('Ingresa un email válido'); return; }
-              setNewsletterMsg('¡Listo! Te enviaremos novedades pronto.');
-              setNewsletterEmail('');
-            }}>Suscribirme</Button>
-          </div>
-          {newsletterMsg && (
-            <div className="mt-2 text-center text-sm text-slate-700">{newsletterMsg}</div>
-          )}
         </section>
 
         {/* Sección: Productos Populares */}
         {popularList.length > 0 && (
-          <section className="mx-auto max-w-6xl px-4 py-8">
-            <h2 className="mb-6 text-center text-3xl font-bold text-foreground">Los más populares de InnovCircuit</h2>
-            <p className="mb-8 text-center text-muted-foreground">Lo que la comunidad está amando</p>
-            <div className="rounded-xl border bg-card p-6 shadow-lg">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <section className="mx-auto max-w-6xl px-4 py-16">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-slate-800 mb-4">Más Populares</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">Lo que más les gusta a nuestros usuarios</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {popularList.slice(0,8).map((diseno) => (
-                  <div key={`pop-${diseno.id}`}>
+                  <div key={`pop-${diseno.id}`} className="transform transition-all duration-300 hover:scale-105">
                     <DisenoCard diseno={diseno} />
                   </div>
                 ))}
@@ -252,13 +325,15 @@ const HomePage = () => {
         )}
 
         {/* Catálogo completo */}
-        <section id="catalogo" className="mx-auto max-w-6xl px-4 py-8">
-          <h2 className="mb-6 text-center text-3xl font-bold text-foreground">Todos nuestros productos</h2>
-          <p className="mb-8 text-center text-muted-foreground">Explora el catálogo completo de InnovCircuit</p>
-          <div className="rounded-xl border bg-card p-6 shadow-lg">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <section id="catalogo" className="mx-auto max-w-6xl px-4 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-4">Catálogo Completo</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Descubre todos nuestros productos ordenados por popularidad</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {ordered.map((diseno) => (
-                <div key={`all-${diseno.id}`}>
+                <div key={`all-${diseno.id}`} className="transform transition-all duration-300 hover:scale-105">
                   <DisenoCard diseno={diseno} />
                 </div>
               ))}
@@ -271,48 +346,68 @@ const HomePage = () => {
 
   return (
 <div className="mx-auto max-w-7xl px-4 py-6">
-      {/* Hero con nuevos colores oscuros */}
-      <div className="mb-8 rounded-xl border border-[#2D3748] bg-gradient-to-br from-[#1A202C] to-[#2D3748] p-8 text-white shadow-xl">
-        <div className="mb-2 text-center">
-          <h1 className="mb-4 text-center text-4xl font-bold tracking-tight md:text-5xl text-[#C7F782]">Compra cosas increíbles directamente a los makers.</h1>
-          <p className="mb-8 text-center text-lg text-[#CBD5E0]">Construye algo extraordinario.</p>
-        </div>
-        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="mx-auto flex max-w-2xl gap-2">
-          <Input
-            type="text"
-            placeholder="Buscar por nombre o palabra clave..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            className="flex-grow rounded-md border-[#2D3748] bg-[#2D3748] text-white placeholder-[#CBD5E0] focus:border-[#48BB78] focus:ring-[#48BB78]"
-          />
-          <Button type="submit" variant="default" className="bg-[#48BB78] text-white hover:bg-[#48BB78]/90">Buscar</Button>
-        </form>
-        <div className="mx-auto mt-6 flex max-w-2xl justify-center gap-3">
-          <Button variant="secondary" className="bg-[#ECC94B] text-[#1A202C] hover:bg-[#ECC94B]/90" onClick={() => navigate('/subir-diseno')}>Comienza a vender</Button>
-          <Button variant="outline" className="border-[#48BB78] text-[#48BB78] hover:bg-[#48BB78]/10 hover:text-[#48BB78]" onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}>Explorar productos</Button>
-          <Button variant="ghost" className="text-white hover:bg-[#2D3748] hover:text-[#C7F782]" onClick={() => setIaSearchOpen(true)}>Búsqueda Asistida (IA)</Button>
-        </div>
-        {categorias.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <Badge
-              variant={categoriaSeleccionada === '' ? 'default' : 'secondary'}
-              className="cursor-pointer"
-              onClick={() => setCategoriaSeleccionada('')}
+      {/* Hero con diseño mejorado */}
+      <div className="mb-8 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-12 text-white shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(45,212,191,0.15),transparent_50%),radial-gradient(circle_at_70%_80%,rgba(163,230,53,0.1),transparent_50%)]" />
+        <div className="relative z-10 text-center">
+          <h1 className="mb-6 text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-teal-300 to-emerald-400 bg-clip-text text-transparent">
+            Hardware Creativo
+          </h1>
+          <p className="mb-8 text-xl text-slate-300 max-w-3xl mx-auto">Descubre diseños electrónicos innovadores de makers y proveedores confiables</p>
+          
+          <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="mx-auto flex max-w-2xl gap-3">
+            <Input
+              type="text"
+              placeholder="¿Qué estás buscando hoy?..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              className="flex-grow rounded-xl border-slate-700 bg-slate-800/80 text-white placeholder-slate-400 focus:border-teal-400 focus:ring-teal-400 backdrop-blur-sm"
+            />
+            <Button type="submit" variant="default" className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 rounded-xl px-8 shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+              Buscar
+            </Button>
+          </form>
+          
+          <div className="mx-auto mt-8 flex flex-wrap justify-center gap-4">
+            <Button 
+              variant="default" 
+              className="bg-gradient-to-r from-lime-400 to-emerald-400 text-slate-900 hover:from-lime-500 hover:to-emerald-500 rounded-xl px-6 font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              onClick={() => navigate('/subir-diseno')}
             >
-              Todas
-            </Badge>
-            {categorias.map((cat) => (
-              <Badge
-                key={cat.id}
-                variant={categoriaSeleccionada === cat.nombre ? 'default' : 'secondary'}
-                className="cursor-pointer"
-                onClick={() => setCategoriaSeleccionada(cat.nombre)}
-              >
-                {cat.nombre}
-              </Badge>
-            ))}
+              Comienza a vender
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-teal-400 text-teal-300 hover:bg-teal-400/10 hover:text-teal-300 rounded-xl px-6 backdrop-blur-sm"
+              onClick={() => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Explorar productos
+            </Button>
           </div>
-        )}
+          
+          {categorias.length > 0 && (
+            <div className="mt-8 flex flex-wrap justify-center items-center gap-3">
+              <span className="text-slate-400 text-sm">Categorías populares:</span>
+              <Badge
+                variant={categoriaSeleccionada === '' ? 'default' : 'secondary'}
+                className="cursor-pointer rounded-full"
+                onClick={() => setCategoriaSeleccionada('')}
+              >
+                Todas
+              </Badge>
+              {categorias.slice(0, 6).map((cat) => (
+                <Badge
+                  key={cat.id}
+                  variant={categoriaSeleccionada === cat.nombre ? 'default' : 'secondary'}
+                  className="cursor-pointer rounded-full"
+                  onClick={() => setCategoriaSeleccionada(cat.nombre)}
+                >
+                  {cat.nombre}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {content}

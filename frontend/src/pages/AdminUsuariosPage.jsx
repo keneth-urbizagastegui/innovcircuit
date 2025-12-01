@@ -60,7 +60,7 @@ const AdminUsuariosPage = () => {
         </div>
       )}
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto hide-scrollbar">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-muted">

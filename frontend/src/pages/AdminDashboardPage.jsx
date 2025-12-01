@@ -14,6 +14,7 @@ const AdminDashboardPage = () => {
   const [statsError, setStatsError] = useState('');
   const [reporteOpen, setReporteOpen] = useState(false);
   const [reporteJson, setReporteJson] = useState('');
+  const [bulkMsg, setBulkMsg] = useState('');
 
   const cargarPendientes = () => {
     setLoading(true);
@@ -77,6 +78,18 @@ const AdminDashboardPage = () => {
       .catch(() => setError('No se pudo actualizar el estado de destacado.'));
   };
 
+  const handleAprobarTodos = () => {
+    setBulkMsg('');
+    adminService.aprobarTodosPendientes()
+      .then((res) => {
+        const n = Number(res?.data?.aprobados ?? 0);
+        setBulkMsg(`Se aprobaron ${n} diseños pendientes.`);
+        cargarPendientes();
+        cargarAprobados();
+      })
+      .catch(() => setBulkMsg('Error al aprobar todos los pendientes.'));
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center mt-4">
@@ -121,12 +134,20 @@ const AdminDashboardPage = () => {
         </div>
       </div>
       <h2 className="text-xl font-semibold mb-2">Diseños Pendientes de Revisión</h2>
+      {bulkMsg && (
+        <div className="mb-2 rounded-md border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700">{bulkMsg}</div>
+      )}
       {error && (
         <div className="mb-2 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
       )}
       <div className="divide-y">
         {pendientes.length === 0 ? (
-          <p className="text-muted-foreground">No hay diseños pendientes.</p>
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">No hay diseños pendientes.</p>
+            <div>
+              <Button variant="outline" onClick={cargarPendientes}>Refrescar</Button>
+            </div>
+          </div>
         ) : (
           pendientes.map(diseno => (
             <div key={diseno.id} className="py-3 flex items-center justify-between">
@@ -142,6 +163,11 @@ const AdminDashboardPage = () => {
           ))
         )}
       </div>
+      {pendientes.length > 0 && (
+        <div className="mt-3">
+          <Button onClick={handleAprobarTodos}>Aprobar todos los pendientes</Button>
+        </div>
+      )}
       {/* ----- INICIO NUEVA SECCIÓN: APROBADOS ----- */}
       <h2 className="text-xl font-semibold mb-2 mt-6">Gestionar Diseños Aprobados (Curación)</h2>
       <div className="divide-y">

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="32" viewBox="0 0 160 32">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#A3E635"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="160" height="32" rx="8" fill="none"/>
+  <g transform="translate(4,4)">
+    <circle cx="12" cy="12" r="12" fill="url(#g)"/>
+    <path d="M6 10h4l2-2 4 4-2 2v4H10l-2-2" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="40" y="22" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial" font-size="16" font-weight="700" fill="#0F172A">InnovCircuit</text>
+</svg>

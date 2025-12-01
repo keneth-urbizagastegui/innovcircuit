@@ -48,6 +48,13 @@ public class AdminController {
     // Nota: El endpoint para APROBAR ('/api/v1/disenos/{id}/aprobar')
     // ya existe en DisenoController y está protegido para ADMIN.
 
+    // Endpoint para APROBAR TODOS los diseños pendientes
+    @PostMapping("/disenos/aprobar-todos")
+    public ResponseEntity<java.util.Map<String, Integer>> aprobarTodosPendientes() {
+        int aprobados = disenoService.aprobarTodosPendientes();
+        return ResponseEntity.ok(java.util.Map.of("aprobados", aprobados));
+    }
+
     // Endpoint para estadísticas globales de ventas y comisiones
     @GetMapping("/estadisticas")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -121,6 +128,12 @@ public class AdminController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(pedidoService.actualizarEstadoPedido(id, nuevoEstado));
+    }
+
+    // Endpoint para enviar pedido a fábrica (confirmar orden de producción)
+    @PostMapping("/pedidos/{id}/enviar-fabrica")
+    public ResponseEntity<PedidoResponseDTO> enviarAFabrica(@PathVariable Long id) {
+        return ResponseEntity.ok(pedidoService.confirmarOrdenFabrica(id));
     }
 
     // Endpoint para que el Admin vea diseños APROBADOS (para poder gestionarlos)

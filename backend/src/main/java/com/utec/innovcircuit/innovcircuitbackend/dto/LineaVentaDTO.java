@@ -12,4 +12,7 @@ public class LineaVentaDTO {
     private Double comisionPlataforma;
     private Double montoProveedor;
     private LocalDateTime fechaVenta;
+    private String estadoFinanciero;
+    private String motivoReclamo;
+    private LocalDateTime fechaLiberacion;
 }

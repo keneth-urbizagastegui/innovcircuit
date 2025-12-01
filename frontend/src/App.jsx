@@ -1,4 +1,5 @@
 import React from 'react';
+import { Toaster } from 'sonner';
 import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -15,20 +16,25 @@ import AdminUsuariosPage from './pages/AdminUsuariosPage';
 import AdminConfigPage from './pages/AdminConfigPage';
 import AdminRetirosPage from './pages/AdminRetirosPage';
 import AdminPedidosPage from './pages/AdminPedidosPage';
+import AdminReclamosPage from './pages/AdminReclamosPage';
 import DashboardPage from './pages/DashboardPage';
 import PerfilPage from './pages/PerfilPage';
 import MisPedidosPage from './pages/MisPedidosPage';
 import RetirosPage from './pages/RetirosPage';
 import StorePage from './pages/StorePage';
 import ReportesPage from './pages/ReportesPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
-    <Routes>
+    <>
+      <Toaster richColors position="top-right" />
+      <Routes>
       {/* Ruta Padre: Layout */}
       <Route path="/" element={<Layout />}>
         {/* Rutas Hijas */}
         <Route index element={<HomePage />} />
+        <Route path="explorar" element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="tienda/:id" element={<StorePage />} />
@@ -60,9 +66,12 @@ function App() {
           <Route path="admin/configuracion" element={<AdminConfigPage />} />
           <Route path="admin/retiros" element={<AdminRetirosPage />} />
           <Route path="admin/pedidos" element={<AdminPedidosPage />} />
+          <Route path="admin/reclamos" element={<AdminReclamosPage />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
-    </Routes>
+      </Routes>
+    </>
   );
 }
 

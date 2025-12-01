@@ -7,5 +7,7 @@ public class EstadisticasProveedorDTO {
     private double totalVendido;   // Suma de precios de líneas de sus diseños
     private double gananciaNeta;   // Suma de montoProveedor de sus líneas
     private double totalRetirado;  // Suma de retiros PENDIENTES + APROBADOS
-    private double saldoDisponible; // gananciaNeta - totalRetirado
+    private double saldoDisponible; // montos liberados - totalRetirado
+    private double saldoPendiente;  // montos aún no liberados
+    private double saldoEnDisputa;  // montos en estado EN_RECLAMO
 }

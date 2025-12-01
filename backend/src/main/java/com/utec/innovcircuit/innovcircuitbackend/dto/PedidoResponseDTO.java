@@ -12,4 +12,6 @@ public class PedidoResponseDTO {
     private String disenoNombre;
     private String clienteNombre;
     private String imagenUrlDiseno;
+    private String codigoSeguimientoFabrica;
+    private Double costoEstimado;
 }

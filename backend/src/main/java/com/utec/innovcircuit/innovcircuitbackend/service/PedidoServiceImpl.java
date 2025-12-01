@@ -9,6 +9,7 @@ import com.utec.innovcircuit.innovcircuitbackend.repository.DisenoRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.PedidoRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.UsuarioRepository;
 import com.utec.innovcircuit.innovcircuitbackend.repository.VentaRepository;
+import com.utec.innovcircuit.innovcircuitbackend.service.external.IFabricacionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,9 @@ public class PedidoServiceImpl {
     @Autowired
     private VentaRepository ventaRepository;
 
+    @Autowired
+    private IFabricacionProvider fabricacionProvider;
+
     public PedidoResponseDTO crearPedido(PedidoRequestDTO requestDTO, String emailCliente) {
         Cliente cliente = usuarioRepository.findByEmail(emailCliente, Cliente.class)
                 .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado"));
@@ -51,8 +55,9 @@ public class PedidoServiceImpl {
         pedido.setFechaSolicitud(LocalDateTime.now());
         pedido.setEstado("PENDIENTE_IMPRESION");
         pedido.setDireccionEnvio(requestDTO.getDireccionEnvio());
-        // (Lógica futura: calcular costoEnvio aquí)
-        pedido.setCostoEnvio(15.0); // Costo fijo por ahora
+        // Calcular costo estimado de fabricación usando Strategy/Adapter
+        Double costo = fabricacionProvider.cotizarFabricacion(diseno.getId());
+        pedido.setCostoEnvio(costo);
 
         Pedido guardado = pedidoRepository.save(pedido);
         return convertToDTO(guardado);
@@ -99,6 +104,16 @@ public class PedidoServiceImpl {
         return convertToDTO(guardado);
     }
 
+    public PedidoResponseDTO confirmarOrdenFabrica(Long pedidoId) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new NoSuchElementException("Pedido no encontrado"));
+        String codigo = fabricacionProvider.enviarOrdenProduccion(pedido.getId(), pedido.getDireccionEnvio());
+        pedido.setCodigoSeguimientoFabrica(codigo);
+        pedido.setEstado("EN_PROCESO");
+        Pedido guardado = pedidoRepository.save(pedido);
+        return convertToDTO(guardado);
+    }
+
     private PedidoResponseDTO convertToDTO(Pedido pedido) {
         PedidoResponseDTO dto = new PedidoResponseDTO();
         dto.setId(pedido.getId());
@@ -108,6 +123,8 @@ public class PedidoServiceImpl {
         dto.setDisenoNombre(pedido.getDiseno().getNombre());
         dto.setClienteNombre(pedido.getCliente().getNombre());
         dto.setImagenUrlDiseno(pedido.getDiseno().getImagenUrl());
+        dto.setCodigoSeguimientoFabrica(pedido.getCodigoSeguimientoFabrica());
+        dto.setCostoEstimado(pedido.getCostoEnvio());
         return dto;
     }
 }

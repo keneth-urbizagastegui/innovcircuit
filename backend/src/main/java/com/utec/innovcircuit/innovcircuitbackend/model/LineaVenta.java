@@ -2,6 +2,7 @@ package com.utec.innovcircuit.innovcircuitbackend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lineas_venta")
@@ -29,4 +30,13 @@ public class LineaVenta {
     // Monto neto que corresponde al proveedor por esta línea
     @Column
     private Double montoProveedor;
+
+    @Column(name = "fecha_liberacion")
+    private LocalDateTime fechaLiberacion;
+
+    @Column
+    private String estadoFinanciero = "PENDIENTE_LIBERACION";
+
+    @Column
+    private String motivoReclamo;
 }

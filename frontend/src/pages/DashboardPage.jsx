@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import usuarioService from '../services/usuarioService';
+import apiClient from '../services/api';
+import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
 import { formatCurrencyPEN } from '../utils/currency';
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -28,6 +31,15 @@ const DashboardPage = () => {
   const [direccion, setDireccion] = useState('');
   const [pedidoError, setPedidoError] = useState('');
   const [pedidoLoading, setPedidoLoading] = useState(false);
+  const [costoLoading, setCostoLoading] = useState(false);
+  const [costoEstimado, setCostoEstimado] = useState(null);
+
+  // Reclamos
+  const [reclamoOpen, setReclamoOpen] = useState(false);
+  const [reclamoMotivo, setReclamoMotivo] = useState('');
+  const [reclamoLineaId, setReclamoLineaId] = useState(null);
+  const [reclamoLoading, setReclamoLoading] = useState(false);
+  const [reclamoError, setReclamoError] = useState('');
 
   const recargarMisDisenos = () => {
     usuarioService.getMisDisenos()
@@ -58,6 +70,15 @@ const DashboardPage = () => {
     }
   }, [user]);
 
+  const recargarStats = () => {
+    setStatsLoading(true);
+    setStatsError('');
+    usuarioService.getMiDashboard()
+      .then(res => setStats(res.data))
+      .catch(() => setStatsError('Error al cargar estadísticas'))
+      .finally(() => setStatsLoading(false));
+  };
+
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [disenoAEliminar, setDisenoAEliminar] = useState(null);
   const solicitarEliminarDiseno = (id) => { setDisenoAEliminar(id); setConfirmOpen(true); };
@@ -79,6 +100,55 @@ const DashboardPage = () => {
     setPedidoError('');
     setPedidoLoading(false);
     setPedidoModalOpen(true);
+    setCostoLoading(true);
+    setCostoEstimado(null);
+    apiClient.get(`/pedidos/cotizar/${linea.disenoId}`)
+      .then(res => {
+        const v = res?.data?.costoEstimado;
+        setCostoEstimado(typeof v === 'number' ? v : null);
+      })
+      .catch(() => setCostoEstimado(null))
+      .finally(() => setCostoLoading(false));
+  };
+
+  const puedeReportar = (compraFecha, estadoFinanciero) => {
+    if (!compraFecha) return false;
+    const compraMs = new Date(compraFecha).getTime();
+    const sieteDiasMs = 7 * 24 * 60 * 60 * 1000;
+    const dentroDeSiete = (Date.now() - compraMs) < sieteDiasMs;
+    const bloqueado = estadoFinanciero === 'EN_RECLAMO' || estadoFinanciero === 'REEMBOLSADO';
+    return dentroDeSiete && !bloqueado;
+  };
+
+  const abrirReclamo = (linea) => {
+    setReclamoLineaId(linea.id);
+    setReclamoMotivo('');
+    setReclamoError('');
+    setReclamoLoading(false);
+    setReclamoOpen(true);
+  };
+
+  const confirmarReclamo = async () => {
+    if (!reclamoLineaId || !reclamoMotivo.trim()) {
+      setReclamoError('El motivo del reclamo es obligatorio.');
+      return;
+    }
+    setReclamoLoading(true);
+    setReclamoError('');
+    try {
+      await usuarioService.crearReclamo({ lineaId: reclamoLineaId, motivo: reclamoMotivo });
+      setReclamoOpen(false);
+      toast.success('Reclamo enviado');
+      // Recargar compras para reflejar estado EN_RECLAMO
+      usuarioService.getMisCompras()
+        .then(res => setCompras(res.data))
+        .catch(() => {});
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Error al enviar el reclamo.';
+      setReclamoError(msg);
+    } finally {
+      setReclamoLoading(false);
+    }
   };
 
   const handleConfirmarPedido = async () => {
@@ -95,8 +165,7 @@ const DashboardPage = () => {
       };
       await pedidoService.crearPedido(pedidoData);
       setPedidoModalOpen(false);
-      // (Opcional: mostrar un toast de éxito)
-      alert('¡Solicitud de impresión enviada con éxito!');
+      toast.success('Solicitud de impresión enviada');
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data || 'Error al crear el pedido.';
       setPedidoError(msg);
@@ -143,16 +212,33 @@ const DashboardPage = () => {
             {/* Iterar sobre compras y luego sobre líneas de venta */}
             {compras.flatMap(compra =>
               (compra.lineas || []).map(linea => (
-                <div key={linea.id} className="py-3 flex items-center justify-between">
+                <div key={linea.id} className="py-3 grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
                   <div>
                     <div className="font-medium">{linea.disenoNombre}</div>
                     <div className="text-sm text-muted-foreground">
                       Comprado el: {new Date(compra.fecha).toLocaleDateString()} | Precio: {formatCurrencyPEN(linea.precioAlComprar)}
                     </div>
+                    <div className="mt-1 flex items-center gap-2">
+                      {linea.estadoFinanciero === 'EN_RECLAMO' && (
+                        <Badge className="border border-yellow-500 text-yellow-600" variant="outline">En revisión por Admin</Badge>
+                      )}
+                      {linea.estadoFinanciero === 'REEMBOLSADO' && (
+                        <Badge className="border border-red-500 text-red-600" variant="outline">Reembolsado</Badge>
+                      )}
+                    </div>
                   </div>
-                  <Button variant="default" size="sm" onClick={() => handleAbrirModalPedido(linea)}>
-                    Solicitar Impresión
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="default" size="sm" onClick={() => handleAbrirModalPedido(linea)}>
+                      Solicitar Impresión
+                    </Button>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    {puedeReportar(compra.fecha, linea.estadoFinanciero) && (
+                      <Button variant="outline" size="sm" onClick={() => abrirReclamo(linea)}>
+                        Reportar Problema
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))
             )}
@@ -174,10 +260,14 @@ const DashboardPage = () => {
                 <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" aria-label="Cargando" />
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
                 <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
                   <div className="text-sm text-muted-foreground">Total Vendido</div>
                   <div className="text-lg font-semibold">S/{Number(stats?.totalVendido ?? 0).toFixed(2)}</div>
+                </div>
+                <div className="p-3 rounded-lg border border-yellow-500 bg-white shadow-sm">
+                  <div className="text-sm text-yellow-600">Saldo Pendiente (En canje)</div>
+                  <div className="text-lg font-semibold text-yellow-600">{formatCurrencyPEN(Number(stats?.saldoPendiente ?? 0))}</div>
                 </div>
                 <div className="p-3 rounded-lg border border-border bg-white shadow-sm">
                   <div className="text-sm text-muted-foreground">Ganancia Neta (Tras comisiones)</div>
@@ -186,15 +276,28 @@ const DashboardPage = () => {
               </div>
             )}
             {/* Botones para ver historial y gestionar retiros */}
-            <div className="mt-2 flex gap-2">
-              <Button variant="outline" onClick={() => navigate('/dashboard/transacciones')}>
-                Ver Historial de Transacciones
-              </Button>
-              <Button variant="default" onClick={() => navigate('/dashboard/retiros')}>
-                Gestionar Retiros
-              </Button>
-              <Button variant="outline" onClick={() => navigate('/dashboard/reportes')}>
-                Ver Reportes
+            <div className="mt-2 flex gap-2 items-center justify-between">
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => navigate('/dashboard/transacciones')}>
+                  Ver Historial de Transacciones
+                </Button>
+                <Button variant="default" onClick={() => navigate('/dashboard/retiros')}>
+                  Gestionar Retiros
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/dashboard/reportes')}>
+                  Ver Reportes
+                </Button>
+              </div>
+              <Button variant="outline" size="sm" onClick={async () => {
+                try {
+                  await apiClient.post('/test/time-travel', null, { params: { dias: 8 } });
+                  toast.success('Simulación (+8 días) realizada');
+                  recargarStats();
+                } catch (e) {
+                  toast.error('Error al simular paso del tiempo');
+                }
+              }}>
+                🛠️ Simular paso del tiempo (+8 días)
               </Button>
             </div>
           </div>
@@ -246,19 +349,60 @@ const DashboardPage = () => {
         </DialogFooter>
       </Dialog>
 
-      {/* Modal para solicitar impresión */}
-      <Dialog open={pedidoModalOpen} onClose={() => setPedidoModalOpen(false)} className="w-[90%] sm:w-[500px] p-4">
+      {/* Modal para crear reclamo */}
+      <Dialog open={reclamoOpen} onClose={() => setReclamoOpen(false)} className="w-[90%] sm:w-[500px] p-4">
         <DialogHeader>
-          <DialogTitle>Solicitar Impresión Física</DialogTitle>
+          <DialogTitle>Reportar Problema</DialogTitle>
           <DialogDescription>
-            Estás solicitando la impresión del diseño: <strong>{selectedLinea?.disenoNombre}</strong>.
-            {pedidoError && (
+            Describe el motivo del reclamo.
+            {reclamoError && (
               <div className="mt-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                {pedidoError}
+                {reclamoError}
               </div>
             )}
           </DialogDescription>
         </DialogHeader>
+        <div className="py-2">
+          <label className="text-sm font-medium text-slate-700">Motivo del reclamo</label>
+          <Textarea
+            rows={3}
+            value={reclamoMotivo}
+            onChange={(e) => setReclamoMotivo(e.target.value)}
+            placeholder="Describe el problema con el diseño..."
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setReclamoOpen(false)} disabled={reclamoLoading}>
+            Cancelar
+          </Button>
+          <Button onClick={confirmarReclamo} disabled={reclamoLoading || !reclamoMotivo.trim()}>
+            {reclamoLoading ? 'Enviando...' : 'Enviar Reclamo'}
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* Modal para solicitar impresión */}
+      <Dialog open={pedidoModalOpen} onClose={() => setPedidoModalOpen(false)} className="w-[90%] sm:w-[500px] p-4">
+      <DialogHeader>
+        <DialogTitle>Solicitar Impresión Física</DialogTitle>
+        <DialogDescription>
+          Estás solicitando la impresión del diseño: <strong>{selectedLinea?.disenoNombre}</strong>.
+          {pedidoError && (
+            <div className="mt-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              {pedidoError}
+            </div>
+          )}
+          <div className="mt-2 text-sm">
+            {costoLoading ? (
+              <span>Costo Estimado de Fabricación: Cargando...</span>
+            ) : costoEstimado != null ? (
+              <span>Costo Estimado de Fabricación: S/ {Number(costoEstimado).toFixed(2)}</span>
+            ) : (
+              <span>No se pudo cotizar el costo de fabricación.</span>
+            )}
+          </div>
+        </DialogDescription>
+      </DialogHeader>
         <div className="py-2">
           <label className="text-sm font-medium text-slate-700">Dirección de Envío Completa</label>
           <Textarea

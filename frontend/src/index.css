@@ -3,42 +3,33 @@
 
 @layer base {
   :root {
-    /* Fondo blanco, Texto gris oscuro (Tu paleta) */
-    --background: 0 0% 100%; /* Blanco */
-    --foreground: 0 0% 30.2%; /* Tu innov-dark-gray: #4D4D4D */
+    --background: 0 0% 100%;
+    --foreground: 225 14% 18%;
 
-    /* Tarjetas blancas, Texto gris oscuro */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 30.2%;
+    --card-foreground: 225 14% 18%;
 
-    /* Popovers blancos, Texto gris oscuro */
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 30.2%;
+    --popover-foreground: 225 14% 18%;
 
-    /* Color Primario (Botones) - Tu innov-aqua: #54C4BB */
-    --primary: 174 51.6% 55.3%;
-    --primary-foreground: 0 0% 30.2%; /* Tu innov-dark-gray para contraste */
+    --primary: 172 66% 47%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Color Secundario (Botones) - Tu innov-red: #FA7776 */
-    --secondary: 0.5 91.8% 72.5%;
-    --secondary-foreground: 0 0% 100%; /* Texto blanco para contraste */
+    --secondary: 84 75% 59%;
+    --secondary-foreground: 0 0% 12%;
 
-    /* Muted (Fondos grises) - Tu innov-light-gray: #EBEBEB */
-    --muted: 0 0% 92.2%;
-    --muted-foreground: 0 0% 30.2%; /* Tu innov-dark-gray */
+    --muted: 210 16% 97%;
+    --muted-foreground: 225 14% 28%;
 
-    /* Acento - Tu innov-lime: #C7F782 */
-    --accent: 81.4 89.5% 73.5%;
-    --accent-foreground: 0 0% 30.2%; /* Tu innov-dark-gray */
+    --accent: 172 66% 47%;
+    --accent-foreground: 0 0% 100%;
 
-    /* Destructivo (Rojo) - Tu innov-red: #FA7776 */
-    --destructive: 0.5 91.8% 72.5%;
+    --destructive: 0 72% 54%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Bordes e Inputs - Tu innov-light-gray: #EBEBEB */
-    --border: 0 0% 92.2%;
-    --input: 0 0% 92.2%;
-    --ring: 174 51.6% 55.3%; /* Tu innov-aqua */
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 172 66% 47%;
     --radius: 0.5rem;
   }
 
@@ -69,4 +60,18 @@
 @layer base {
   * { border-color: hsl(var(--border)); }
   body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); font-feature-settings: "rlig" 1, "calt" 1; }
+  
+  /* Hide scrollbars but maintain functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+  
+  /* Smooth scrolling for navigation */
+  html {
+    scroll-behavior: smooth;
+  }
 }

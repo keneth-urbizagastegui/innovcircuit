@@ -23,6 +23,9 @@ public class Pedido {
 
     private Double costoEnvio;
 
+    @Column
+    private String codigoSeguimientoFabrica;
+
     // Relación: Un pedido pertenece a un Cliente
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import categoriaService from '../services/categoriaService';
@@ -17,6 +18,7 @@ const SubirDisenoPage = () => {
   const [categoriaId, setCategoriaId] = useState('');
   const [imagenFile, setImagenFile] = useState(null);
   const [esquematicoFile, setEsquematicoFile] = useState(null);
+  const [imagenesFiles, setImagenesFiles] = useState([]);
 
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -58,6 +60,11 @@ const SubirDisenoPage = () => {
     formData.append('disenoDTO', disenoDTO);
     formData.append('imagenFile', imagenFile);
     formData.append('esquematicoFile', esquematicoFile);
+    if (imagenesFiles && imagenesFiles.length) {
+      Array.from(imagenesFiles).forEach((f) => {
+        formData.append('imagenesFiles', f);
+      });
+    }
 
     try {
       // 3. Enviar con apiClient (el interceptor añade el token)
@@ -65,11 +72,13 @@ const SubirDisenoPage = () => {
       const response = await apiClient.post('/disenos', formData);
 
       setSuccess(`¡Diseño '${response.data.nombre}' subido! Estado: ${response.data.estado}.`);
+      toast.success(`Diseño '${response.data.nombre}' subido`);
       setLoading(false);
       setTimeout(() => navigate('/'), 2000);
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data || 'Error al subir el diseño.';
       setError(msg);
+      toast.error(msg);
       setLoading(false);
     }
   };
@@ -132,6 +141,16 @@ const SubirDisenoPage = () => {
           <Button as="label" variant="outline" className="cursor-pointer">
             {imagenFile ? `Imagen: ${imagenFile.name}` : 'Seleccionar archivo'}
             <input type="file" accept="image/*" hidden onChange={(e) => setImagenFile(e.target.files[0])} />
+          </Button>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Galería de Imágenes (opcional, múltiples)</label>
+        <div className="flex items-center gap-2">
+          <Button as="label" variant="outline" className="cursor-pointer">
+            {imagenesFiles && imagenesFiles.length ? `${imagenesFiles.length} imágenes seleccionadas` : 'Seleccionar imágenes'}
+            <input type="file" accept="image/*" multiple hidden onChange={(e) => setImagenesFiles(e.target.files)} />
           </Button>
         </div>
       </div>

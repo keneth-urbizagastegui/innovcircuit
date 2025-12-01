@@ -1,6 +1,7 @@
 package com.utec.innovcircuit.innovcircuitbackend.dto;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class DisenoResponseDTO {
@@ -22,4 +23,6 @@ public class DisenoResponseDTO {
 
     // Proveedor anidado
     private ProveedorDTO proveedor;
+
+    private List<String> imagenesUrls;
 }

@@ -103,6 +103,7 @@ public class VentaServiceImpl implements IVentaService {
             linea.setPrecioAlComprar(precio);
             linea.setComisionPlataforma(comision);
             linea.setMontoProveedor(montoProv);
+            linea.setFechaLiberacion(venta.getFecha().plusDays(7));
             linea.setVenta(venta); // Asignar la venta padre
             venta.getLineasVenta().add(linea); // Añadir la línea a la venta
         }
@@ -141,15 +142,36 @@ public class VentaServiceImpl implements IVentaService {
         Proveedor proveedor = usuarioRepository.findByEmail(emailProveedor, Proveedor.class)
                 .orElseThrow(() -> new NoSuchElementException("Proveedor no encontrado"));
 
-        // 1. Calcular Ganancia Neta Total y Total Vendido
+        // 1. Calcular montos por estado de liberación y Total Vendido
         double gananciaNetaTotal = 0.0;
         double totalVendido = 0.0;
+        double saldoPendiente = 0.0;
+        double saldoEnDisputa = 0.0;
+        LocalDateTime ahora = LocalDateTime.now();
         for (Venta v : ventaRepository.findAll()) {
             for (LineaVenta lv : v.getLineasVenta()) {
                 if (lv.getDiseno() != null && lv.getDiseno().getProveedor() != null
                         && lv.getDiseno().getProveedor().getId().equals(proveedor.getId())) {
                     totalVendido += (lv.getPrecioAlComprar() != null ? lv.getPrecioAlComprar() : 0.0);
-                    gananciaNetaTotal += (lv.getMontoProveedor() != null ? lv.getMontoProveedor() : 0.0);
+                    LocalDateTime liberacion = lv.getFechaLiberacion();
+                    double montoProveedor = (lv.getMontoProveedor() != null ? lv.getMontoProveedor() : 0.0);
+                    String ef = lv.getEstadoFinanciero();
+                    if (ef != null && ef.equals("REEMBOLSADO")) {
+                        continue;
+                    }
+                    if (ef != null && ef.equals("EN_RECLAMO")) {
+                        saldoEnDisputa += montoProveedor;
+                        continue;
+                    }
+                    if (ef != null && ef.equals("LIBERADO")) {
+                        gananciaNetaTotal += montoProveedor;
+                        continue;
+                    }
+                    if (liberacion != null && ahora.isBefore(liberacion)) {
+                        saldoPendiente += montoProveedor;
+                    } else {
+                        gananciaNetaTotal += montoProveedor;
+                    }
                 }
             }
         }
@@ -162,9 +184,11 @@ public class VentaServiceImpl implements IVentaService {
 
         com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO dto = new com.utec.innovcircuit.innovcircuitbackend.dto.EstadisticasProveedorDTO();
         dto.setTotalVendido(totalVendido);
-        dto.setGananciaNeta(gananciaNetaTotal); // Ganancia histórica
-        dto.setTotalRetirado(totalRetirado);   // Total retirado o pendiente
-        dto.setSaldoDisponible(saldoDisponible); // Saldo actual
+        dto.setGananciaNeta(gananciaNetaTotal);
+        dto.setTotalRetirado(totalRetirado);
+        dto.setSaldoDisponible(saldoDisponible);
+        dto.setSaldoPendiente(saldoPendiente);
+        dto.setSaldoEnDisputa(saldoEnDisputa);
         return dto;
     }
 
@@ -190,6 +214,9 @@ public class VentaServiceImpl implements IVentaService {
         l.setPrecioAlComprar(lv.getPrecioAlComprar());
         l.setComisionPlataforma(lv.getComisionPlataforma());
         l.setMontoProveedor(lv.getMontoProveedor());
+        l.setEstadoFinanciero(lv.getEstadoFinanciero());
+        l.setMotivoReclamo(lv.getMotivoReclamo());
+        l.setFechaLiberacion(lv.getFechaLiberacion());
         if (lv.getVenta() != null) {
             l.setFechaVenta(lv.getVenta().getFecha());
         }

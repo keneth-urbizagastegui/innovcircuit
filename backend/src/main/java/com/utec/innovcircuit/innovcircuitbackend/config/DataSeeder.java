@@ -7,6 +7,7 @@ import com.utec.innovcircuit.innovcircuitbackend.model.Administrador;
 import com.utec.innovcircuit.innovcircuitbackend.model.Categoria;
 import com.utec.innovcircuit.innovcircuitbackend.model.Cliente;
 import com.utec.innovcircuit.innovcircuitbackend.model.Diseno;
+import com.utec.innovcircuit.innovcircuitbackend.model.DisenoImagen;
 import com.utec.innovcircuit.innovcircuitbackend.model.Proveedor;
 import com.utec.innovcircuit.innovcircuitbackend.model.Configuracion;
 import com.utec.innovcircuit.innovcircuitbackend.repository.CategoriaRepository;
@@ -167,7 +168,16 @@ public class DataSeeder implements CommandLineRunner {
                 diseno.setDescargasCount((int) (Math.random() * 2000));
                 diseno.setCategoria(categoria);
                 diseno.setProveedor(proveedor);
-                disenoRepository.save(diseno);
+                Diseno saved = disenoRepository.save(diseno);
+                if (dto.getImagenUrl() != null && !dto.getImagenUrl().isBlank()) {
+                    DisenoImagen di = new DisenoImagen();
+                    di.setDiseno(saved);
+                    di.setUrl(dto.getImagenUrl());
+                    di.setOrden(0);
+                    di.setThumbnail(true);
+                    saved.getImagenes().add(di);
+                    disenoRepository.save(saved);
+                }
             }
         }
     }

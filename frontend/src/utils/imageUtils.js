@@ -83,3 +83,16 @@ export function resolveAvatarUrl(avatarUrl, name, size = 64, opts = {}) {
   if (resolved) return resolved;
   return buildUiAvatar(name, size, { rounded: true, background: 'e5e7eb', color: '111827', format: 'svg', ...opts });
 }
+
+export function categoryPlaceholderImage(nombreCategoria) {
+  const key = String(nombreCategoria || '').toLowerCase();
+  const map = {
+    'sensores': 'https://images.unsplash.com/photo-1618401470828-0f3b3f3b57dc?q=80&w=1200&auto=format&fit=crop',
+    'iot': 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200&auto=format&fit=crop',
+    'robots y drones': 'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200&auto=format&fit=crop',
+    'fuentes de poder': 'https://images.unsplash.com/photo-1555617117-08fda9f52bb8?q=80&w=1200&auto=format&fit=crop',
+    'sonido': 'https://images.unsplash.com/photo-1519671482749-f3b1c73c7343?q=80&w=1200&auto=format&fit=crop',
+  };
+  const url = Object.keys(map).find(k => key.includes(k)) ? map[Object.keys(map).find(k => key.includes(k))] : null;
+  return url || makeImagePlaceholder(300, 200, nombreCategoria ? nombreCategoria : 'Diseño');
+}

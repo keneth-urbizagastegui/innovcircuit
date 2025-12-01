@@ -1,5 +1,7 @@
 package com.utec.innovcircuit.innovcircuitbackend.service;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +50,21 @@ public class FileStorageService {
             return "/uploads/" + fileName;
         } catch (IOException ex) {
             throw new RuntimeException("No se pudo guardar el archivo " + fileName, ex);
+        }
+    }
+
+    public Resource loadFileAsResource(String fileNameOrUrl) {
+        String fileName = extractFileName(fileNameOrUrl);
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Archivo no encontrado: " + fileName);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("No se pudo cargar el archivo: " + fileName, ex);
         }
     }
 
