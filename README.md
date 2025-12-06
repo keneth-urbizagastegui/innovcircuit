@@ -438,6 +438,37 @@ Resultado esperado: error por validación de estado (el diseño no está aprobad
 - Reportes en modales formateados (no `alert(JSON)`)
 - Componentes shadcn/ui + Tailwind CSS v4
 
+### 🖼️ Imágenes Sugeridas (Unsplash)
+
+La funcionalidad **"Buscar imagen sugerida"** permite generar automáticamente imágenes para los diseños usando la API de Unsplash.
+
+**Configuración:**
+
+1. Obtén una Access Key gratuita en https://unsplash.com/developers
+2. Exporta la variable de entorno antes de iniciar el backend:
+
+   **En desarrollo (sin Docker):**
+   ```bash
+   export UNSPLASH_ACCESS_KEY=tu_access_key_aqui
+   mvn spring-boot:run
+   ```
+
+   **Con Docker Compose:**
+   ```bash
+   export UNSPLASH_ACCESS_KEY=tu_access_key_aqui
+   docker compose up --build
+   ```
+
+3. En Windows PowerShell:
+   ```powershell
+   $env:UNSPLASH_ACCESS_KEY="tu_access_key_aqui"
+   mvn spring-boot:run
+   ```
+
+**Comportamiento:**
+- Si la variable NO está configurada, el botón mostrará un mensaje de error amigable.
+- Si está configurada, buscará imágenes relacionadas con el nombre y categoría del diseño.
+
 ---
 
 ## 🧪 Comprobación Rápida

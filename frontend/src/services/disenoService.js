@@ -31,6 +31,10 @@ const disenoService = {
   listarDestacados: () => {
     return apiClient.get('/disenos/destacados');
   },
+  // Generar imagen automática usando Unsplash
+  autoGenerarImagen: (disenoId) => {
+    return apiClient.post(`/disenos/${disenoId}/auto-imagen`);
+  },
 };
 
 export default disenoService;

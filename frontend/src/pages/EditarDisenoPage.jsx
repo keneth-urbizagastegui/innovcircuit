@@ -6,7 +6,9 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
 import { Select } from '../components/ui/select'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Sparkles } from 'lucide-react'
+import { toast } from 'sonner'
+import { resolveImageUrl, FALLBACK_IMAGE, onErrorSetSrc } from '../utils/imageUtils'
 
 const EditarDisenoPage = () => {
   const { id } = useParams()
@@ -17,9 +19,11 @@ const EditarDisenoPage = () => {
   const [precio, setPrecio] = useState(0.0)
   const [gratuito, setGratuito] = useState(false)
   const [categoriaId, setCategoriaId] = useState('')
+  const [imagenUrl, setImagenUrl] = useState('')
 
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading] = useState(false)
+  const [loadingAuto, setLoadingAuto] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -44,6 +48,7 @@ const EditarDisenoPage = () => {
         setDescripcion(diseno?.descripcion ?? '')
         setPrecio(Number(diseno?.precio ?? 0))
         setGratuito(Boolean(diseno?.gratuito))
+        setImagenUrl(diseno?.imagenUrl ?? '')
 
         // Intentar mapear la categoría por nombre si está disponible
         if (categorias && categorias.length > 0 && diseno?.nombreCategoria) {
@@ -85,6 +90,25 @@ const EditarDisenoPage = () => {
     }
   }
 
+  // Handler para generar imagen automática con Unsplash
+  const handleAutoImagen = async () => {
+    if (!id) return
+    setLoadingAuto(true)
+    setError('')
+    try {
+      const res = await disenoService.autoGenerarImagen(id)
+      toast.success('Imagen sugerida aplicada correctamente')
+      // Actualizar la imagen en el estado local
+      setImagenUrl(res.data?.imagenUrl || '')
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'No se pudo generar una imagen sugerida. Verifica que la API key de Unsplash esté configurada.'
+      toast.error(msg)
+      setError(msg)
+    } finally {
+      setLoadingAuto(false)
+    }
+  }
+
   if (pageLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
@@ -99,66 +123,111 @@ const EditarDisenoPage = () => {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
       <form onSubmit={handleSubmit} className="max-w-[600px] mx-auto p-6 bg-white rounded-xl border border-border shadow-sm space-y-4">
-      <h1 className="text-2xl font-semibold">Editar Diseño</h1>
+        <h1 className="text-2xl font-semibold">Editar Diseño</h1>
 
-      {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
-      )}
-      {success && (
-        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700">{success}</div>
-      )}
+        {error && (
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</div>
+        )}
+        {success && (
+          <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700">{success}</div>
+        )}
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Nombre del Diseño</label>
-        <Input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
-      </div>
+        {/* Preview de imagen actual */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Imagen Actual</label>
+          <div className="flex items-start gap-4">
+            <div className="h-24 w-24 bg-slate-100 rounded-lg border border-slate-200 overflow-hidden flex-shrink-0">
+              {imagenUrl ? (
+                <img
+                  src={resolveImageUrl(imagenUrl)}
+                  alt="Imagen del diseño"
+                  className="h-full w-full object-cover"
+                  onError={onErrorSetSrc(FALLBACK_IMAGE)}
+                />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center text-xs text-slate-400">
+                  Sin imagen
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAutoImagen}
+                disabled={loadingAuto}
+              >
+                {loadingAuto ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Buscando…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Buscar imagen sugerida
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-slate-500">
+                Genera automáticamente una imagen desde Unsplash basada en el nombre y categoría del diseño.
+              </p>
+            </div>
+          </div>
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Descripción</label>
-        <Textarea rows={8} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
-      </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Nombre del Diseño</label>
+          <Input value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Precio</label>
-        <Input
-          type="number"
-          value={precio}
-          onChange={(e) => setPrecio(parseFloat(e.target.value))}
-          required
-          disabled={gratuito}
-        />
-      </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Descripción</label>
+          <Textarea rows={8} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
+        </div>
 
-      <div className="flex items-center gap-2">
-        <input
-          id="gratuito"
-          type="checkbox"
-          checked={gratuito}
-          onChange={(e) => {
-            const isFree = e.target.checked
-            setGratuito(isFree)
-            if (isFree) setPrecio(0)
-          }}
-          className="h-4 w-4 rounded border-slate-300"
-        />
-        <label htmlFor="gratuito" className="text-sm">Es gratuito (precio será 0)</label>
-      </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Precio</label>
+          <Input
+            type="number"
+            value={precio}
+            onChange={(e) => setPrecio(parseFloat(e.target.value))}
+            required
+            disabled={gratuito}
+          />
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Categoría</label>
-        <Select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)} required>
-          <option value="" disabled>Seleccione una categoría</option>
-          {categorias.map((cat) => (
-            <option key={cat.id} value={cat.id}>{cat.nombre}</option>
-          ))}
-        </Select>
-      </div>
+        <div className="flex items-center gap-2">
+          <input
+            id="gratuito"
+            type="checkbox"
+            checked={gratuito}
+            onChange={(e) => {
+              const isFree = e.target.checked
+              setGratuito(isFree)
+              if (isFree) setPrecio(0)
+            }}
+            className="h-4 w-4 rounded border-slate-300"
+          />
+          <label htmlFor="gratuito" className="text-sm">Es gratuito (precio será 0)</label>
+        </div>
 
-      <div className="pt-2">
-        <Button type="submit" className="w-full" loading={loading}>
-          Guardar Cambios
-        </Button>
-      </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Categoría</label>
+          <Select value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)} required>
+            <option value="" disabled>Seleccione una categoría</option>
+            {categorias.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+            ))}
+          </Select>
+        </div>
+
+        <div className="pt-2">
+          <Button type="submit" className="w-full" loading={loading}>
+            Guardar Cambios
+          </Button>
+        </div>
       </form>
     </div>
   )

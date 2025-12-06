@@ -30,6 +30,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_GOOGLE_API_KEY: ${VITE_GOOGLE_API_KEY}
+        VITE_BACKEND_URL: http://localhost:8080
     ports:
       - "5173:80"
     networks:
@@ -55,6 +58,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/innovcircuit_db
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin123
+      - UNSPLASH_ACCESS_KEY=${UNSPLASH_ACCESS_KEY:-}
 
 volumes:
   postgres_data:

@@ -7,6 +7,7 @@ import com.utec.innovcircuit.innovcircuitbackend.dto.ResenaResponseDTO;
 import com.utec.innovcircuit.innovcircuitbackend.service.IDisenoService;
 import com.utec.innovcircuit.innovcircuitbackend.service.IResenaService;
 import com.utec.innovcircuit.innovcircuitbackend.service.FileStorageService;
+import com.utec.innovcircuit.innovcircuitbackend.service.AutoImageService;
 import com.utec.innovcircuit.innovcircuitbackend.model.Cliente;
 import com.utec.innovcircuit.innovcircuitbackend.model.Diseno;
 import com.utec.innovcircuit.innovcircuitbackend.model.Proveedor;
@@ -40,13 +41,16 @@ public class DisenoController {
     @Autowired
     private FileStorageService fileStorageService;
     @Autowired
+    private AutoImageService autoImageService;
+    @Autowired
     private VentaRepository ventaRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
     private DisenoRepository disenoRepository;
 
-    // RF-6, RF-9: Para todos los usuarios logueados, con búsqueda opcional por nombre (q)
+    // RF-6, RF-9: Para todos los usuarios logueados, con búsqueda opcional por
+    // nombre (q)
     @GetMapping
     public ResponseEntity<List<DisenoResponseDTO>> listarDisenos(
             @RequestParam(name = "q", required = false) String q,
@@ -78,7 +82,8 @@ public class DisenoController {
             // 'Principal' nos da el usuario (email) desde el token JWT
             String emailProveedor = principal.getName();
 
-            DisenoResponseDTO response = disenoService.subirDiseno(requestDTO, emailProveedor, imagenFile, esquematicoFile, imagenesFiles);
+            DisenoResponseDTO response = disenoService.subirDiseno(requestDTO, emailProveedor, imagenFile,
+                    esquematicoFile, imagenesFiles);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             throw new RuntimeException("Error al procesar la subida: " + e.getMessage());
@@ -133,7 +138,8 @@ public class DisenoController {
                 .body(resource);
     }
 
-    // Endpoint PÚBLICO: obtener reseñas de un diseño (ubicado aquí para alinearse con rutas públicas de /disenos/**)
+    // Endpoint PÚBLICO: obtener reseñas de un diseño (ubicado aquí para alinearse
+    // con rutas públicas de /disenos/**)
     @GetMapping("/{disenoId}/resenas")
     public ResponseEntity<List<ResenaResponseDTO>> getResenasPorDiseno(@PathVariable Long disenoId) {
         return ResponseEntity.ok(resenaService.getResenasPorDiseno(disenoId));
@@ -143,8 +149,8 @@ public class DisenoController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('PROVEEDOR')")
     public ResponseEntity<DisenoResponseDTO> editarDiseno(@PathVariable Long id,
-                                                          @Valid @RequestBody DisenoRequestDTO requestDTO,
-                                                          Principal principal) {
+            @Valid @RequestBody DisenoRequestDTO requestDTO,
+            Principal principal) {
         String emailProveedor = principal.getName();
         return ResponseEntity.ok(disenoService.editarDiseno(id, requestDTO, emailProveedor));
     }
@@ -162,5 +168,38 @@ public class DisenoController {
     @GetMapping("/destacados")
     public ResponseEntity<List<DisenoResponseDTO>> getDisenosDestacados() {
         return ResponseEntity.ok(disenoService.listarDisenosDestacados());
+    }
+
+    /**
+     * Endpoint para generar automáticamente una imagen para un diseño usando
+     * Unsplash.
+     * Solo PROVEEDOR dueño del diseño o ADMINISTRADOR pueden usarlo.
+     */
+    @PostMapping("/{id}/auto-imagen")
+    @PreAuthorize("hasAnyRole('PROVEEDOR', 'ADMINISTRADOR')")
+    public ResponseEntity<DisenoResponseDTO> generarImagenAuto(@PathVariable Long id, Principal principal) {
+        Diseno diseno = disenoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Diseño no encontrado"));
+
+        // Verificar propiedad si es proveedor
+        String email = principal.getName();
+        boolean esAdmin = usuarioRepository
+                .findByEmail(email, com.utec.innovcircuit.innovcircuitbackend.model.Administrador.class).isPresent();
+        boolean esDueno = diseno.getProveedor() != null && email.equals(diseno.getProveedor().getEmail());
+
+        if (!esAdmin && !esDueno) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para modificar este diseño");
+        }
+
+        String ruta = autoImageService.generarImagenParaDiseno(diseno);
+        if (ruta == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No se pudo generar imagen automática. Verifica que la API key de Unsplash esté configurada.");
+        }
+
+        diseno.setImagenUrl(ruta);
+        disenoRepository.save(diseno);
+
+        return ResponseEntity.ok(disenoService.getDisenoById(id));
     }
 }

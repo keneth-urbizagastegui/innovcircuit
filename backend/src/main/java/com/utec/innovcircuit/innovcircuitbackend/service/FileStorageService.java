@@ -74,19 +74,24 @@ public class FileStorageService {
      * Si el archivo existe en el directorio de almacenamiento, lo elimina.
      */
     public void deleteFile(String urlOrFilename) {
-        if (urlOrFilename == null || urlOrFilename.isBlank()) return;
+        if (urlOrFilename == null || urlOrFilename.isBlank())
+            return;
         String fileName = extractFileName(urlOrFilename);
-        if (fileName == null || fileName.isBlank()) return;
+        if (fileName == null || fileName.isBlank())
+            return;
         try {
             Path targetLocation = this.fileStorageLocation.resolve(fileName).normalize();
             Files.deleteIfExists(targetLocation);
         } catch (IOException ex) {
-            // No propagamos para no bloquear la eliminación del diseño; registramos si fuese necesario
-            System.err.println("[FileStorageService] No se pudo eliminar el archivo: " + fileName + " -> " + ex.getMessage());
+            // No propagamos para no bloquear la eliminación del diseño; registramos si
+            // fuese necesario
+            System.err.println(
+                    "[FileStorageService] No se pudo eliminar el archivo: " + fileName + " -> " + ex.getMessage());
         }
     }
 
-    // Extrae el nombre del archivo de una URL del estilo "/uploads/<nombre>" o devuelve el valor si ya es un nombre
+    // Extrae el nombre del archivo de una URL del estilo "/uploads/<nombre>" o
+    // devuelve el valor si ya es un nombre
     private String extractFileName(String urlOrFilename) {
         String trimmed = urlOrFilename.trim();
         // Si contiene "/uploads/", tomamos todo lo que sigue a ese prefijo
@@ -101,5 +106,30 @@ public class FileStorageService {
             return trimmed.substring(lastSlash + 1);
         }
         return trimmed; // caso simple: ya es nombre de archivo
+    }
+
+    /**
+     * Guarda un array de bytes como archivo en el directorio de uploads.
+     * Usado por AutoImageService para guardar imágenes descargadas.
+     * 
+     * @param bytes       contenido del archivo
+     * @param filename    nombre sugerido para el archivo
+     * @param contentType tipo MIME (no usado actualmente, pero disponible para
+     *                    validación futura)
+     * @return ruta relativa del archivo guardado (p.ej. "/uploads/archivo.jpg")
+     */
+    public String storeBytes(byte[] bytes, String filename, String contentType) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+        // Generar nombre único
+        String safeFilename = UUID.randomUUID().toString() + "_" + filename;
+        try {
+            Path targetLocation = this.fileStorageLocation.resolve(safeFilename);
+            Files.write(targetLocation, bytes);
+            return "/uploads/" + safeFilename;
+        } catch (IOException ex) {
+            throw new RuntimeException("No se pudo guardar el archivo " + safeFilename, ex);
+        }
     }
 }

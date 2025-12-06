@@ -69,3 +69,36 @@ El enrutado está definido en `src/App.jsx` con rutas protegidas por rol. Págin
 
 - El servidor Vite se ha validado sin errores de PostCSS/Tailwind.
 - Ante cambios de UI, verifica en el navegador y revisa la consola del terminal por errores.
+
+## 🔑 Configurar Google Gemini para el Chatbot
+
+El chatbot flotante puede usar **Google Gemini** si se define la variable de entorno `VITE_GOOGLE_API_KEY`. Si no está configurada, usará automáticamente la IA local del backend.
+
+### Pasos:
+
+1. **Obtén una API key** en [Google AI Studio](https://aistudio.google.com/app/apikey)
+
+2. **Copia el archivo de ejemplo a `.env`**:
+   ```bash
+   cd frontend
+   cp .env.example .env
+   ```
+
+3. **Edita `.env`** y coloca tu key:
+   ```env
+   VITE_GOOGLE_API_KEY=tu_api_key_aqui
+   ```
+
+4. **Reinicia el servidor de desarrollo**:
+   ```bash
+   npm run dev
+   ```
+
+### Comportamiento:
+
+| `VITE_GOOGLE_API_KEY` | Comportamiento |
+|-----------------------|----------------|
+| Definida y válida | Chatbot usa Google Gemini |
+| Vacía o no definida | Chatbot usa IA local (`/api/v1/ia`) |
+
+> **Nota**: El archivo `.env` está en `.gitignore` y nunca debe subirse al repositorio.

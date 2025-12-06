@@ -256,10 +256,45 @@ const DisenoDetallePage = () => {
     setIaError('');
     // Añade mensaje del usuario
     setIaMessages((prev) => [...prev, { sender: 'user', text: pregunta }]);
+
     try {
-      const response = await iaService.chatbotDiseno(id, { pregunta });
-      const texto = response?.data?.respuesta || 'Sin respuesta.';
-      setIaMessages((prev) => [...prev, { sender: 'ai', text: texto }]);
+      let respuestaTexto = '';
+
+      // Importar googleAiService dinámicamente para verificar disponibilidad
+      const googleAiService = (await import('../services/googleAiService')).default;
+
+      if (googleAiService.isAvailable() && diseno) {
+        try {
+          // Construir contexto del diseño para Google AI
+          const contextoDiseno = `
+Diseño: ${diseno.nombre || 'Sin nombre'}
+Categoría: ${diseno.nombreCategoria || diseno.categoria?.nombre || 'N/A'}
+Precio: $${diseno.precio || 0} | Gratuito: ${diseno.gratuito ? 'Sí' : 'No'}
+Descripción: ${diseno.descripcion || 'Sin descripción disponible'}
+Proveedor: ${diseno.proveedor?.nombre || 'N/A'}
+`.trim();
+
+          const promptCompleto = `Contexto del diseño de InnovCircuit:
+${contextoDiseno}
+
+Pregunta del usuario: ${pregunta}
+
+Responde como experto en electrónica explicando detalles técnicos útiles sobre este diseño específico. Si la pregunta es sobre especificaciones, conexiones, uso práctico, o compatibilidad, proporciona información relevante basada en el contexto.`;
+
+          respuestaTexto = await googleAiService.generateChatResponse(promptCompleto, iaMessages);
+        } catch (googleError) {
+          console.warn('Google AI falló en detalle, usando backend:', googleError.message);
+          // Fallback al backend
+          const response = await iaService.chatbotDiseno(id, { pregunta });
+          respuestaTexto = response?.data?.respuesta || 'Sin respuesta del asistente.';
+        }
+      } else {
+        // Google AI no disponible, usar backend
+        const response = await iaService.chatbotDiseno(id, { pregunta });
+        respuestaTexto = response?.data?.respuesta || 'Sin respuesta del asistente.';
+      }
+
+      setIaMessages((prev) => [...prev, { sender: 'ai', text: respuestaTexto }]);
       setIaQuestion('');
     } catch (err) {
       const msg = err?.response?.data?.message || 'Error al consultar el asistente de diseño.';
@@ -602,7 +637,7 @@ const DisenoDetallePage = () => {
         <DialogFooter>
           <div className="flex w-full gap-2">
             <Input
-              placeholder="Escribe tu pregunta..."
+              placeholder="Pregunta técnica (especificaciones, uso, conexiones...)"
               value={iaQuestion}
               onChange={(e) => setIaQuestion(e.target.value)}
               disabled={iaSending}

@@ -1,15 +1,16 @@
-# Usamos la imagen base de Java 17 (Temurin)
-FROM eclipse-temurin:17-jre-alpine
-
-# Establecemos el directorio de trabajo
+# ----- Etapa 1: Build (Construcción) -----
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+# Construir el JAR saltando tests para agilizar
+RUN mvn clean package -DskipTests
 
-# Copiamos el JAR (construido por Maven) al contenedor
-# Usamos un comodín para el nombre del archivo JAR
-COPY target/innovcircuit-backend-*.jar app.jar
+# ----- Etapa 2: Runtime (Ejecución) -----
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+# Copiar el JAR desde la etapa de construcción
+COPY --from=build /app/target/innovcircuit-backend-*.jar app.jar
 
-# Exponemos el puerto 8080 (donde corre Spring)
 EXPOSE 8080
-
-# Comando para ejecutar la aplicación
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

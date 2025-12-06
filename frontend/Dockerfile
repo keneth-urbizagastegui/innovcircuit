@@ -14,6 +14,14 @@ RUN npm install
 # Copiamos el resto del código fuente
 COPY . .
 
+# Recibimos argumentos de construcción (build args)
+ARG VITE_GOOGLE_API_KEY
+ARG VITE_BACKEND_URL
+
+# Establecemos variables de entorno para que Vite las vea durante el build
+ENV VITE_GOOGLE_API_KEY=$VITE_GOOGLE_API_KEY
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
 # Ejecutamos el build de Vite para producción
 RUN npm run build
 
