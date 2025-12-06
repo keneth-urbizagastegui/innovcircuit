@@ -372,7 +372,18 @@ Resultado esperado: error por validación de estado (el diseño no está aprobad
    cd ..
    ```
 
-2. **Levantar todos los servicios**:
+
+2. **Configurar variables de entorno**:
+   Crea un archivo `.env` en la raíz del proyecto (basado en `.env.docker.example`) con el siguiente contenido:
+   ```env
+   VITE_GOOGLE_API_KEY=tu_api_key_de_google
+   UNSPLASH_ACCESS_KEY=tu_access_key_de_unsplash
+   POSTGRES_USER=admin
+   POSTGRES_PASSWORD=admin123
+   POSTGRES_DB=innovcircuit_db
+   ```
+
+3. **Levantar todos los servicios**:
    ```bash
    docker compose up --build
    ```
