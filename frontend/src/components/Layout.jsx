@@ -38,15 +38,28 @@ const Layout = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const q = (term || '').trim();
-    navigate(q ? `/?q=${encodeURIComponent(q)}` : '/');
+    if (q) {
+      navigate(`/?q=${encodeURIComponent(q)}`);
+    } else {
+      navigate('/');
+    }
   };
 
   const handleSearch = () => {
     const q = (term || '').trim();
-    navigate(q ? `/?q=${encodeURIComponent(q)}` : '/');
+    if (q) {
+      navigate(`/?q=${encodeURIComponent(q)}`);
+    } else {
+      navigate('/');
+    }
   };
 
-  // Detectar grupo activo desde la URL
+  // Sincronizar term con la URL si cambia desde fuera (ej. navegación atrás/adelante)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q') || '';
+    setTerm(q);
+  }, [location.search]);
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const group = params.get('group') || '';
@@ -102,51 +115,99 @@ const Layout = () => {
             </button>
           </div>
           <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+            {/* Carrito SIEMPRE visible, para visitantes y usuarios */}
+            <Link
+              to="/carrito"
+              className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-[#2D3748]"
+              aria-label="Ver carrito"
+            >
+              <ShoppingCart className="h-5 w-5 text-teal-300" />
+              {items?.length > 0 && (
+                <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-[#F56565] px-1 text-xs font-bold text-white">
+                  {items.length}
+                </span>
+              )}
+            </Link>
+
             {auth.isAuthenticated() ? (
               <>
-                {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
-                  <Button as={Link} to="/dashboard" variant="ghost" className="text-white hover:bg-teal-500/20 hover:text-teal-300 rounded-lg transition-all">Mi Panel</Button>
+                {(auth.user?.rol === "CLIENTE" || auth.user?.rol === "PROVEEDOR") && (
+                  <Button
+                    as={Link}
+                    to="/dashboard"
+                    variant="ghost"
+                    className="text-white hover:bg-teal-500/20 hover:text-teal-300 rounded-lg transition-all"
+                  >
+                    Mi Panel
+                  </Button>
                 )}
-                {(auth.user?.rol === 'CLIENTE' || auth.user?.rol === 'PROVEEDOR') && (
-                  <Button as={Link} to="/perfil" variant="ghost" className="text-white hover:bg-teal-500/20 hover:text-teal-300 rounded-lg transition-all">Mi Perfil</Button>
+                {(auth.user?.rol === "CLIENTE" || auth.user?.rol === "PROVEEDOR") && (
+                  <Button
+                    as={Link}
+                    to="/perfil"
+                    variant="ghost"
+                    className="text-white hover:bg-teal-500/20 hover:text-teal-300 rounded-lg transition-all"
+                  >
+                    Mi Perfil
+                  </Button>
                 )}
-                {auth.user?.rol === 'PROVEEDOR' && (
-                  <Button as={Link} to="/subir-diseno" variant="default" className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">Subir Diseño</Button>
+                {auth.user?.rol === "PROVEEDOR" && (
+                  <Button
+                    as={Link}
+                    to="/subir-diseno"
+                    variant="default"
+                    className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                  >
+                    Subir Diseño
+                  </Button>
                 )}
-                {auth.user?.rol === 'CLIENTE' && (
-                  <Link to="/carrito" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-[#2D3748]">
-                    <ShoppingCart className="h-5 w-5 text-teal-300" />
-                    {items?.length > 0 && (
-                      <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-[#F56565] px-1 text-xs font-bold text-white">
-                        {items.length}
-                      </span>
-                    )}
-                  </Link>
+                {auth.user?.rol === "ADMINISTRADOR" && (
+                  <>
+                    <Button as={Link} to="/admin" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">
+                      Panel de Admin
+                    </Button>
+                    <Button as={Link} to="/admin/usuarios" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">
+                      Usuarios
+                    </Button>
+                    <Button as={Link} to="/admin/configuracion" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">
+                      Config
+                    </Button>
+                    <Button as={Link} to="/admin/retiros" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">
+                      Retiros
+                    </Button>
+                    <Button as={Link} to="/admin/pedidos" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">
+                      Pedidos
+                    </Button>
+                    <Button as={Link} to="/admin/reclamos" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">
+                      Reclamos
+                    </Button>
+                  </>
                 )}
-                {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">Panel de Admin</Button>
-                )}
-                {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/usuarios" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">Usuarios</Button>
-                )}
-                {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/configuracion" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">Config</Button>
-                )}
-                {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/retiros" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">Retiros</Button>
-                )}
-                {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/pedidos" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">Pedidos</Button>
-                )}
-                {auth.user?.rol === 'ADMINISTRADOR' && (
-                  <Button as={Link} to="/admin/reclamos" variant="ghost" className="text-white hover:bg-amber-500/20 hover:text-amber-300 rounded-lg transition-all">Reclamos</Button>
-                )}
-                <Button onClick={handleLogout} variant="ghost" className="text-white hover:bg-red-500/20 hover:text-red-300 rounded-lg transition-all">Salir</Button>
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  className="text-white hover:bg-red-500/20 hover:text-red-300 rounded-lg transition-all"
+                >
+                  Salir
+                </Button>
               </>
             ) : (
               <>
-                <Button as={Link} to="/login" variant="ghost" className="text-white hover:bg-teal-500/20 hover:text-teal-300 rounded-lg transition-all">Iniciar sesión</Button>
-                <Button as={Link} to="/register" className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105">Registrarse</Button>
+                <Button
+                  as={Link}
+                  to="/login"
+                  variant="ghost"
+                  className="text-white hover:bg-teal-500/20 hover:text-teal-300 rounded-lg transition-all"
+                >
+                  Iniciar sesión
+                </Button>
+                <Button
+                  as={Link}
+                  to="/register"
+                  className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                >
+                  Registrarse
+                </Button>
               </>
             )}
           </div>
@@ -168,9 +229,9 @@ const Layout = () => {
                   {g.label}
                 </Link>
               ))}
-              
-              {/* Categorías */}
-              {categorias.map((cat) => (
+
+              {/* Categorías - solo primeras 3 */}
+              {categorias.slice(0, 3).map((cat) => (
                 <span
                   key={cat.id}
                   className={cn(

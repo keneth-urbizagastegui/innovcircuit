@@ -2,15 +2,24 @@ import React from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 
-const base = 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:pointer-events-none disabled:opacity-50'
+const base =
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ' +
+  'disabled:pointer-events-none disabled:opacity-50 border'
 
 const variants = {
-  default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-  outline: 'border border-slate-200 bg-white text-slate-900 hover:bg-slate-50',
-  ghost: 'hover:bg-slate-100',
-  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90',
-  destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-  success: 'bg-success text-success-foreground hover:bg-success/90',
+  default:
+    'bg-primary text-primary-foreground border-primary hover:bg-primary/90',
+  outline:
+    'bg-background text-foreground border-slate-300 hover:bg-slate-50 hover:border-slate-400',
+  ghost:
+    'bg-transparent text-slate-700 border-transparent hover:bg-slate-100 hover:border-slate-300',
+  secondary:
+    'bg-secondary text-secondary-foreground border-secondary hover:bg-secondary/90',
+  destructive:
+    'bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90',
+  success:
+    'bg-success text-success-foreground border-success hover:bg-success/90',
 }
 
 const sizes = {

@@ -262,6 +262,8 @@ Endpoints útiles:
 
 - Usuarios (ADMIN)
   - `GET /api/v1/admin/usuarios` (ADMIN): lista usuarios (clientes y proveedores).
+  - `POST /api/v1/admin/usuarios` (ADMIN): crea usuario CLIENTE o PROVEEDOR.
+  - `PUT /api/v1/admin/usuarios/{id}` (ADMIN): actualiza nombre/email/estado de un usuario.
   - `PUT /api/v1/admin/usuarios/{id}/estado` (ADMIN): actualiza estado `ACTIVO`/`BLOQUEADO`.
   - `DELETE /api/v1/admin/usuarios/{id}` (ADMIN): elimina un usuario.
 
@@ -355,16 +357,151 @@ curl -X POST http://localhost:8080/api/v1/ventas/comprar \
 ```
 Resultado esperado: error por validación de estado (el diseño no está aprobado).
 
-## Despliegue Completo (Docker Compose)
+## 📦 Despliegue Completo con Docker Compose
 
-1. Asegúrate de que el backend tenga un JAR construido:
-   - En la carpeta `backend/` ejecuta: `mvn clean package`
-   - Se generará el archivo `backend/target/innovcircuit-backend-0.0.1-SNAPSHOT.jar`
-2. Desde la carpeta raíz (`/innovcircuit`), ejecuta:
-   - `docker compose up --build`
-3. La aplicación estará accesible en:
-   - Frontend: `http://localhost:5173`
-   - Backend (API): `http://localhost:8080`
-   - pgAdmin: `http://localhost:8081`
-4. Para apagar los contenedores:
-   - `docker compose down`
+### Pre-requisitos
+- Docker y Docker Compose instalados
+- No se requiere Java ni Node.js localmente (Docker los incluye)
+
+### Pasos de Despliegue
+
+1. **Construir el JAR del backend** (si no existe o hay cambios):
+   ```bash
+   cd backend
+   mvn clean package -DskipTests
+   cd ..
+   ```
+
+2. **Levantar todos los servicios**:
+   ```bash
+   docker compose up --build
+   ```
+
+3. **URLs de acceso**:
+   | Servicio | URL |
+   |----------|-----|
+   | Frontend | http://localhost:5173 |
+   | API Backend | http://localhost:8080 |
+   | pgAdmin | http://localhost:8081 |
+   | PostgreSQL | localhost:5433 |
+
+4. **Apagar los contenedores**:
+   ```bash
+   docker compose down
+   ```
+
+> **Nota sobre credenciales**: El archivo `.env.docker.example` contiene las credenciales de demo. Para producción, copia a `.env` y ajusta los valores.
+
+---
+
+## 📚 Funcionalidades Clave
+
+### Catálogo Público
+- Navegación de diseños electrónicos con filtros por categoría
+- Búsqueda por nombre y descripción
+- Imágenes inteligentes: si no hay imagen subida, se muestra una imagen de stock coherente con la categoría/keywords
+- Detalles de diseño con galería de imágenes y reseñas
+
+### Carrito de Compras
+- Visitantes pueden agregar diseños al carrito
+- El carrito persiste en la sesión
+- Se requiere login para completar la compra
+
+### Perfil CLIENTE
+- Ver y actualizar datos de perfil
+- Historial de compras con reporte visual amigable
+- Solicitar impresión física de diseños (PCB printing)
+- Crear reclamos sobre pedidos
+- Sistema de reseñas y calificaciones
+
+### Perfil PROVEEDOR
+- Dashboard con estadísticas de ventas y descargas
+- **"Mis Diseños"** con paginación (10 por página)
+- Subir nuevos diseños con múltiples imágenes
+- Editar y eliminar diseños propios
+- Solicitar retiros de saldo acumulado
+- Responder a reseñas de clientes
+
+### Perfil ADMINISTRADOR
+- **Gestión de usuarios**: crear, editar, bloquear/activar, eliminar
+- **Curaduría de diseños**: aprobar, rechazar, destacar
+- **Lista de diseños aprobados** con paginación
+- **Reportes de ventas** con resumen visual (totales, gráficos, no solo JSON)
+- Configuración de tasas de comisión
+- Gestión de solicitudes de retiro
+- Gestión de reclamos
+
+### UI/UX Mejorada
+- Botones con alto contraste y bordes visibles
+- Focus ring con color primario para accesibilidad
+- Modales para confirmaciones (no `window.confirm`)
+- Reportes en modales formateados (no `alert(JSON)`)
+- Componentes shadcn/ui + Tailwind CSS v4
+
+---
+
+## 🧪 Comprobación Rápida
+
+### Login por Rol
+1. Ir a http://localhost:5173
+2. Click en "Iniciar Sesión"
+3. Usar credenciales de prueba (password: `password123`):
+   - Admin: `admin@innovcircuit.com`
+   - Proveedor: `proveedor@innovcircuit.com`
+   - Cliente: `cliente@innovcircuit.com`
+
+### Compra de Prueba (Cliente)
+1. Login como cliente
+2. Navegar al catálogo y agregar un diseño al carrito
+3. Ir al carrito y completar la compra
+4. Ver el historial en Dashboard → Mis Compras
+
+### Publicar Diseño (Proveedor)
+1. Login como proveedor
+2. Dashboard → "Subir Diseño"
+3. Completar formulario con nombre, categoría, precio e imagen
+4. El diseño queda en estado PENDIENTE hasta aprobación del admin
+
+### Ver Reporte de Ventas (Admin)
+1. Login como admin
+2. Dashboard → "Ver Reporte de Ventas"
+3. Modal muestra resumen con totales y detalles
+
+---
+
+## 🐳 Arquitectura Docker
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   docker-compose.yml                     │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌──────────────┐    ┌──────────────┐    ┌───────────┐ │
+│  │   frontend   │    │   backend    │    │    db     │ │
+│  │   (Nginx)    │───▶│ (Spring Boot)│───▶│(Postgres) │ │
+│  │  :5173→:80   │    │   :8080      │    │ :5433→5432│ │
+│  └──────────────┘    └──────────────┘    └───────────┘ │
+│         │                   │                   │       │
+│         └───────────────────┴───────────────────┘       │
+│                    innovcircuit-net                      │
+│                                                          │
+│  ┌──────────────┐                                       │
+│  │   pgadmin    │  (Administración DB)                  │
+│  │   :8081→:80  │                                       │
+│  └──────────────┘                                       │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Servicios
+| Servicio | Puerto Externo | Puerto Interno | Descripción |
+|----------|----------------|----------------|-------------|
+| frontend | 5173 | 80 | SPA React servida por Nginx |
+| backend | 8080 | 8080 | API REST Spring Boot |
+| db | 5433 | 5432 | PostgreSQL 15 |
+| pgadmin | 8081 | 80 | Administrador web de PostgreSQL |
+
+### Volúmenes
+- `postgres_data`: Persistencia de la base de datos
+
+### Red
+- `innovcircuit-net`: Red bridge para comunicación entre servicios

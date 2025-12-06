@@ -4,14 +4,13 @@ import { Card, CardContent, CardFooter, CardTitle } from './ui/card';
 import { formatCurrencyPEN } from '../utils/currency';
 import { Badge } from './ui/badge';
 import { Avatar } from './ui/avatar';
-import { resolveImageUrl, resolveAvatarUrl, FALLBACK_CARD_IMAGE, onErrorSetSrc, categoryPlaceholderImage } from '../utils/imageUtils';
+import { getDesignImage, FALLBACK_CARD_IMAGE, onErrorSetSrc, resolveAvatarUrl } from '../utils/imageUtils';
 import DisenoActions from './DisenoActions';
 
 const DisenoCard = ({ diseno }) => {
   const proveedor = diseno.proveedor || { id: 0, nombre: 'N/A', avatarUrl: '' };
   const avatarSrc = resolveAvatarUrl(proveedor.avatarUrl, proveedor.nombre, 32, { rounded: true });
-  const firstGallery = Array.isArray(diseno.imagenesUrls) && diseno.imagenesUrls.length ? diseno.imagenesUrls[0] : diseno.imagenUrl;
-  const imageSrc = resolveImageUrl(firstGallery) || categoryPlaceholderImage(diseno?.nombreCategoria) || FALLBACK_CARD_IMAGE;
+  const imageSrc = getDesignImage(diseno);
   const isGratis = Boolean(diseno.gratuito) || Number(diseno.precio || 0) === 0;
   const popular = Number(diseno.descargasCount || 0) >= 25;
 
@@ -66,9 +65,9 @@ const DisenoCard = ({ diseno }) => {
             </span>
           </Link>
           {/* Acciones interactivas */}
-          <DisenoActions 
-            disenoId={diseno.id} 
-            initialLikes={diseno.likesCount} 
+          <DisenoActions
+            disenoId={diseno.id}
+            initialLikes={diseno.likesCount}
             initialDownloads={diseno.descargasCount}
             size={12}
           />

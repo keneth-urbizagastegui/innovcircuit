@@ -4,6 +4,7 @@ import { Heart, Download } from 'lucide-react'
 import { Button } from './ui/button'
 import { Avatar } from './ui/avatar'
 import { Badge } from './ui/badge'
+import { getDesignImage, FALLBACK_CARD_IMAGE, onErrorSetSrc } from '../utils/imageUtils'
 
 function DesignCard({ design }) {
   const getProveedorName = () => {
@@ -18,18 +19,13 @@ function DesignCard({ design }) {
     <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
       {/* Imagen del diseño */}
       <div className="relative h-48 w-full overflow-hidden bg-muted">
-        {design?.imagenUrl ? (
-          <img
-            src={design.imagenUrl}
-            alt={design?.nombre || 'Diseño'}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-            Sin Imagen
-          </div>
-        )}
+        <img
+          src={getDesignImage(design)}
+          alt={design?.nombre || 'Diseño'}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+          onError={onErrorSetSrc(FALLBACK_CARD_IMAGE)}
+        />
 
         {/* Precio flotante */}
         {precio != null && (

@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { formatCurrencyPEN } from '../utils/currency';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const RetirosPage = () => {
   const [stats, setStats] = useState(null);
@@ -27,12 +28,15 @@ const RetirosPage = () => {
 
     usuarioService.getMiDashboard()
       .then((res) => setStats(res.data))
-      .catch(() => setError('Error al cargar estadísticas'))
+      .catch(() => toast.error('Error al cargar estadísticas'))
       .finally(() => setLoadingStats(false));
 
     usuarioService.getMisRetiros()
       .then((res) => setRetiros(res.data))
-      .catch(() => setError('Error al cargar historial de retiros'))
+      .catch((err) => {
+        setError('Error al cargar historial de retiros');
+        toast.error('Error al cargar historial de retiros');
+      })
       .finally(() => setLoadingRetiros(false));
   };
 
@@ -49,13 +53,25 @@ const RetirosPage = () => {
       if (isNaN(montoNum) || montoNum <= 0) {
         throw new Error('El monto debe ser un número positivo.');
       }
+      // Validación de monto mínimo
+      if (montoNum < 10) {
+        throw new Error(`El monto mínimo de retiro es ${formatCurrencyPEN(10)}.`);
+      }
+
+      const saldoDisponible = stats?.gananciaNeta || 0;
+      if (montoNum > saldoDisponible) {
+        throw new Error(`El monto supera tu saldo disponible (${formatCurrencyPEN(saldoDisponible)}).`);
+      }
+
       await retiroService.solicitarRetiro({ monto: montoNum, metodoPago });
+      toast.success('Solicitud de retiro creada correctamente');
       setMonto('');
       setMetodoPago('');
       cargarDatos(); // Recargar todo
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data || err.message || 'Error al solicitar el retiro.';
       setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -87,6 +103,7 @@ const RetirosPage = () => {
                     placeholder="Ej: 150.00"
                     required
                   />
+                  <p className="text-xs text-muted-foreground mt-1">Mínimo: {formatCurrencyPEN(10)}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Método de Pago</label>
@@ -142,7 +159,14 @@ const RetirosPage = () => {
                           <td className="px-3 py-2">{new Date(r.fechaSolicitud).toLocaleDateString()}</td>
                           <td className="px-3 py-2 max-w-lg break-words">{r.metodoPago}</td>
                           <td className="px-3 py-2 text-right font-medium">{formatCurrencyPEN(r.monto)}</td>
-                          <td className="px-3 py-2 text-right font-semibold">{r.estado}</td>
+                          <td className="px-3 py-2 text-right font-semibold">
+                            <span className={`px-2 py-1 rounded-full text-xs border ${r.estado === 'APROBADO' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                r.estado === 'RECHAZADO' ? 'bg-red-100 text-red-700 border-red-200' :
+                                  'bg-yellow-100 text-yellow-700 border-yellow-200'
+                              }`}>
+                              {r.estado}
+                            </span>
+                          </td>
                         </tr>
                       ))
                     )}

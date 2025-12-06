@@ -1,0 +1,131 @@
+﻿
+> innovcircuit-frontend@0.0.0 build
+> vite build
+
+[36mvite v7.2.2 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 1805 modules transformed.
+node.exe : [31mÔ£ù[39m 
+Build failed in 3.31s
+En línea: 1 Carácter: 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo          
+    : NotSpecified: ([31m  
+  Ô£ù[39m Build failed i   
+ n 3.31s:String) [], Rem    
+oteException
+    + FullyQualifiedErrorId 
+    : NativeCommandError
+ 
+[31merror during build:
+[31msrc/pages/AdminUsuarios
+Page.jsx (6:17): 
+"SelectTrigger" is not 
+exported by "src/components/
+ui/select.jsx", imported by 
+"src/pages/AdminUsuariosPage
+.jsx".[31m
+file: [36mC:/Users/josek/On
+eDrive/Desktop/KENETH 
+2025-2/DISE├æO DE SOFTWARE/i
+nnovcircuit/frontend/src/pag
+es/AdminUsuariosPage.jsx:6:1
+7[31m
+[33m
+4: import { Button } from 
+'../components/ui/button';
+5: import { Input } from 
+'../components/ui/input';
+6: import { Select, 
+SelectTrigger, SelectValue, 
+SelectContent, SelectItem } 
+from 
+'../components/ui/select';
+                    ^
+7: import { Dialog, 
+DialogHeader, DialogTitle, 
+DialogFooter } from 
+'../components/ui/dialog';
+8: import { Search, Loader2 
+} from 'lucide-react';
+[31m
+    at getRollupError (file:
+///C:/Users/josek/OneDrive/D
+esktop/KENETH%202025-2/DISE%
+C3%91O%20DE%20SOFTWARE/innov
+circuit/frontend/node_module
+s/rollup/dist/es/shared/pars
+eAst.js:401:41)
+    at error (file:///C:/Use
+rs/josek/OneDrive/Desktop/KE
+NETH%202025-2/DISE%C3%91O%20
+DE%20SOFTWARE/innovcircuit/f
+rontend/node_modules/rollup/
+dist/es/shared/parseAst.js:3
+97:42)
+    at Module.error (file://
+/C:/Users/josek/OneDrive/Des
+ktop/KENETH%202025-2/DISE%C3
+%91O%20DE%20SOFTWARE/innovci
+rcuit/frontend/node_modules/
+rollup/dist/es/shared/node-e
+ntry.js:16946:16)
+    at Module.traceVariable 
+(file:///C:/Users/josek/OneD
+rive/Desktop/KENETH%202025-2
+/DISE%C3%91O%20DE%20SOFTWARE
+/innovcircuit/frontend/node_
+modules/rollup/dist/es/share
+d/node-entry.js:17400:29)
+    at 
+ModuleScope.findVariable (fi
+le:///C:/Users/josek/OneDriv
+e/Desktop/KENETH%202025-2/DI
+SE%C3%91O%20DE%20SOFTWARE/in
+novcircuit/frontend/node_mod
+ules/rollup/dist/es/shared/n
+ode-entry.js:15067:39)
+    at ReturnValueScope.find
+Variable (file:///C:/Users/j
+osek/OneDrive/Desktop/KENETH
+%202025-2/DISE%C3%91O%20DE%2
+0SOFTWARE/innovcircuit/front
+end/node_modules/rollup/dist
+/es/shared/node-entry.js:564
+1:38)
+    at FunctionBodyScope.fin
+dVariable (file:///C:/Users/
+josek/OneDrive/Desktop/KENET
+H%202025-2/DISE%C3%91O%20DE%
+20SOFTWARE/innovcircuit/fron
+tend/node_modules/rollup/dis
+t/es/shared/node-entry.js:56
+41:38)
+    at Identifier.bind (file
+:///C:/Users/josek/OneDrive/
+Desktop/KENETH%202025-2/DISE
+%C3%91O%20DE%20SOFTWARE/inno
+vcircuit/frontend/node_modul
+es/rollup/dist/es/shared/nod
+e-entry.js:5415:40)
+    at CallExpression.bind (
+file:///C:/Users/josek/OneDr
+ive/Desktop/KENETH%202025-2/
+DISE%C3%91O%20DE%20SOFTWARE/
+innovcircuit/frontend/node_m
+odules/rollup/dist/es/shared
+/node-entry.js:2802:28)
+    at CallExpression.bind (
+file:///C:/Users/josek/OneDr
+ive/Desktop/KENETH%202025-2/
+DISE%C3%91O%20DE%20SOFTWARE/
+innovcircuit/frontend/node_m
+odules/rollup/dist/es/shared
+/node-entry.js:12114:15)[39
+m

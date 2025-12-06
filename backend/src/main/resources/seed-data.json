@@ -1,164 +1,212 @@
 [
   {
-    "nombre": "Estación Meteorológica WiFi con ESP32",
-    "descripcion": "Mide temperatura, humedad y presión con BME280 y publica los datos en un servidor web o dashboard.",
-    "precio": 14.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?esp32,weather,station",
+    "nombre": "Dev Board ESP32-S3 Minimalista",
+    "descripcion": "Placa de desarrollo compacta basada en el ESP32-S3 con puerto USB-C y pines expuestos para prototipado rápido.",
+    "precio": 0.0,
+    "imagenUrl": "/uploads/seed/design-1.png",
     "categoria": "Microcontroladores"
   },
   {
-    "nombre": "Robot Seguidor de Línea con Arduino UNO",
-    "descripcion": "Carrito autónomo que sigue trayectorias usando sensores infrarrojos y control PID básico.",
-    "precio": 19.49,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?arduino,robot",
+    "nombre": "Adaptador DIP para ATmega328P SMD",
+    "descripcion": "PCB adaptador que permite utilizar el microcontrolador ATmega328P en encapsulado SMD en protoboards estándar.",
+    "precio": 5.50,
+    "imagenUrl": "/uploads/seed/design-2.png",
     "categoria": "Microcontroladores"
   },
   {
-    "nombre": "Control de Tira LED Neopixel con ESP8266",
-    "descripcion": "Controla efectos RGB y animaciones desde una app o servidor web utilizando NeoPixel/WS2812.",
-    "precio": 12.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?led,strips,arduino",
-    "categoria": "Microcontroladores"
-  },
-  {
-    "nombre": "Gamepad Bluetooth con Arduino Nano 33 BLE",
-    "descripcion": "Controlador inalámbrico con sensores integrados para proyectos de juegos y robótica.",
-    "precio": 21.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?arduino,joystick",
-    "categoria": "Microcontroladores"
-  },
-  {
-    "nombre": "Servidor Web de Control de GPIO con ESP32",
-    "descripcion": "Activa y monitorea salidas/entradas desde cualquier lugar mediante un servidor web simple en ESP32.",
-    "precio": 16.49,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?esp32,web,server,electronics",
-    "categoria": "Microcontroladores"
-  },
-  {
-    "nombre": "Monitor de Calidad del Aire MQ135 con Arduino",
-    "descripcion": "Lee gases y contaminantes con el sensor MQ135 y muestra niveles en pantalla u hoja de datos.",
-    "precio": 13.49,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?sensor,gas,arduino",
-    "categoria": "Sensores"
-  },
-  {
-    "nombre": "Detector de Movimiento PIR con ESP32",
-    "descripcion": "Sistema de alerta con sensor PIR y notificaciones; integra modo de bajo consumo del ESP32.",
-    "precio": 11.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?pir,sensor,esp32",
-    "categoria": "Sensores"
-  },
-  {
-    "nombre": "Medidor de Nivel de Agua con HC-SR04",
-    "descripcion": "Usa ultrasonido para medir el nivel en tanques; ideal para riego automático y depósitos.",
-    "precio": 10.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?ultrasonic,sensor,arduino",
-    "categoria": "Sensores"
-  },
-  {
-    "nombre": "Sensor de Pulso con Arduino (BPM)",
-    "descripcion": "Monitorea ritmo cardíaco con Pulse Sensor y grafica datos en tiempo real.",
-    "precio": 12.49,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?pulse,sensor,arduino",
-    "categoria": "Sensores"
-  },
-  {
-    "nombre": "Datalogger de Temperatura y Humedad con DHT22",
-    "descripcion": "Registra datos ambientales en tarjeta SD o base de datos y los visualiza en un panel web.",
-    "precio": 15.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?dht22,humidity,sensor",
-    "categoria": "Sensores"
-  },
-  {
-    "nombre": "Amplificador de Audio TDA2030",
-    "descripcion": "Esquemático de amplificador clase AB de ~14–18W con TDA2030, ideal para altavoces de escritorio.",
-    "precio": 9.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?audio,amplifier,pcb",
-    "categoria": "Audio"
-  },
-  {
-    "nombre": "Amplificador Mini LM386",
-    "descripcion": "Amplificador compacto de baja potencia para proyectos portátiles y radios DIY.",
+    "nombre": "Shield de Expansión para Arduino Nano",
+    "descripcion": "Placa base que expande los pines del Arduino Nano facilitando la conexión de sensores y servos sin soldadura.",
     "precio": 8.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?audio,amplifier",
-    "categoria": "Audio"
+    "imagenUrl": "/uploads/seed/design-3.png",
+    "categoria": "Microcontroladores"
   },
   {
-    "nombre": "Vúmetro LED con Micrófono Electret",
-    "descripcion": "Visualiza niveles de audio con una barra de LEDs controlada por Arduino y un micrófono electret.",
-    "precio": 11.49,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?led,vu,arduino",
-    "categoria": "Audio"
+    "nombre": "Módulo Sensor de Gas MQ-7 CO",
+    "descripcion": "Módulo sensor calibrado para la detección de monóxido de carbono con salida analógica y digital ajustable.",
+    "precio": 12.50,
+    "imagenUrl": "/uploads/seed/design-4.png",
+    "categoria": "Sensores"
   },
   {
-    "nombre": "Radio FM con TEA5767 y Arduino",
-    "descripcion": "Sintoniza emisoras FM con el módulo TEA5767, pantalla LCD y control por botones.",
-    "precio": 12.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?radio,pcb",
-    "categoria": "Audio"
+    "nombre": "Breakout Board BME280 I2C",
+    "descripcion": "Placa breakout para el sensor ambiental BME280, mide temperatura, humedad y presión barométrica con precisión.",
+    "precio": 0.0,
+    "imagenUrl": "/uploads/seed/design-5.png",
+    "categoria": "Sensores"
   },
   {
-    "nombre": "Pedal de Distorsión de Guitarra DIY",
-    "descripcion": "Efecto de distorsión analógico con controles de tono y ganancia; caja metálica y true bypass.",
+    "nombre": "Sensor de Humedad de Suelo Capacitivo v2.0",
+    "descripcion": "Sensor resistente a la corrosión para medir la humedad del suelo en sistemas de riego automático.",
+    "precio": 7.25,
+    "imagenUrl": "/uploads/seed/design-6.png",
+    "categoria": "Sensores"
+  },
+  {
+    "nombre": "Gateway LoRaWAN de un Canal",
+    "descripcion": "Punto de acceso básico para redes LoRaWAN utilizando un ESP32 y un módulo RFM95W, ideal para pruebas IoT.",
+    "precio": 45.00,
+    "imagenUrl": "/uploads/seed/design-7.png",
+    "categoria": "IoT y Hogar Inteligente"
+  },
+  {
+    "nombre": "Interruptor Inteligente WiFi 10A con ESP8266",
+    "descripcion": "Dispositivo compacto para controlar cargas de CA mediante WiFi, compatible con asistentes de voz y MQTT.",
     "precio": 18.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?guitar,pedal,diy",
+    "imagenUrl": "/uploads/seed/design-8.png",
+    "categoria": "IoT y Hogar Inteligente"
+  },
+  {
+    "nombre": "Termostato WiFi con Pantalla OLED",
+    "descripcion": "Control de temperatura conectado a internet con interfaz visual OLED y configuración remota vía web.",
+    "precio": 22.50,
+    "imagenUrl": "/uploads/seed/design-9.png",
+    "categoria": "IoT y Hogar Inteligente"
+  },
+  {
+    "nombre": "Amplificador de Auriculares Hi-Fi Clase A",
+    "descripcion": "Circuito amplificador de alta fidelidad para auriculares, diseñado para baja distorsión y respuesta plana.",
+    "precio": 55.00,
+    "imagenUrl": "/uploads/seed/design-10.png",
     "categoria": "Audio"
   },
   {
-    "nombre": "Fuente Ajustable LM317 (1.25–12V)",
-    "descripcion": "Fuente regulable con LM317, voltímetro digital y protección térmica; ideal para banco de pruebas.",
-    "precio": 17.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?power,supply,lab",
+    "nombre": "Módulo Sintetizador de Voz con Arduino",
+    "descripcion": "Shield capaz de generar voz sintética básica a partir de texto enviado por serial, ideal para robots parlantes.",
+    "precio": 0.0,
+    "imagenUrl": "/uploads/seed/design-11.png",
+    "categoria": "Audio"
+  },
+  {
+    "nombre": "Preamplificador de Micrófono de Bajo Ruido",
+    "descripcion": "Etapa de preamplificación para micrófonos dinámicos y electret con ganancia ajustable y filtro pasa altos.",
+    "precio": 14.99,
+    "imagenUrl": "/uploads/seed/design-12.png",
+    "categoria": "Audio"
+  },
+  {
+    "nombre": "Fuente de Laboratorio Ajustable 0-30V 3A",
+    "descripcion": "Diseño de fuente lineal regulada con limitación de corriente, esencial para cualquier banco de trabajo electrónico.",
+    "precio": 0.0,
+    "imagenUrl": "/uploads/seed/design-13.png",
     "categoria": "Fuentes de Poder"
   },
   {
-    "nombre": "Buck XL4015 5A con Indicador de Corriente",
-    "descripcion": "Convertidor reductor eficiente para alimentar módulos y cargas de hasta 5A con ajuste fino.",
-    "precio": 13.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?buck,converter,pcb",
+    "nombre": "Cargador Solar MPPT para Baterías LiPo",
+    "descripcion": "Controlador de carga eficiente con seguimiento del punto de máxima potencia para paneles solares pequeños.",
+    "precio": 28.40,
+    "imagenUrl": "/uploads/seed/design-14.png",
     "categoria": "Fuentes de Poder"
   },
   {
-    "nombre": "Cargador Li‑ion TP4056 con Protección",
-    "descripcion": "Módulo para cargar celdas 18650 con control de corriente, protección y conector micro‑USB.",
-    "precio": 9.49,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?battery,charger,pcb",
+    "nombre": "Conversor DC-DC Buck 24V a 5V 5A",
+    "descripcion": "Fuente conmutada reductora de alta eficiencia para alimentar SBCs como Raspberry Pi desde baterías de 24V.",
+    "precio": 11.99,
+    "imagenUrl": "/uploads/seed/design-15.png",
     "categoria": "Fuentes de Poder"
   },
   {
-    "nombre": "Boost MT3608 5V→12V",
-    "descripcion": "Convertidor elevador compacto para alimentar dispositivos de 12V desde fuentes de 5V.",
-    "precio": 10.49,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?boost,converter,pcb",
-    "categoria": "Fuentes de Poder"
+    "nombre": "Controlador de Vuelo para Drone Cuadricóptero",
+    "descripcion": "PCB principal con STM32 y sensores IMU para la estabilización y control de drones de carreras.",
+    "precio": 58.00,
+    "imagenUrl": "/uploads/seed/design-16.png",
+    "categoria": "Robots y Drones"
   },
   {
-    "nombre": "Banco de Trabajo con Fuente ATX",
-    "descripcion": "Convierte una fuente ATX reciclada en salidas 3.3V/5V/12V con protecciones y bornes de laboratorio.",
-    "precio": 22.99,
-    "imagenUrl": "https://source.unsplash.com/1600x900/?atx,power,supply,mod",
-    "categoria": "Fuentes de Poder"
+    "nombre": "Driver de Motor Paso a Paso DRV8825 Breakout",
+    "descripcion": "Placa controladora para motores stepper bipolares, soporta micropasos hasta 1/32 y corriente ajustable.",
+    "precio": 6.50,
+    "imagenUrl": "/uploads/seed/design-17.png",
+    "categoria": "Robots y Drones"
+  },
+  {
+    "nombre": "Brazo Robótico de 3 Grados de Libertad",
+    "descripcion": "Diseño electrónico para controlar 3 servomotores de alto torque mediante potenciómetros o serial.",
+    "precio": 0.0,
+    "imagenUrl": "/uploads/seed/design-18.png",
+    "categoria": "Robots y Drones"
+  },
+  {
+    "nombre": "Osciloscopio Digital de Bolsillo 200kHz",
+    "descripcion": "Instrumento portátil basado en ARM Cortex-M3 para visualización de señales de baja frecuencia en campo.",
+    "precio": 42.00,
+    "imagenUrl": "/uploads/seed/design-19.png",
+    "categoria": "Instrumentación y Medición"
+  },
+  {
+    "nombre": "Multímetro Digital Open Source Autorango",
+    "descripcion": "Medidor de voltaje, corriente y resistencia con selección automática de rango y conectividad Bluetooth.",
+    "precio": 35.50,
+    "imagenUrl": "/uploads/seed/design-20.png",
+    "categoria": "Instrumentación y Medición"
+  },
+  {
+    "nombre": "Generador de Funciones DDS 1Hz-100kHz",
+    "descripcion": "Generador de ondas seno, cuadrada y triangular basado en síntesis digital directa con control de frecuencia preciso.",
+    "precio": 29.99,
+    "imagenUrl": "/uploads/seed/design-1.png",
+    "categoria": "Instrumentación y Medición"
+  },
+  {
+    "nombre": "Transceptor RF 433MHz de Largo Alcance",
+    "descripcion": "Módulo de comunicación sub-GHz para telemetría y control remoto con alcance de hasta 1km en línea de vista.",
+    "precio": 16.75,
+    "imagenUrl": "/uploads/seed/design-2.png",
+    "categoria": "Comunicaciones Inalámbricas"
+  },
+  {
+    "nombre": "Baliza Bluetooth Low Energy (BLE) iBeacon",
+    "descripcion": "Dispositivo de bajo consumo que emite señales BLE para localización en interiores y marketing de proximidad.",
+    "precio": 13.20,
+    "imagenUrl": "/uploads/seed/design-3.png",
+    "categoria": "Comunicaciones Inalámbricas"
+  },
+  {
+    "nombre": "Módulo GSM/GPRS SIM800L Minimalista",
+    "descripcion": "Placa breakout reducida para el módem SIM800L, permite enviar SMS y datos GPRS con microcontroladores.",
+    "precio": 9.50,
+    "imagenUrl": "/uploads/seed/design-4.png",
+    "categoria": "Comunicaciones Inalámbricas"
+  },
+  {
+    "nombre": "Controlador DMX512 para Tiras LED RGB",
+    "descripcion": "Interfaz que permite controlar iluminación LED estándar mediante el protocolo profesional DMX512.",
+    "precio": 24.99,
+    "imagenUrl": "/uploads/seed/design-5.png",
+    "categoria": "Iluminación LED"
+  },
+  {
+    "nombre": "Lámpara de Escritorio PWM Táctil",
+    "descripcion": "Circuito para lámpara LED regulable con control táctil capacitivo y memoria de último nivel de brillo.",
+    "precio": 0.0,
+    "imagenUrl": "/uploads/seed/design-6.png",
+    "categoria": "Iluminación LED"
+  },
+  {
+    "nombre": "Matriz de LEDs 8x8 Max7219 Cascada",
+    "descripcion": "Módulo visualizador de puntos LED rojos controlado por SPI, conectable en serie para formar paneles grandes.",
+    "precio": 5.99,
+    "imagenUrl": "/uploads/seed/design-7.png",
+    "categoria": "Iluminación LED"
+  },
+  {
+    "nombre": "Kit de Semáforo Inteligente con Arduino",
+    "descripcion": "Proyecto didáctico que simula un cruce de calles con semáforos vehiculares y peatonales sincronizados.",
+    "precio": 15.00,
+    "imagenUrl": "/uploads/seed/design-8.png",
+    "categoria": "Proyectos Educativos"
+  },
+  {
+    "nombre": "Piano Electrónico con 555 Timer",
+    "descripcion": "Circuito simple y divertido que genera diferentes notas musicales usando pulsadores y el clásico chip 555.",
+    "precio": 0.0,
+    "imagenUrl": "/uploads/seed/design-9.png",
+    "categoria": "Proyectos Educativos"
+  },
+  {
+    "nombre": "Dado Electrónico Digital con CMOS 4017",
+    "descripcion": "Juego electrónico que simula el lanzamiento de un dado usando LEDs y lógica secuencial sin microcontrolador.",
+    "precio": 8.50,
+    "imagenUrl": "/uploads/seed/design-10.png",
+    "categoria": "Proyectos Educativos"
   }
-]
-[
-  { "nombre": "Estación Meteorológica WiFi con ESP32", "descripcion": "Mide temperatura, humedad y presión...", "precio": 14.99, "imagenUrl": "/uploads/seed/design-1.png", "categoria": "Microcontroladores" },
-  { "nombre": "Robot Seguidor de Línea con Arduino UNO", "descripcion": "Carrito autónomo que sigue trayectorias...", "precio": 19.49, "imagenUrl": "/uploads/seed/design-2.png", "categoria": "Microcontroladores" },
-  { "nombre": "Control de Tira LED Neopixel con ESP8266", "descripcion": "Controla efectos RGB y animaciones...", "precio": 12.99, "imagenUrl": "/uploads/seed/design-3.png", "categoria": "Microcontroladores" },
-  { "nombre": "Gamepad Bluetooth con Arduino Nano 33 BLE", "descripcion": "Controlador inalámbrico con sensores...", "precio": 21.99, "imagenUrl": "/uploads/seed/design-4.png", "categoria": "Microcontroladores" },
-  { "nombre": "Servidor Web de Control de GPIO con ESP32", "descripcion": "Activa y monitorea salidas/entradas...", "precio": 16.49, "imagenUrl": "/uploads/seed/design-5.png", "categoria": "Microcontroladores" },
-  { "nombre": "Monitor de Calidad del Aire MQ135 con Arduino", "descripcion": "Lee gases y contaminantes con el sensor MQ135...", "precio": 13.49, "imagenUrl": "/uploads/seed/design-6.png", "categoria": "Sensores" },
-  { "nombre": "Detector de Movimiento PIR con ESP32", "descripcion": "Sistema de alerta con sensor PIR...", "precio": 11.99, "imagenUrl": "/uploads/seed/design-7.png", "categoria": "Sensores" },
-  { "nombre": "Medidor de Nivel de Agua con HC-SR04", "descripcion": "Usa ultrasonido para medir el nivel en tanques...", "precio": 10.99, "imagenUrl": "/uploads/seed/design-8.png", "categoria": "Sensores" },
-  { "nombre": "Sensor de Pulso con Arduino (BPM)", "descripcion": "Monitorea ritmo cardíaco con Pulse Sensor...", "precio": 12.49, "imagenUrl": "/uploads/seed/design-9.png", "categoria": "Sensores" },
-  { "nombre": "Datalogger de Temperatura y Humedad con DHT22", "descripcion": "Registra datos ambientales en tarjeta SD...", "precio": 15.99, "imagenUrl": "/uploads/seed/design-10.png", "categoria": "Sensores" },
-  { "nombre": "Amplificador de Audio TDA2030", "descripcion": "Esquemático de amplificador clase AB de ~14–18W...", "precio": 9.99, "imagenUrl": "/uploads/seed/design-11.png", "categoria": "Audio" },
-  { "nombre": "Amplificador Mini LM386", "descripcion": "Amplificador compacto de baja potencia...", "precio": 8.99, "imagenUrl": "/uploads/seed/design-12.png", "categoria": "Audio" },
-  { "nombre": "Vúmetro LED con Micrófono Electret", "descripcion": "Visualiza niveles de audio con una barra de LEDs...", "precio": 11.49, "imagenUrl": "/uploads/seed/design-13.png", "categoria": "Audio" },
-  { "nombre": "Radio FM con TEA5767 y Arduino", "descripcion": "Sintoniza emisoras FM con el módulo TEA5767...", "precio": 12.99, "imagenUrl": "/uploads/seed/design-14.png", "categoria": "Audio" },
-  { "nombre": "Pedal de Distorsión de Guitarra DIY", "descripcion": "Efecto de distorsión analógico...", "precio": 18.99, "imagenUrl": "/uploads/seed/design-15.png", "categoria": "Audio" },
-  { "nombre": "Fuente Ajustable LM317 (1.25–12V)", "descripcion": "Fuente regulable con LM317...", "precio": 17.99, "imagenUrl": "/uploads/seed/design-16.png", "categoria": "Fuentes de Poder" },
-  { "nombre": "Buck XL4015 5A con Indicador de Corriente", "descripcion": "Convertidor reductor eficiente...", "precio": 13.99, "imagenUrl": "/uploads/seed/design-17.png", "categoria": "Fuentes de Poder" },
-  { "nombre": "Cargador Li‑ion TP4056 con Protección", "descripcion": "Módulo para cargar celdas 18650...", "precio": 9.49, "imagenUrl": "/uploads/seed/design-18.png", "categoria": "Fuentes de Poder" },
-  { "nombre": "Boost MT3608 5V→12V", "descripcion": "Convertidor elevador compacto...", "precio": 10.49, "imagenUrl": "/uploads/seed/design-19.png", "categoria": "Fuentes de Poder" },
-  { "nombre": "Banco de Trabajo con Fuente ATX", "descripcion": "Convierte una fuente ATX reciclada...", "precio": 22.99, "imagenUrl": "/uploads/seed/design-20.png", "categoria": "Fuentes de Poder" }
 ]

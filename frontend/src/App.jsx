@@ -41,6 +41,9 @@ function App() {
         <Route path="store/:id" element={<StorePage />} />
         {/* Ruta dinámica para página de detalle */}
         <Route path="diseno/:id" element={<DisenoDetallePage />} />
+        {/* Carrito público (checkout requiere auth) */}
+        <Route path="carrito" element={<CarritoPage />} />
+
         {/* Ruta de Dashboard (Cliente y Proveedor) */}
         <Route element={<ProtectedRoute allowedRoles={["CLIENTE", "PROVEEDOR"]} />}> 
           <Route path="dashboard" element={<DashboardPage />} />
@@ -56,9 +59,7 @@ function App() {
           <Route path="dashboard/reportes" element={<ReportesPage />} />
           <Route path="dashboard/retiros" element={<RetirosPage />} />
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={["CLIENTE"]} />}> 
-          <Route path="carrito" element={<CarritoPage />} />
-        </Route>
+        
         {/* Ruta protegida para ADMINISTRADOR */}
         <Route element={<ProtectedRoute allowedRoles={["ADMINISTRADOR"]} />}> 
           <Route path="admin" element={<AdminDashboardPage />} />

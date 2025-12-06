@@ -3,6 +3,7 @@ import usuarioService from '../services/usuarioService';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
+import { toast } from 'sonner';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,19 +18,29 @@ import { Button } from '../components/ui/button';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+import { RefreshCw } from 'lucide-react';
+
 const ReportesPage = () => {
   const [lineas, setLineas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargarDatos = () => {
     setLoading(true);
     setError('');
     usuarioService
       .getMisTransacciones()
       .then((res) => setLineas(res.data))
-      .catch(() => setError('Error al cargar las transacciones.'))
+      .catch((err) => {
+        const msg = err.response?.data?.message || 'Error al cargar las transacciones.';
+        setError(msg);
+        toast.error(msg);
+      })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    cargarDatos();
   }, []);
 
   // Procesar datos para el gráfico
@@ -113,30 +124,63 @@ const ReportesPage = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success('Reporte CSV descargado correctamente');
   };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
       <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-2">
-        <CardTitle>Reportes de Proveedor</CardTitle>
-        <Button
-          variant="outline"
-          onClick={exportarCSV}
-          disabled={loading || lineas.length === 0}
-        >
-          Exportar a CSV
-        </Button>
-      </CardHeader>
-      <CardContent className="p-0">
-        {loading ? (
-          <div className="flex justify-center p-10">
-            <Loader2 className="h-8 w-8 animate-spin" />
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <CardTitle>Reportes de Proveedor</CardTitle>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={cargarDatos}
+              disabled={loading}
+              title="Actualizar reporte"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={exportarCSV}
+              disabled={loading || lineas.length === 0}
+            >
+              Exportar a CSV
+            </Button>
           </div>
-        ) : (
-          <Line options={chartOptions} data={chartData} />
-        )}
-      </CardContent>
+        </CardHeader>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="flex justify-center p-10">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : error ? (
+            <div className="p-6 text-center text-red-600">
+              <p>{error}</p>
+              <Button variant="link" onClick={cargarDatos}>Reintentar</Button>
+            </div>
+          ) : lineas.length === 0 ? (
+            <div className="p-10 text-center text-muted-foreground">
+              No hay datos suficientes para generar reportes.
+            </div>
+          ) : (
+            <div className="space-y-6 p-4">
+              <Line options={chartOptions} data={chartData} />
+
+              {/* Opcional: Vista en crudo para depuración o si el usuario prefiere JSON */}
+              <details className="mt-6 border-t pt-4">
+                <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-primary">
+                  Ver datos crudos (JSON)
+                </summary>
+                <div className="mt-2 rounded-md bg-slate-950 p-4 text-xs text-slate-50 overflow-auto max-h-96">
+                  <pre>{JSON.stringify(lineas, null, 2)}</pre>
+                </div>
+              </details>
+            </div>
+          )}
+        </CardContent>
       </Card>
     </div>
   );

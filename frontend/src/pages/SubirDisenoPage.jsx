@@ -28,11 +28,17 @@ const SubirDisenoPage = () => {
 
   // Cargar categorías para el dropdown
   useEffect(() => {
+    if (user && user.rol !== 'PROVEEDOR') {
+      toast.error("Debes ser proveedor para subir diseños");
+      navigate('/dashboard');
+      return;
+    }
+
     categoriaService
       .listarCategorias()
       .then((response) => setCategorias(response.data))
       .catch(() => setError('No se pudieron cargar las categorías.'));
-  }, []);
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,8 +46,36 @@ const SubirDisenoPage = () => {
     setError('');
     setSuccess('');
 
+    // Validaciones previas
+    if (!nombre.trim() || !descripcion.trim() || !categoriaId) {
+      setError('Por favor, completa todos los campos obligatorios (Nombre, Descripción, Categoría).');
+      setLoading(false);
+      return;
+    }
+
+    if (!gratuito && precio <= 0) {
+      setError('El precio debe ser mayor a 0 si el diseño no es gratuito.');
+      setLoading(false);
+      return;
+    }
+
     if (!imagenFile || !esquematicoFile) {
-      setError('Debes subir ambos archivos (imagen y esquemático).');
+      setError('Debes seleccionar una imagen principal y el archivo del diseño antes de subirlo.');
+      setLoading(false);
+      return;
+    }
+
+    // Validar tipos de archivo
+    if (!imagenFile.type.startsWith('image/')) {
+      setError('El archivo principal debe ser una imagen válida (PNG, JPG, etc).');
+      setLoading(false);
+      return;
+    }
+
+    const validExts = ['.zip', '.rar'];
+    const fileName = esquematicoFile.name.toLowerCase();
+    if (!validExts.some(ext => fileName.endsWith(ext))) {
+      setError('El archivo de diseño debe ser .zip o .rar');
       setLoading(false);
       return;
     }
@@ -68,13 +102,27 @@ const SubirDisenoPage = () => {
 
     try {
       // 3. Enviar con apiClient (el interceptor añade el token)
-      // Importante: NO establecer manualmente Content-Type para FormData, axios lo gestiona con boundary
       const response = await apiClient.post('/disenos', formData);
 
-      setSuccess(`¡Diseño '${response.data.nombre}' subido! Estado: ${response.data.estado}.`);
-      toast.success(`Diseño '${response.data.nombre}' subido`);
-      setLoading(false);
-      setTimeout(() => navigate('/'), 2000);
+      const msg = `¡Diseño '${response.data.nombre}' enviado para revisión! Estado: ${response.data.estado}.`;
+      setSuccess(msg);
+      toast.success("Tu diseño se ha enviado para revisión");
+      
+      // Limpiar formulario
+      setNombre('');
+      setDescripcion('');
+      setPrecio(0);
+      setGratuito(false);
+      setCategoriaId('');
+      setImagenFile(null);
+      setEsquematicoFile(null);
+      setImagenesFiles([]);
+      
+      // Redirigir después de un delay
+      setTimeout(() => {
+        setLoading(false);
+        navigate('/dashboard');
+      }, 2000);
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data || 'Error al subir el diseño.';
       setError(msg);
@@ -82,6 +130,8 @@ const SubirDisenoPage = () => {
       setLoading(false);
     }
   };
+
+  const isFormValid = nombre.trim() && descripcion.trim() && categoriaId && imagenFile && esquematicoFile && (gratuito || precio > 0);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
@@ -138,9 +188,9 @@ const SubirDisenoPage = () => {
       <div>
         <label className="block text-sm font-medium mb-1">Imagen Principal (PNG/JPG)</label>
         <div className="flex items-center gap-2">
-          <Button as="label" variant="outline" className="cursor-pointer">
+          <Button as="label" variant="outline" className="cursor-pointer" disabled={loading}>
             {imagenFile ? `Imagen: ${imagenFile.name}` : 'Seleccionar archivo'}
-            <input type="file" accept="image/*" hidden onChange={(e) => setImagenFile(e.target.files[0])} />
+            <input type="file" accept="image/*" hidden onChange={(e) => setImagenFile(e.target.files[0])} disabled={loading} />
           </Button>
         </div>
       </div>
@@ -148,9 +198,9 @@ const SubirDisenoPage = () => {
       <div>
         <label className="block text-sm font-medium mb-1">Galería de Imágenes (opcional, múltiples)</label>
         <div className="flex items-center gap-2">
-          <Button as="label" variant="outline" className="cursor-pointer">
+          <Button as="label" variant="outline" className="cursor-pointer" disabled={loading}>
             {imagenesFiles && imagenesFiles.length ? `${imagenesFiles.length} imágenes seleccionadas` : 'Seleccionar imágenes'}
-            <input type="file" accept="image/*" multiple hidden onChange={(e) => setImagenesFiles(e.target.files)} />
+            <input type="file" accept="image/*" multiple hidden onChange={(e) => setImagenesFiles(e.target.files)} disabled={loading} />
           </Button>
         </div>
       </div>
@@ -158,16 +208,16 @@ const SubirDisenoPage = () => {
       <div>
         <label className="block text-sm font-medium mb-1">Archivo de Diseño (ZIP/RAR)</label>
         <div className="flex items-center gap-2">
-          <Button as="label" variant="outline" className="cursor-pointer">
+          <Button as="label" variant="outline" className="cursor-pointer" disabled={loading}>
             {esquematicoFile ? `Esquemático: ${esquematicoFile.name}` : 'Seleccionar archivo'}
-            <input type="file" accept=".zip,.rar" hidden onChange={(e) => setEsquematicoFile(e.target.files[0])} />
+            <input type="file" accept=".zip,.rar" hidden onChange={(e) => setEsquematicoFile(e.target.files[0])} disabled={loading} />
           </Button>
         </div>
       </div>
 
       <div className="pt-2">
-        <Button type="submit" className="w-full" loading={loading}>
-          Subir Diseño
+        <Button type="submit" className="w-full" loading={loading} disabled={loading || !isFormValid}>
+          {loading ? 'Subiendo...' : 'Subir Diseño'}
         </Button>
       </div>
       </form>

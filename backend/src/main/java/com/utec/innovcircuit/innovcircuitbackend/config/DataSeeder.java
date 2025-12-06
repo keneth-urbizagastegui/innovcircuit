@@ -191,3 +191,26 @@ public class DataSeeder implements CommandLineRunner {
         });
     }
 }
+
+/*
+ RESUMEN DE DATASEEDER:
+
+ 1. Qué usuarios crea (roles y correos):
+    - Administrador: admin@innovcircuit.com
+    - Proveedor: proveedor@innovcircuit.com
+    - Cliente: cliente@innovcircuit.com
+    (Todos con contraseña "password123")
+
+ 2. Cómo copia las imágenes de prueba a uploads/seed:
+    - Usa PathMatchingResourcePatternResolver para buscar todos los archivos .png en 'classpath:seed-images/'.
+    - Verifica si la carpeta 'uploads/seed' existe (la crea si no).
+    - Copia cada archivo encontrado a 'uploads/seed/', reemplazando si ya existe.
+
+ 3. Cómo usa seed-data.json para crear categorías y diseños:
+    - Lee 'seed-data.json' desde el classpath.
+    - Deserializa el JSON a una lista de objetos SeedDisenoDTO.
+    - Itera sobre la lista:
+        - Busca la categoría por nombre; si no existe, crea una nueva.
+        - Crea una entidad Diseno, asigna sus datos (precio, descripción, imagenUrl) y la asocia al proveedor 'proveedor@innovcircuit.com'.
+        - Guarda el diseño con estado "APROBADO".
+*/
